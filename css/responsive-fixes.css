@@ -1,0 +1,316 @@
+/* 
+======================
+    Responsive Breakpoint Fixes
+    For optimal display across all screen sizes
+======================
+*/
+
+/* Fix for navigation menu on small screens */
+@media screen and (max-width: 768px) {
+    body.menu-open {
+        overflow: hidden;
+    }
+    
+    #header .container {
+        padding: 0 15px;
+    }
+    
+    .nav-links {
+        padding-top: 20px;
+        overflow-y: auto;
+    }
+    
+    .nav-links a {
+        font-size: 1.2rem;
+        padding: 15px;
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Fix for hero section on very small screens */
+@media screen and (max-width: 380px) {
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.3rem;
+    }
+    
+    .social-icons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+}
+
+/* Fix for portfolio items on medium screens */
+@media screen and (min-width: 577px) and (max-width: 767px) {
+    .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .portfolio-img {
+        height: 180px;
+    }
+}
+
+/* Fix for skills section on medium screens */
+@media screen and (min-width: 769px) and (max-width: 991px) {
+    .skills-content {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .skill-category {
+        flex: 0 0 100%;
+        margin-bottom: 40px;
+    }
+}
+
+/* Fix for about section image on medium screens */
+@media screen and (min-width: 577px) and (max-width: 991px) {
+    .about-image {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+}
+
+/* Fix for contact section on medium screens */
+@media screen and (min-width: 577px) and (max-width: 991px) {
+    .contact-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .contact-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Fix for wow section on small screens */
+@media screen and (max-width: 576px) {
+    .wow-section {
+        padding: 60px 0;
+    }
+    
+    .wow-content {
+        padding: 0 15px;
+    }
+    
+    .wow-button {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Fix for horizontal scroll section */
+@media screen and (max-width: 991px) {
+    .horizontal-scroll-container {
+        height: auto;
+    }
+    
+    .horizontal-scroll-section {
+        position: static;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .horizontal-scroll-item {
+        width: 100%;
+        height: auto;
+        min-height: 50vh;
+    }
+}
+
+/* Fix for theme switcher on very small screens */
+@media screen and (max-width: 380px) {
+    .theme-switcher {
+        top: 70px;
+        right: 10px;
+    }
+    
+    .theme-btn {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* Fix for portfolio modal on small screens */
+@media screen and (max-width: 768px) {
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .close-modal {
+        top: 10px;
+        right: 10px;
+    }
+}
+
+/* Fix for sticky header on mobile */
+@media screen and (max-width: 768px) {
+    #header.scrolled {
+        padding: 10px 0;
+    }
+    
+    .logo a {
+        font-size: 1.5rem;
+    }
+}
+
+/* Fix for skill bars animation on mobile */
+@media screen and (max-width: 768px) {
+    .skill-level {
+        transition: width 1s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+}
+
+/* Fix for 3D card effect on touch devices */
+@media (hover: none) {
+    .card-3d:hover {
+        transform: none !important;
+    }
+    
+    .card-3d-inner:hover {
+        transform: none !important;
+    }
+}
+
+/* Fix for floating elements on small screens */
+@media screen and (max-width: 576px) {
+    .floating-element {
+        transform: scale(0.7);
+    }
+    
+    .floating-element:nth-child(2),
+    .floating-element:nth-child(4) {
+        display: none;
+    }
+}
+
+/* Fix for parallax effect on mobile */
+@media screen and (max-width: 768px) {
+    .parallax-section {
+        perspective: none;
+    }
+    
+    .parallax-bg {
+        transform: none;
+    }
+    
+    .parallax-content {
+        transform-style: flat;
+    }
+}
+
+/* Fix for scroll animations on mobile */
+@media screen and (max-width: 768px) {
+    .scroll-reveal,
+    .scroll-scale,
+    .scroll-rotate {
+        transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1), 
+                    transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+}
+
+/* Fix for staggered animations on mobile */
+@media screen and (max-width: 768px) {
+    @keyframes staggerFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+
+/* Fix for split text animation on mobile */
+@media screen and (max-width: 768px) {
+    .split-text span {
+        transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+                    opacity 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+}
+
+/* Fix for back to top button on small screens */
+@media screen and (max-width: 576px) {
+    .back-to-top {
+        width: 40px;
+        height: 40px;
+        right: 15px;
+        bottom: 15px;
+    }
+}
+
+/* Fix for scroll progress indicator on mobile */
+@media screen and (max-width: 768px) {
+    .scroll-progress {
+        height: 3px;
+    }
+}
+
+/* Fix for form elements on small screens */
+@media screen and (max-width: 576px) {
+    .form-group input,
+    .form-group textarea {
+        padding: 12px;
+    }
+    
+    .form-group textarea {
+        min-height: 120px;
+    }
+}
+
+/* Fix for social icons in footer on small screens */
+@media screen and (max-width: 576px) {
+    .footer-social {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+}
+
+/* Fix for section padding consistency on mobile */
+@media screen and (max-width: 768px) {
+    section {
+        padding: 80px 0;
+    }
+    
+    section:first-of-type {
+        padding-top: 100px;
+    }
+}
+
+/* Fix for font sizes on very large screens */
+@media screen and (min-width: 1800px) {
+    html {
+        font-size: 20px;
+    }
+    
+    .container {
+        max-width: 1500px;
+    }
+}
+
+/* Fix for devices with notches */
+@supports (padding: max(0px)) {
+    #header {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+    }
+    
+    .container {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+    }
+}

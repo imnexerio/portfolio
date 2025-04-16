@@ -1,0 +1,654 @@
+/* 
+======================
+    Additional Breakpoint Fixes
+    For optimal display across all devices
+======================
+*/
+
+/* Fix for specific breakpoints where content might overflow */
+
+/* Extra breakpoint for medium-small screens */
+@media screen and (min-width: 577px) and (max-width: 767px) {
+    /* Hero section adjustments */
+    .hero-content h1 {
+        font-size: 2.2rem;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.4rem;
+    }
+    
+    /* Portfolio grid adjustments */
+    .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    /* Contact section adjustments */
+    .contact-content {
+        gap: 25px;
+    }
+}
+
+/* Extra breakpoint for medium-large screens */
+@media screen and (min-width: 992px) and (max-width: 1199px) {
+    /* Container width adjustment */
+    .container {
+        max-width: 960px;
+        padding: 0 15px;
+    }
+    
+    /* Skills section adjustments */
+    .skills-content {
+        gap: 30px;
+    }
+    
+    /* Portfolio grid adjustments */
+    .portfolio-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+}
+
+/* Fix for specific device widths where issues are common */
+
+/* iPhone SE / Small phones (320px) */
+@media screen and (max-width: 320px) {
+    /* Reduce padding */
+    .container {
+        padding: 0 10px;
+    }
+    
+    /* Adjust font sizes */
+    html {
+        font-size: 14px;
+    }
+    
+    /* Adjust hero section */
+    .hero-content h1 {
+        font-size: 1.7rem;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.2rem;
+    }
+    
+    /* Adjust buttons */
+    .btn {
+        padding: 8px 20px;
+        font-size: 0.8rem;
+    }
+    
+    /* Adjust theme switcher */
+    .theme-switcher {
+        right: 5px;
+    }
+    
+    .theme-btn {
+        width: 28px;
+        height: 28px;
+        margin-bottom: 5px;
+    }
+    
+    /* Adjust portfolio items */
+    .portfolio-info h3 {
+        font-size: 1.1rem;
+    }
+    
+    /* Adjust contact form */
+    .form-group {
+        margin-bottom: 10px;
+    }
+}
+
+/* iPhone X / Modern phones with notch (375px) */
+@media screen and (min-width: 321px) and (max-width: 375px) {
+    /* Adjust container */
+    .container {
+        padding: 0 12px;
+    }
+    
+    /* Adjust hero section */
+    .hero-content h1 {
+        font-size: 2rem;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.3rem;
+    }
+    
+    /* Adjust buttons */
+    .btn {
+        padding: 10px 25px;
+        font-size: 0.85rem;
+    }
+}
+
+/* iPhone Plus / Large phones (414px-428px) */
+@media screen and (min-width: 376px) and (max-width: 428px) {
+    /* Adjust hero section */
+    .hero-content h1 {
+        font-size: 2.2rem;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.4rem;
+    }
+}
+
+/* iPad Mini / Small tablets (768px) */
+@media screen and (min-width: 768px) and (max-width: 820px) {
+    /* Adjust skills section */
+    .skills-content {
+        gap: 25px;
+    }
+    
+    /* Adjust portfolio grid */
+    .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 25px;
+    }
+    
+    /* Adjust contact section */
+    .contact-content {
+        gap: 30px;
+    }
+}
+
+/* iPad Pro / Large tablets (1024px) */
+@media screen and (min-width: 1024px) and (max-width: 1112px) {
+    /* Adjust container */
+    .container {
+        max-width: 960px;
+    }
+    
+    /* Adjust portfolio grid */
+    .portfolio-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
+}
+
+/* Fix for specific aspect ratios */
+
+/* Tall phones (aspect ratio > 2) */
+@media screen and (max-aspect-ratio: 1/2) {
+    #hero {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .wow-section {
+        height: auto;
+        min-height: 100vh;
+    }
+}
+
+/* Wide screens (aspect ratio > 16/9) */
+@media screen and (min-aspect-ratio: 16/9) {
+    #hero {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .parallax-section {
+        height: auto;
+        min-height: 100vh;
+    }
+    
+    .wow-section {
+        height: auto;
+        min-height: 100vh;
+    }
+}
+
+/* Ultra-wide screens (aspect ratio > 21/9) */
+@media screen and (min-aspect-ratio: 21/9) {
+    .container {
+        max-width: 1600px;
+    }
+    
+    .about-content,
+    .skills-content,
+    .contact-content {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+}
+
+/* Fix for specific screen resolutions */
+
+/* 1366x768 (Common laptop resolution) */
+@media screen and (width: 1366px) and (height: 768px) {
+    .container {
+        max-width: 1140px;
+    }
+    
+    .portfolio-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* 1440x900 (MacBook resolution) */
+@media screen and (width: 1440px) and (height: 900px) {
+    .container {
+        max-width: 1200px;
+    }
+}
+
+/* 1920x1080 (Full HD) */
+@media screen and (width: 1920px) and (height: 1080px) {
+    .container {
+        max-width: 1400px;
+    }
+    
+    html {
+        font-size: 18px;
+    }
+}
+
+/* 2560x1440 (QHD) */
+@media screen and (width: 2560px) and (height: 1440px) {
+    .container {
+        max-width: 1600px;
+    }
+    
+    html {
+        font-size: 20px;
+    }
+}
+
+/* 3840x2160 (4K) */
+@media screen and (width: 3840px) and (height: 2160px) {
+    .container {
+        max-width: 1800px;
+    }
+    
+    html {
+        font-size: 22px;
+    }
+}
+
+/* Fix for specific device orientations */
+
+/* Landscape orientation on phones */
+@media screen and (max-width: 896px) and (orientation: landscape) {
+    #hero {
+        height: auto;
+        min-height: 100vh;
+        padding: 80px 0;
+    }
+    
+    .hero-content {
+        padding: 20px 0;
+    }
+    
+    .hero-buttons {
+        margin-bottom: 20px;
+    }
+    
+    .social-icons {
+        margin-top: 20px;
+    }
+    
+    .wow-section {
+        height: auto;
+        min-height: 100vh;
+        padding: 60px 0;
+    }
+    
+    .wow-content {
+        padding: 20px 0;
+    }
+}
+
+/* Portrait orientation on tablets */
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: portrait) {
+    .about-content {
+        flex-direction: column;
+    }
+    
+    .about-image {
+        max-width: 400px;
+        margin: 0 auto 30px;
+    }
+    
+    .skills-content {
+        flex-direction: column;
+    }
+    
+    .skill-category {
+        margin-bottom: 40px;
+    }
+}
+
+/* Fix for specific browsers */
+
+/* Safari-specific fixes */
+@media not all and (min-resolution:.001dpcm) {
+    @supports (-webkit-appearance:none) {
+        /* Fix for Safari flexbox issues */
+        .about-content,
+        .skills-content,
+        .contact-content {
+            display: flex;
+            flex-wrap: wrap;
+        }
+        
+        /* Fix for Safari overflow issues */
+        .portfolio-grid {
+            width: 100%;
+        }
+    }
+}
+
+/* Firefox-specific fixes */
+@-moz-document url-prefix() {
+    /* Fix for Firefox flexbox issues */
+    .about-content,
+    .skills-content,
+    .contact-content {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+/* Edge-specific fixes */
+@supports (-ms-ime-align: auto) {
+    /* Fix for Edge flexbox issues */
+    .about-content,
+    .skills-content,
+    .contact-content {
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+/* Fix for specific pixel densities */
+
+/* High DPI screens (Retina displays) */
+@media (-webkit-min-device-pixel-ratio: 2), 
+       (min-resolution: 192dpi) {
+    /* Ensure borders are crisp */
+    .btn,
+    .theme-btn,
+    .social-icons a,
+    .portfolio-links a,
+    .back-to-top {
+        border-width: 0.5px;
+    }
+    
+    /* Ensure skill bars look good */
+    .skill-bar {
+        height: 7px;
+    }
+}
+
+/* Fix for touch vs non-touch devices */
+
+/* Touch devices */
+@media (hover: none) {
+    /* Disable hover effects that might cause issues */
+    .btn:hover,
+    .theme-btn:hover,
+    .social-icons a:hover,
+    .portfolio-item:hover,
+    .portfolio-links a:hover,
+    .back-to-top:hover {
+        transform: none;
+    }
+    
+    /* Add active states for touch */
+    .btn:active,
+    .theme-btn:active,
+    .social-icons a:active,
+    .portfolio-links a:active,
+    .back-to-top:active {
+        transform: scale(0.95);
+    }
+}
+
+/* Non-touch devices (mouse) */
+@media (hover: hover) {
+    /* Enable hover effects */
+    .btn:hover,
+    .theme-btn:hover,
+    .social-icons a:hover,
+    .portfolio-links a:hover,
+    .back-to-top:hover {
+        transform: translateY(-3px);
+    }
+    
+    .portfolio-item:hover {
+        transform: translateY(-5px);
+    }
+}
+
+/* Fix for specific CSS features support */
+
+/* For browsers that don't support CSS Grid */
+@supports not (display: grid) {
+    .portfolio-grid {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    
+    .portfolio-item {
+        flex: 0 0 calc(33.333% - 20px);
+        margin: 10px;
+    }
+    
+    @media screen and (max-width: 992px) {
+        .portfolio-item {
+            flex: 0 0 calc(50% - 20px);
+        }
+    }
+    
+    @media screen and (max-width: 576px) {
+        .portfolio-item {
+            flex: 0 0 100%;
+            margin: 10px 0;
+        }
+    }
+}
+
+/* For browsers that don't support CSS Variables */
+@supports not (--test: 0) {
+    /* Fallback colors */
+    body {
+        color: #2b2d42;
+        background-color: #ffffff;
+    }
+    
+    .primary-btn {
+        background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        color: white;
+    }
+    
+    .secondary-btn {
+        border: 2px solid #4361ee;
+        color: #2b2d42;
+    }
+    
+    .secondary-btn:hover {
+        background: #4361ee;
+        color: white;
+    }
+}
+
+/* Fix for print layout */
+@media print {
+    /* Ensure proper page breaks */
+    section {
+        page-break-inside: avoid;
+    }
+    
+    /* Hide interactive elements */
+    .theme-switcher,
+    .back-to-top,
+    .hamburger,
+    .portfolio-modal {
+        display: none !important;
+    }
+    
+    /* Adjust colors for printing */
+    body {
+        color: black;
+        background: white;
+    }
+    
+    a {
+        color: black;
+        text-decoration: underline;
+    }
+    
+    /* Ensure content fits on page */
+    .container {
+        width: 100%;
+        max-width: none;
+        padding: 0 10mm;
+    }
+}
+
+/* Fix for prefers-reduced-motion */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* Fix for prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+    /* Auto-switch to dark theme if user prefers dark mode and hasn't selected a theme */
+    html:not([data-theme="light"]):not([data-theme="purple"]):not([data-theme="green"]) {
+        --primary-color: #4cc9f0;
+        --secondary-color: #4361ee;
+        --accent-color: #7209b7;
+        --background-color: #121212;
+        --surface-color: #1e1e1e;
+        --surface-color-alt: #2d2d2d;
+        --text-color: #f8f9fa;
+        --text-color-light: #adb5bd;
+        --card-bg: #1e1e1e;
+        --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        --header-bg: rgba(30, 30, 30, 0.95);
+        --footer-bg: #121212;
+        --footer-text: #f8f9fa;
+        --gradient-primary: linear-gradient(135deg, #4cc9f0, #4361ee);
+        --gradient-secondary: linear-gradient(135deg, #7209b7, #4361ee);
+    }
+}
+
+/* Fix for high contrast mode */
+@media (forced-colors: active) {
+    /* Ensure buttons and interactive elements have visible borders */
+    .btn,
+    .theme-btn,
+    .social-icons a,
+    .portfolio-links a,
+    .back-to-top {
+        border: 1px solid currentColor;
+    }
+    
+    /* Ensure text is readable */
+    .highlight {
+        color: currentColor;
+        -webkit-text-fill-color: currentColor;
+    }
+}
+
+/* Fix for RTL languages */
+[dir="rtl"] {
+    .slide-in-left {
+        transform: translateX(50px);
+    }
+    
+    .slide-in-left.active {
+        transform: translateX(0);
+    }
+    
+    .slide-in-right {
+        transform: translateX(-50px);
+    }
+    
+    .slide-in-right.active {
+        transform: translateX(0);
+    }
+    
+    .skill-info {
+        flex-direction: row-reverse;
+    }
+    
+    .info-title {
+        margin-right: 0;
+        margin-left: 10px;
+    }
+}
+
+/* Fix for older browsers */
+@supports not (display: flex) {
+    /* Fallback for flexbox */
+    .about-content,
+    .skills-content,
+    .contact-content,
+    .footer-content {
+        display: block;
+    }
+    
+    .about-image,
+    .about-text,
+    .skill-category,
+    .contact-info,
+    .contact-form {
+        width: 100%;
+        margin-bottom: 30px;
+    }
+}
+
+/* Fix for container width on different screen sizes */
+.container {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+@media screen and (max-width: 1400px) {
+    .container {
+        max-width: 1320px;
+    }
+}
+
+@media screen and (max-width: 1200px) {
+    .container {
+        max-width: 1140px;
+    }
+}
+
+@media screen and (max-width: 992px) {
+    .container {
+        max-width: 960px;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .container {
+        max-width: 720px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .container {
+        max-width: 540px;
+    }
+}
+
+/* Final overflow prevention */
+html, body, section, div {
+    max-width: 100%;
+}
+
+* {
+    box-sizing: border-box;
+}

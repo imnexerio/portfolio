@@ -1,0 +1,381 @@
+/* Advanced Scroll Effects and Animations */
+
+/* Parallax and 3D Effects */
+.parallax-section {
+  position: relative;
+  overflow: hidden;
+  height: 100vh;
+  perspective: 1000px;
+}
+
+.parallax-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  transform: translateZ(-10px) scale(2);
+  z-index: -1;
+}
+
+.parallax-content {
+  position: relative;
+  z-index: 1;
+  transform-style: preserve-3d;
+}
+
+/* Apple-style Scroll Transitions */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(100px);
+  transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1), 
+              transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.scroll-reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-scale {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1), 
+              transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.scroll-scale.active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.scroll-rotate {
+  opacity: 0;
+  transform: rotateY(45deg);
+  transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1), 
+              transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.scroll-rotate.active {
+  opacity: 1;
+  transform: rotateY(0);
+}
+
+/* Staggered Animations */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.stagger-item.active {
+  animation: staggerFadeIn 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+}
+
+@keyframes staggerFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Sticky Sections */
+.sticky-section {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.sticky-content {
+  width: 100%;
+  max-width: 1200px;
+  padding: 0 20px;
+}
+
+/* Horizontal Scroll Section */
+.horizontal-scroll-container {
+  height: 100vh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.horizontal-scroll-section {
+  position: absolute;
+  height: 100%;
+  display: flex;
+  will-change: transform;
+}
+
+.horizontal-scroll-item {
+  height: 100%;
+  width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Text Split Animation */
+.split-text {
+  overflow: hidden;
+}
+
+.split-text span {
+  display: inline-block;
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1),
+              opacity 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.split-text.active span {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Magnetic Elements */
+.magnetic {
+  position: relative;
+  display: inline-block;
+  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Wow Factor Bottom Section */
+.wow-section {
+  position: relative;
+  min-height: 100vh;
+  background: var(--gradient-primary);
+  overflow: hidden;
+}
+
+.wow-section::before {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+  background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 70%);
+  animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.wow-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  text-align: center;
+  color: white;
+}
+
+.wow-title {
+  font-size: 5rem;
+  font-weight: 700;
+  margin-bottom: 2rem;
+  background: linear-gradient(to right, #ffffff, #f0f0f0);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1),
+              transform 1.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.wow-title.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wow-subtitle {
+  font-size: 1.5rem;
+  max-width: 600px;
+  margin: 0 auto 3rem;
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1) 0.2s,
+              transform 1.5s cubic-bezier(0.19, 1, 0.22, 1) 0.2s;
+}
+
+.wow-subtitle.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wow-button {
+  position: relative;
+  padding: 15px 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  color: white;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 1s cubic-bezier(0.19, 1, 0.22, 1) 0.4s,
+              transform 1.5s cubic-bezier(0.19, 1, 0.22, 1) 0.4s,
+              background 0.4s cubic-bezier(0.19, 1, 0.22, 1),
+              border 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.wow-button.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wow-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.4);
+  transform: translateY(-5px);
+}
+
+.wow-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transform: translateX(-100%);
+}
+
+.wow-button:hover::before {
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Floating Elements */
+.floating-elements {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.floating-element {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  animation: float 15s infinite ease-in-out;
+}
+
+.floating-element:nth-child(1) {
+  width: 100px;
+  height: 100px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.floating-element:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  top: 20%;
+  right: 10%;
+  animation-delay: 2s;
+}
+
+.floating-element:nth-child(3) {
+  width: 80px;
+  height: 80px;
+  bottom: 30%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+.floating-element:nth-child(4) {
+  width: 120px;
+  height: 120px;
+  bottom: 10%;
+  right: 15%;
+  animation-delay: 6s;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+  }
+  100% {
+    transform: translateY(0) rotate(360deg);
+  }
+}
+
+/* 3D Card Effect */
+.card-3d {
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card-3d-inner {
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+/* Scroll Progress Indicator */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
+
+/* Responsive Adjustments */
+@media screen and (max-width: 768px) {
+  .wow-title {
+    font-size: 3rem;
+  }
+  
+  .wow-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .floating-element {
+    display: none;
+  }
+  
+  .floating-element:nth-child(1),
+  .floating-element:nth-child(3) {
+    display: block;
+  }
+}
