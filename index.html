@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
-    <title>Santosh Prajapati - Portfolio</title>
-    <link rel="stylesheet" href="css/modern-styles.css">
+    <title>Santosh Prajapati - Portfolio</title>    <link rel="stylesheet" href="css/modern-styles.css">
     <link rel="stylesheet" href="css/advanced-animations.css">
     <link rel="stylesheet" href="css/wow-effects.css">
     <link rel="stylesheet" href="css/consolidated-responsive.css">
     <link rel="stylesheet" href="css/github-stats.css">
+    <link rel="stylesheet" href="css/website-generator.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -314,22 +314,24 @@
     <a href="#" class="back-to-top magnetic" title="Back to Top"><i class="fas fa-arrow-up"></i></a>    <!-- Scripts -->
     <script src="js/github-config.js"></script>
     <script src="js/github-stats.js"></script>
-    <script src="js/optimized-main.js"></script>		<script>
-			window.plausible =
-				window.plausible ||
-				function () {
-					(window.plausible.q = window.plausible.q || []).push(arguments);
-				};
-			plausible('custom-pageview', {
-			  props: {
-    			domain: window.location.host
-  			}
-			})
-		</script>
-        
-    <!-- Website Creator Attribution -->
+    <script src="js/optimized-main.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="js/website-generator.js"></script>
+    <script>
+        window.plausible =
+            window.plausible ||
+            function () {
+                (window.plausible.q = window.plausible.q || []).push(arguments);
+            };
+        plausible('custom-pageview', {
+          props: {
+            domain: window.location.host
+          }
+        })
+    </script>
+          <!-- Website Creator Attribution -->
     <div class="website-creator">
-        <div class="website-creator-btn create" title="create for yourself">
+        <div class="website-creator-btn create" title="Create your own portfolio">
             <i class="fas fa-code"></i>
             <div class="typed-container">
                 <span class="typed-message"></span>
