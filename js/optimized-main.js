@@ -32,6 +32,7 @@ function initThemeSwitcher() {
     const htmlElement = document.documentElement;
     const colorOptions = document.querySelectorAll('.color-option');
     const customColorPicker = document.getElementById('custom-color-picker');
+    const purpleButton = document.querySelector('.theme-btn.purple');
     
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
@@ -51,13 +52,24 @@ function initThemeSwitcher() {
         if (button.getAttribute('data-theme') === savedTheme) {
             button.classList.add('active');
         }
-          button.addEventListener('click', (event) => {
+        button.addEventListener('click', (event) => {
             const theme = button.getAttribute('data-theme');
+            
+            // Toggle palette-open class for the purple button
+            if (theme === 'custom') {
+                // Toggle the palette visibility
+                purpleButton.classList.toggle('palette-open');
+                event.stopPropagation(); // Prevent document click from immediately closing it
+                return;
+            }
             
             // Skip if clicking inside the color palette
             if (event.target.closest('.color-palette')) {
                 return;
             }
+            
+            // Close color palette if open
+            purpleButton.classList.remove('palette-open');
             
             // Remove active class from all buttons
             themeButtons.forEach(btn => btn.classList.remove('active'));
@@ -84,8 +96,7 @@ function initThemeSwitcher() {
             }, 1000);
         });
     });
-    
-    // Color palette options click handlers
+      // Color palette options click handlers
     colorOptions.forEach(option => {
         option.addEventListener('click', (e) => {
             e.stopPropagation(); // Prevent the click from propagating to the theme button
@@ -101,6 +112,9 @@ function initThemeSwitcher() {
             // Update active button
             themeButtons.forEach(btn => btn.classList.remove('active'));
             document.querySelector('.theme-btn.purple').classList.add('active');
+            
+            // Keep the palette open
+            purpleButton.classList.add('palette-open');
         });
     });
     
@@ -114,10 +128,19 @@ function initThemeSwitcher() {
         // Set theme to custom
         htmlElement.setAttribute('data-theme', 'custom');
         localStorage.setItem('theme', 'custom');
-        
-        // Update active button
+          // Update active button
         themeButtons.forEach(btn => btn.classList.remove('active'));
         document.querySelector('.theme-btn.purple').classList.add('active');
+        
+        // Keep the palette open
+        purpleButton.classList.add('palette-open');
+    });
+    
+    // Close color palette when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.theme-btn.purple') && !e.target.closest('.color-palette')) {
+            purpleButton.classList.remove('palette-open');
+        }
     });
     
     // Function to apply custom color to CSS variables

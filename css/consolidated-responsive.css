@@ -88,6 +88,21 @@
         flex-wrap: wrap;
         gap: 15px;
     }
+    
+    /* Theme switcher - Improved mobile experience */
+    .color-palette {
+        right: auto;
+        left: 50px;
+        z-index: 1010;
+    }
+    
+    /* Force the palette to be visible when open, even without hover */
+    .theme-btn.purple.palette-open .color-palette {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
 }
 
 /* ======================

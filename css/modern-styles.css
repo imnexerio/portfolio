@@ -216,7 +216,8 @@ img {
     z-index: 1000;
 }
 
-.theme-btn.purple:hover .color-palette {
+.theme-btn.purple:hover .color-palette,
+.theme-btn.purple.palette-open .color-palette {
     visibility: visible;
     opacity: 1;
     transform: translateX(0);
