@@ -378,10 +378,11 @@ async function fetchGitHubProjects() {
     if (!projectsContainer) {
         console.error('GitHub Projects: Projects container not found');
         return;
-    }
-    
+    }    
     try {
         console.log('GitHub Projects: Fetching repositories');
+        
+        // Show loading state (the loading message is already in the HTML)
         
         // Fetch repositories
         const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&direction=desc&per_page=10`, 
@@ -502,11 +503,11 @@ async function fetchGitHubProjects() {
         // Reinitialize 3D effects on portfolio items
         const portfolioItems = document.querySelectorAll('.portfolio-item.card-3d');
         initializeCardEffects(portfolioItems);
-        
-    } catch (error) {
+          } catch (error) {
         console.error('Error fetching GitHub projects:', error);
         projectsContainer.innerHTML = `
             <div class="error-message" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                <i class="fas fa-exclamation-triangle" style="margin-right: 10px;"></i>
                 Failed to load projects. ${error.message}
             </div>
         `;
