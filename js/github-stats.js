@@ -157,15 +157,11 @@ async function extractAndDisplaySkills(repos, headers) {
                 }
             }
         }
-        
-        // If no languages were found, add default languages
+          // If no languages were found, display an error message
         if (!hasLanguages || Object.keys(languageData).length === 0) {
-            console.log('No languages found in repositories, using fallback languages');
-            languageData['JavaScript'] = { score: 90, repos: 1 };
-            languageData['Python'] = { score: 85, repos: 1 };
-            languageData['HTML/CSS'] = { score: 80, repos: 1 };
-            languageData['Java'] = { score: 75, repos: 1 };
-            languageData['C++'] = { score: 70, repos: 1 };
+            console.error('GitHub Stats: No languages found in repositories');
+            showStatsError('No programming languages found in your GitHub repositories.');
+            return;
         }
           // Normalize and limit the number of programming languages
         const maxLanguages = GitHubConfig.getConfig('maxLanguages') || 6;
@@ -204,27 +200,20 @@ async function extractAndDisplaySkills(repos, headers) {
         
         // Now update the skills section with the dynamic data
         updateSkillsSection(languages, professionalSkillsArray);
-        
-    } catch (error) {
+          } catch (error) {
         console.error('Error extracting skills:', error);
         
-        // Fallback skills in case of error
-        const fallbackLanguages = [
-            { name: 'JavaScript', percentage: 90, category: 'language' },
-            { name: 'Python', percentage: 85, category: 'language' },
-            { name: 'HTML/CSS', percentage: 80, category: 'language' },
-            { name: 'Java', percentage: 75, category: 'language' },
-            { name: 'C++', percentage: 70, category: 'language' }
-        ];
+        // Show error message instead of using fallback data
+        showStatsError('Failed to extract skills from GitHub repositories. Please try again later.');
         
-        const fallbackProfessionalSkills = [
-            { name: 'Mobile Development', percentage: 90, category: 'professional' },
-            { name: 'Problem Solving', percentage: 85, category: 'professional' },
-            { name: 'Cross-Platform Development', percentage: 80, category: 'professional' },
-            { name: 'Open Source Contribution', percentage: 75, category: 'professional' }
-        ];
+        // Clear skill sections to indicate error
+        const languageSkillsContainer = document.querySelector('#skills .skill-category:nth-child(1) .skills-grid');
+        const professionalSkillsContainer = document.querySelector('#skills .skill-category:nth-child(2) .skills-grid');
         
-        updateSkillsSection(fallbackLanguages, fallbackProfessionalSkills);
+        if (languageSkillsContainer && professionalSkillsContainer) {
+            languageSkillsContainer.innerHTML = '<div class="error-message">Unable to load language skills</div>';
+            professionalSkillsContainer.innerHTML = '<div class="error-message">Unable to load professional skills</div>';
+        }
     }
 }
 
@@ -364,6 +353,14 @@ function showStatsError(message) {
     const chartContainer = document.getElementById('github-activity-chart');
     if (chartContainer) {
         chartContainer.innerHTML = `<div class="chart-error">${message}</div>`;
+    }
+    
+    // Add error class to skills section if it exists
+    const skillsSection = document.getElementById('skills');
+    if (skillsSection) {
+        skillsSection.classList.add('skills-error');
+        // Add a data attribute to hold the error message
+        skillsSection.setAttribute('data-error', message);
     }
 }
 

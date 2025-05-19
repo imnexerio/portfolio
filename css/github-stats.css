@@ -106,6 +106,40 @@
     background-color: rgba(var(--primary-rgb), 1);
 }
 
+/* Error styles for GitHub stats */
+.chart-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #ff5252;
+    text-align: center;
+    font-weight: 500;
+    padding: 10px;
+}
+
+.skills-error .skills-grid {
+    opacity: 0.7;
+    position: relative;
+}
+
+.error-message {
+    color: #ff5252;
+    text-align: center;
+    font-weight: 500;
+    padding: 15px;
+    border: 1px dashed #ff5252;
+    border-radius: 8px;
+    margin: 10px 0;
+    background-color: rgba(255, 82, 82, 0.05);
+}
+
+/* Add error icon before error message */
+.error-message::before {
+    content: "⚠️";
+    margin-right: 8px;
+}
+
 @media (max-width: 768px) {
     .github-stats-grid {
         grid-template-columns: repeat(2, 1fr);
