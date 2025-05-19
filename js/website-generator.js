@@ -179,8 +179,7 @@ function showGeneratorForm() {
     
     // Generate website event
     generateButton.addEventListener('click', validateAndGenerate);
-    
-    // Add CSS for new elements
+      // Add CSS for new elements
     const style = document.createElement('style');
     style.textContent = `
         .form-info {
@@ -199,6 +198,19 @@ function showGeneratorForm() {
         .form-field-required {
             color: var(--primary-color);
             font-weight: bold;
+        }
+        
+        .update-details {
+            background-color: rgba(var(--primary-color-rgb), 0.05);
+            border-radius: 4px;
+            padding: 8px 12px;
+            margin: 10px 0;
+            font-size: 0.9em;
+        }
+        
+        .update-details ul {
+            margin: 5px 0;
+            padding-left: 20px;
         }
     `;
     document.head.appendChild(style);
@@ -286,44 +298,58 @@ function generateWebsite() {
         if (generatorProgress) generatorProgress.classList.add('active');
           // Update progress
         updateProgress(10, 'Preparing to update GitHub and social links...');
-        updateProgress(30, 'Processing your input...');
+        updateProgress(20, 'Checking internet connection...');
         
-        // Create a configuration object with the user's information
-        const siteConfig = {
-            github: {
-                username: githubUsername,
-                token: githubToken
-            },
-            social: {
-                linkedin: validateUrl(linkedin) || '',
-                twitter: validateUrl(twitter) || '',
-                instagram: validateUrl(instagram) || ''
-            }
-        };
-        
-        // Generate the website files
-        updateProgress(50, 'Generating configuration files...');
-        
-        // Create GitHub configuration file
-        const githubConfigJS = generateGithubConfigFile(siteConfig);
-        
-        // Create social links file
-        const socialLinksJS = generateSocialLinksFile(siteConfig);
-        
-        // Make sure JSZip is available
-        if (typeof JSZip === 'undefined') {
-            console.error("JSZip library not found");
-            throw new Error("Required JSZip library not found. Please check your internet connection and try again.");
-        }
-        
-        // Create a ZIP file with all the necessary website files
-        createWebsiteZip(siteConfig, githubConfigJS, socialLinksJS)
-            .then(zipBlob => {
-                completeGeneration(siteConfig, zipBlob);
+        // Check connectivity to GitHub first
+        fetch('https://raw.githubusercontent.com/imnexerio/portfolio/main/README.md')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Cannot connect to GitHub. Please check your internet connection.');
+                }
+                
+                updateProgress(30, 'Processing your input...');
+                
+                // Create a configuration object with the user's information
+                const siteConfig = {
+                    github: {
+                        username: githubUsername,
+                        token: githubToken
+                    },
+                    social: {
+                        linkedin: validateUrl(linkedin) || '',
+                        twitter: validateUrl(twitter) || '',
+                        instagram: validateUrl(instagram) || ''
+                    }
+                };
+                
+                // Generate the website files
+                updateProgress(50, 'Generating configuration files...');
+                
+                // Create GitHub configuration file
+                const githubConfigJS = generateGithubConfigFile(siteConfig);
+                
+                // Create social links file
+                const socialLinksJS = generateSocialLinksFile(siteConfig);
+                
+                // Make sure JSZip is available
+                if (typeof JSZip === 'undefined') {
+                    console.error("JSZip library not found");
+                    throw new Error("Required JSZip library not found. Please check your internet connection and try again.");
+                }
+                
+                // Create a ZIP file with all the necessary website files
+                createWebsiteZip(siteConfig, githubConfigJS, socialLinksJS)
+                    .then(zipBlob => {
+                        completeGeneration(siteConfig, zipBlob);
+                    })
+                    .catch(error => {
+                        console.error('Error creating website files:', error);
+                        showGenerationError('Failed to create website files: ' + error.message);
+                    });
             })
             .catch(error => {
-                console.error('Error creating website files:', error);
-                showGenerationError('Failed to create website files: ' + error.message);
+                console.error('Connectivity check failed:', error);
+                showGenerationError('Cannot connect to GitHub. Please check your internet connection and try again.');
             });
     } catch (error) {
         console.error('Error in generateWebsite:', error);
@@ -502,13 +528,12 @@ function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
         }
         
         const zip = new JSZip();
-        
-        // Get all the files we need to include
+          // Get all the files we need to include
         collectWebsiteFiles()
             .then(files => {
                 updateProgress(70, 'Updating configuration files...');
                 
-                // Add all files to the ZIP with only GitHub config and social links updates
+                // Add all files to the ZIP with GitHub config and social links updates
                 files.forEach(file => {
                     let content = file.content;
                     
@@ -525,37 +550,15 @@ function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
                     zip.file(file.path, content);
                 });
                 
-                // Also include this website-generator.js file
-                fetch('js/website-generator.js')
-                    .then(response => response.text())
-                    .then(content => {
-                        zip.file('js/website-generator.js', content);
-                        
-                        updateProgress(90, 'Creating download package...');
-                        
-                        // Generate the ZIP file
-                        zip.generateAsync({ type: 'blob' })
-                            .then(blob => {
-                                resolve(blob);
-                            })
-                            .catch(err => {
-                                reject(err);
-                            });
+                updateProgress(90, 'Creating download package...');
+                
+                // Generate the ZIP file
+                zip.generateAsync({ type: 'blob' })
+                    .then(blob => {
+                        resolve(blob);
                     })
                     .catch(err => {
-                        // If we can't get the website-generator.js file, just continue
-                        console.warn('Could not include website-generator.js:', err);
-                        
-                        updateProgress(90, 'Creating download package...');
-                        
-                        // Generate the ZIP file
-                        zip.generateAsync({ type: 'blob' })
-                            .then(blob => {
-                                resolve(blob);
-                            })
-                            .catch(err => {
-                                reject(err);
-                            });
+                        reject(err);
                     });
             })
             .catch(err => {
@@ -567,17 +570,17 @@ function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
 // Collect all website files
 function collectWebsiteFiles() {
     return new Promise((resolve, reject) => {
-        updateProgress(65, 'Collecting website files...');
+        updateProgress(65, 'Collecting website files from repository...');
         
-        // Initialize files array with index.html (unmodified)
-        const html = document.documentElement.outerHTML;
+        // Use the GitHub repository as the source of files instead of the current document
+        const repoBaseUrl = 'https://raw.githubusercontent.com/imnexerio/portfolio/main/';
         const files = [
             {
-                path: 'index.html',
-                content: html
+                path: 'js/github-config.js',
+                content: '' // This will be replaced with our generated content
             },
             {
-                path: 'js/github-config.js',
+                path: 'js/social-links.js',
                 content: '' // This will be replaced with our generated content
             },
             {
@@ -586,76 +589,60 @@ function collectWebsiteFiles() {
             }
         ];
         
-        // Collect all CSS files
-        const cssFiles = [
+        // Files to fetch from the repository
+        const filesToFetch = [
+            'index.html',
             'css/modern-styles.css',
             'css/advanced-animations.css',
             'css/wow-effects.css',
             'css/consolidated-responsive.css',
             'css/github-stats.css',
-            'css/website-generator.css'
-        ];
-        
-        // Collect all JS files (excluding the ones we're already handling)
-        const jsFiles = [
+            'css/website-generator.css',
             'js/github-stats.js',
-            'js/optimized-main.js'
-            // Don't include website-generator.js to avoid recursion issues
-            // Don't include social-links.js as we're generating it
+            'js/optimized-main.js',
+            'js/website-generator.js'
         ];
         
-        // Create promises to fetch each file
+        // Create promises to fetch each file from GitHub
         const fetchPromises = [];
         
-        // Add CSS files to fetch promises
-        cssFiles.forEach(file => {
-            fetchPromises.push(fetch(file)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch ${file}`);
-                    }
-                    return response.text();
-                })
-                .then(content => {
-                    files.push({
-                        path: file,
-                        content: content
-                    });
-                })
-                .catch(error => {
-                    console.warn(`Could not fetch ${file}:`, error);
-                    // Create a placeholder file with a comment
-                    files.push({
-                        path: file,
-                        content: `/* CSS file placeholder: ${file} */\n\n/* This file couldn't be automatically included */`
-                    });
-                })
-            );
-        });
-        
-        // Add JS files to fetch promises
-        jsFiles.forEach(file => {
-            fetchPromises.push(fetch(file)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`Failed to fetch ${file}`);
-                    }
-                    return response.text();
-                })
-                .then(content => {
-                    files.push({
-                        path: file,
-                        content: content
-                    });
-                })
-                .catch(error => {
-                    console.warn(`Could not fetch ${file}:`, error);
-                    // Create a placeholder file with a comment
-                    files.push({
-                        path: file,
-                        content: `// JS file placeholder: ${file}\n\n// This file couldn't be automatically included`
-                    });
-                })
+        // Fetch files from GitHub repository
+        filesToFetch.forEach(file => {
+            const fileUrl = repoBaseUrl + file;
+            fetchPromises.push(
+                fetch(fileUrl)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Failed to fetch ${file} from GitHub`);
+                        }
+                        return response.text();
+                    })
+                    .then(content => {
+                        files.push({
+                            path: file,
+                            content: content
+                        });
+                    })
+                    .catch(error => {
+                        console.warn(`Could not fetch ${file} from GitHub:`, error);
+                        // Create a placeholder file with a comment
+                        if (file.endsWith('.js')) {
+                            files.push({
+                                path: file,
+                                content: `// JS file placeholder: ${file}\n\n// This file couldn't be automatically included`
+                            });
+                        } else if (file.endsWith('.css')) {
+                            files.push({
+                                path: file,
+                                content: `/* CSS file placeholder: ${file} */\n\n/* This file couldn't be automatically included */`
+                            });
+                        } else {
+                            files.push({
+                                path: file,
+                                content: `<!-- Could not fetch ${file} from GitHub -->`
+                            });
+                        }
+                    })
             );
         });
         
@@ -665,7 +652,7 @@ function collectWebsiteFiles() {
                 resolve(files);
             })
             .catch(error => {
-                console.error('Error collecting files:', error);
+                console.error('Error collecting files from GitHub:', error);
                 reject(error);
             });
     });
@@ -680,12 +667,33 @@ function completeGeneration(config, zipBlob) {
     setTimeout(() => {
         document.querySelector('.loading-indicator').classList.remove('active');
         document.querySelector('.success-message').classList.add('active');
-        
-        // Create download link for the ZIP file
+          // Create download link for the ZIP file
         const downloadLink = document.getElementById('download-website');
         const url = URL.createObjectURL(zipBlob);
         downloadLink.href = url;
         downloadLink.download = `${config.github.username}-portfolio-updated.zip`;
+        
+        // Add a small note about what was updated
+        const successMessage = document.querySelector('.success-message');
+        if (successMessage) {
+            const updateNote = document.createElement('div');
+            updateNote.className = 'update-details';
+            updateNote.innerHTML = `
+                <p><small>Files updated:</small></p>
+                <ul>
+                    <li><small>GitHub Configuration (username: ${config.github.username})</small></li>
+                    <li><small>Social Media Links</small></li>
+                </ul>
+            `;
+            
+            // Insert after the first paragraph
+            const firstP = successMessage.querySelector('p');
+            if (firstP && firstP.nextSibling) {
+                successMessage.insertBefore(updateNote, firstP.nextSibling);
+            } else {
+                successMessage.appendChild(updateNote);
+            }
+        }
     }, 500);
 }
 
