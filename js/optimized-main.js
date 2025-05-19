@@ -266,7 +266,7 @@ function initCreatorTypingEffect() {
     const typedMessage = document.querySelector('.typed-message');
     if (!typedMessage) return;
     
-    const message = "Developed by imnexerio - Get for yourself!";
+    const message = "Create your own portfolio - It's free!";
     let charIndex = 0;
     let isDeleting = false;
     let typingSpeed = 100;
