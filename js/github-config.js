@@ -6,10 +6,9 @@
  */
 
 // Create a namespace for GitHub configuration
-window.GitHubConfig = (function() {
-    // Private GitHub credentials
+window.GitHubConfig = (function() {    // Private GitHub credentials
     const _username = 'imnexerio';
-    // replace your token here or leave it empty to use public access or use github environment variables
+    // This token will be replaced during the GitHub Actions workflow
     const _token = '';
     
     // Configuration options
