@@ -9,7 +9,7 @@
 window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = 'imnexerio';
-    // Do not store tokens in code - GitHub API allows public data access without a token
+    // replace your token here or leave it empty to use public access or use github environment variables
     const _token = '';
     
     // Configuration options
