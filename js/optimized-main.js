@@ -140,6 +140,29 @@ function initThemeSwitcher() {
             }, 1000);
         });
     }
+      // Toggle color palette visibility for touch devices
+    if (purpleButton) {
+        // Simple toggle for color palette
+        purpleButton.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent click from propagating
+            purpleButton.classList.toggle('palette-open');
+            
+            // Close palette when clicking outside
+            if (purpleButton.classList.contains('palette-open')) {
+                setTimeout(() => {
+                    document.addEventListener('click', closeColorPalette);
+                }, 10);
+            }
+        });
+        
+        // Function to close color palette
+        function closeColorPalette(e) {
+            if (!e.target.closest('.color-palette') && !e.target.closest('.theme-btn.purple')) {
+                purpleButton.classList.remove('palette-open');
+                document.removeEventListener('click', closeColorPalette);
+            }
+        }
+    }
     
     // Apply saved custom color if available
     const savedCustomColor = localStorage.getItem('customThemeColor');
@@ -161,6 +184,40 @@ function initThemeSwitcher() {
             purpleButton.classList.add('active');
         }
     });
+    
+    // Handle color option clicks
+    colorOptions.forEach(option => {
+        option.addEventListener('click', () => {
+            const color = option.getAttribute('data-color');
+            applyCustomColor(color);
+            localStorage.setItem('customThemeColor', color);
+            
+            // Close the color palette after selection on mobile
+            if (purpleButton) {
+                setTimeout(() => {
+                    purpleButton.classList.remove('palette-open');
+                    document.removeEventListener('click', closeColorPalette);
+                }, 300);
+            }
+        });
+    });
+    
+    // Handle custom color picker
+    if (customColorPicker) {
+        customColorPicker.addEventListener('input', () => {
+            const color = customColorPicker.value;
+            applyCustomColor(color);
+            localStorage.setItem('customThemeColor', color);
+            
+            // Close the color palette after selection on mobile
+            if (purpleButton) {
+                setTimeout(() => {
+                    purpleButton.classList.remove('palette-open');
+                    document.removeEventListener('click', closeColorPalette);
+                }, 300);
+            }
+        });
+    }
 }
 
 /**

@@ -136,7 +136,7 @@ img {
     position: fixed;
     right: 30px;
     top: 100px;
-    z-index: 999;
+    z-index: 1100; /* Ensure it's above other elements */
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -154,30 +154,7 @@ img {
     transition: var(--transition);
     box-shadow: var(--card-shadow);
     position: relative;
-}
-
-.theme-btn:hover {
-    transform: scale(1.1);
-}
-
-.theme-btn.light {
-    background-color: #ffffff;
-    color: #121212;
-}
-
-.theme-btn.dark {
-    background-color: #121212;
-    color: #ffffff;
-}
-
-.theme-btn.purple {
-    background-color: #9d4edd;
-    color: #ffffff;
-}
-
-.theme-btn.green {
-    background-color: #2ec4b6;
-    color: #ffffff;
+    background-color: var(--card-bg); /* Ensure background is visible */
 }
 
 /* Color Palette */
@@ -196,6 +173,8 @@ img {
     transition: var(--transition);
     pointer-events: none;
     z-index: 1000;
+    border: 1px solid var(--surface-color-alt); /* Add border for better visibility */
+    max-width: calc(100vw - 70px); /* Ensure it doesn't overflow viewport */
 }
 
 .theme-btn.purple:hover .color-palette,
@@ -1482,16 +1461,6 @@ section:nth-child(even) {
     100% {
         opacity: 1;
     }
-}
-
-/* Website Creator Button Styles */
-.website-creator {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    z-index: 99;
-    display: flex;
-    align-items: center;
 }
 
 /* Website Creator Button Styles */
