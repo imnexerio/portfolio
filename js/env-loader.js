@@ -37,10 +37,32 @@ window.Env = (function() {
                 console.log('Environment variables loaded from .env file');
             } else {
                 console.log('No .env file found - using default configuration');
+                // Try to load from other sources (GitHub Pages meta tags)
+                loadFromMetaTags();
             }
         } catch (error) {
             // If there's an error loading the file, just continue
             console.log('Could not load .env file - using default configuration');
+            // Try to load from other sources (GitHub Pages meta tags)
+            loadFromMetaTags();
+        }
+    }
+    
+    // Function to load environment variables from meta tags (for GitHub Pages)
+    function loadFromMetaTags() {
+        // Look for meta tags with name starting with 'env-'
+        const envMetaTags = document.querySelectorAll('meta[name^="env-"]');
+        
+        if (envMetaTags.length > 0) {
+            envMetaTags.forEach(tag => {
+                const key = tag.getAttribute('name').replace('env-', '');
+                const value = tag.getAttribute('content');
+                
+                if (key && value) {
+                    variables[key] = value;
+                }
+            });
+            console.log('Environment variables loaded from meta tags');
         }
     }
     
