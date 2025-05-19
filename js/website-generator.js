@@ -284,11 +284,11 @@ function generateWebsite() {
         if (formButtons) formButtons.style.display = 'none';
         if (loadingIndicator) loadingIndicator.classList.add('active');
         if (generatorProgress) generatorProgress.classList.add('active');
+          // Update progress
+        updateProgress(10, 'Preparing to update GitHub and social links...');
+        updateProgress(30, 'Processing your input...');
         
-        // Update progress
-        updateProgress(10, 'Preparing website files...');
-        updateProgress(30, 'Updating social links...');
-          // Create a configuration object with the user's information
+        // Create a configuration object with the user's information
         const siteConfig = {
             github: {
                 username: githubUsername,
@@ -302,7 +302,7 @@ function generateWebsite() {
         };
         
         // Generate the website files
-        updateProgress(50, 'Updating website files...');
+        updateProgress(50, 'Generating configuration files...');
         
         // Create GitHub configuration file
         const githubConfigJS = generateGithubConfigFile(siteConfig);
@@ -493,7 +493,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.`;
 // Create a ZIP file with all website files
 function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
     return new Promise((resolve, reject) => {
-        updateProgress(60, 'Packaging updated files...');
+        updateProgress(60, 'Packaging website files...');
         
         // Use the already loaded JSZip library
         if (typeof JSZip === 'undefined') {
@@ -506,32 +506,22 @@ function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
         // Get all the files we need to include
         collectWebsiteFiles()
             .then(files => {
-                updateProgress(70, 'Updating social links...');
+                updateProgress(70, 'Updating configuration files...');
                 
-                // Add all files to the ZIP with customizations
+                // Add all files to the ZIP with only GitHub config and social links updates
                 files.forEach(file => {
                     let content = file.content;
                     
-                    // Customize file content based on the configuration
+                    // Only modify the GitHub config and social links files
                     if (file.path === 'js/github-config.js') {
                         // Replace with our generated config
                         content = githubConfigJS;
                     } else if (file.path === 'js/social-links.js') {
                         // Replace with our generated social links
                         content = socialLinksJS;
-                    } else if (file.path === 'index.html') {
-                        // We're keeping the existing HTML as is
-                        // Just make sure any generator overlay is reset
-                        content = content.replace(/class="generator-overlay active"/g, 'class="generator-overlay"');
-                    } else if (file.path === 'js/website-generator.js') {
-                        // Ensure form is shown correctly in the generated site
-                        content = content.replace(/class="generator-overlay active"/g, 'class="generator-overlay"');
-                        content = content.replace(/class="loading-indicator active"/g, 'class="loading-indicator"');
-                        content = content.replace(/class="generator-progress active"/g, 'class="generator-progress"');
-                        content = content.replace(/class="success-message active"/g, 'class="success-message"');
                     }
                     
-                    // Add the file to the ZIP
+                    // Add the file to the ZIP without other modifications
                     zip.file(file.path, content);
                 });
                 
