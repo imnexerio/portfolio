@@ -30,19 +30,34 @@ document.addEventListener('DOMContentLoaded', function() {
 function initThemeSwitcher() {
     const themeButtons = document.querySelectorAll('.theme-btn');
     const htmlElement = document.documentElement;
+    const colorOptions = document.querySelectorAll('.color-option');
+    const customColorPicker = document.getElementById('custom-color-picker');
     
     // Check for saved theme preference
     const savedTheme = localStorage.getItem('theme') || 'light';
+    const savedCustomColor = localStorage.getItem('customThemeColor') || '#9d4edd';
+    
+    // Apply saved theme
     htmlElement.setAttribute('data-theme', savedTheme);
+    
+    // Apply saved custom color if theme is custom
+    if (savedTheme === 'custom') {
+        applyCustomColor(savedCustomColor);
+        customColorPicker.value = savedCustomColor;
+    }
     
     // Add active class to current theme button
     themeButtons.forEach(button => {
         if (button.getAttribute('data-theme') === savedTheme) {
             button.classList.add('active');
         }
-        
-        button.addEventListener('click', () => {
+          button.addEventListener('click', (event) => {
             const theme = button.getAttribute('data-theme');
+            
+            // Skip if clicking inside the color palette
+            if (event.target.closest('.color-palette')) {
+                return;
+            }
             
             // Remove active class from all buttons
             themeButtons.forEach(btn => btn.classList.remove('active'));
@@ -52,6 +67,12 @@ function initThemeSwitcher() {
             
             // Set theme
             htmlElement.setAttribute('data-theme', theme);
+            
+            // Apply custom color if selecting the custom theme
+            if (theme === 'custom') {
+                const customColor = localStorage.getItem('customThemeColor') || '#9d4edd';
+                applyCustomColor(customColor);
+            }
             
             // Save theme preference
             localStorage.setItem('theme', theme);
@@ -63,6 +84,73 @@ function initThemeSwitcher() {
             }, 1000);
         });
     });
+    
+    // Color palette options click handlers
+    colorOptions.forEach(option => {
+        option.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent the click from propagating to the theme button
+            const color = option.getAttribute('data-color');
+            applyCustomColor(color);
+            customColorPicker.value = color;
+            localStorage.setItem('customThemeColor', color);
+            
+            // Set theme to custom
+            htmlElement.setAttribute('data-theme', 'custom');
+            localStorage.setItem('theme', 'custom');
+            
+            // Update active button
+            themeButtons.forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.theme-btn.purple').classList.add('active');
+        });
+    });
+    
+    // Custom color picker handler
+    customColorPicker.addEventListener('input', (e) => {
+        e.stopPropagation(); // Prevent the click from propagating to the theme button
+        const color = e.target.value;
+        applyCustomColor(color);
+        localStorage.setItem('customThemeColor', color);
+        
+        // Set theme to custom
+        htmlElement.setAttribute('data-theme', 'custom');
+        localStorage.setItem('theme', 'custom');
+        
+        // Update active button
+        themeButtons.forEach(btn => btn.classList.remove('active'));
+        document.querySelector('.theme-btn.purple').classList.add('active');
+    });
+    
+    // Function to apply custom color to CSS variables
+    function applyCustomColor(color) {
+        document.documentElement.style.setProperty('--primary-color', color);
+        document.documentElement.style.setProperty('--accent-color', color);
+        
+        // Adjust secondary color to be slightly darker
+        const darkerColor = adjustColorBrightness(color, -30);
+        document.documentElement.style.setProperty('--secondary-color', darkerColor);
+        
+        // Update gradients
+        document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
+        document.documentElement.style.setProperty('--gradient-secondary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
+        
+        // Update color of the custom theme button
+        document.querySelector('.theme-btn.purple').style.backgroundColor = color;
+    }
+      // Helper function to darken or lighten a color
+    function adjustColorBrightness(hex, percent) {
+        // Convert hex to RGB
+        var r = parseInt(hex.slice(1, 3), 16);
+        var g = parseInt(hex.slice(3, 5), 16);
+        var b = parseInt(hex.slice(5, 7), 16);
+        
+        // Adjust brightness
+        r = Math.max(0, Math.min(255, r + percent));
+        g = Math.max(0, Math.min(255, g + percent));
+        b = Math.max(0, Math.min(255, b + percent));
+        
+        // Convert back to hex
+        return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
+    }
 }
 
 /**

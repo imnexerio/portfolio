@@ -171,6 +171,7 @@ img {
     justify-content: center;
     transition: var(--transition);
     box-shadow: var(--card-shadow);
+    position: relative;
 }
 
 .theme-btn:hover {
@@ -195,6 +196,80 @@ img {
 .theme-btn.green {
     background-color: #2ec4b6;
     color: #ffffff;
+}
+
+/* Color Palette */
+.color-palette {
+    position: absolute;
+    right: 50px;
+    top: 0;
+    background-color: var(--card-bg);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    width: 200px;
+    padding: 15px;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateX(10px);
+    transition: var(--transition);
+    pointer-events: none;
+    z-index: 1000;
+}
+
+.theme-btn.purple:hover .color-palette {
+    visibility: visible;
+    opacity: 1;
+    transform: translateX(0);
+    pointer-events: auto;
+}
+
+.color-palette-header {
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-color);
+    text-align: center;
+}
+
+.color-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.color-option {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+    border: 2px solid var(--surface-color-alt);
+}
+
+.color-option:hover {
+    transform: scale(1.15);
+}
+
+.custom-color-input {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.custom-color-input input {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    cursor: pointer;
+    background: none;
+}
+
+.custom-color-input label {
+    font-size: 14px;
+    color: var(--text-color);
 }
 
 /* Typography */
@@ -1408,5 +1483,20 @@ section:nth-child(even) {
         height: auto !important;
         min-height: fit-content;
         padding-bottom: 100px; /* Ensure there's always room at the bottom */
+    }
+}
+
+/* Theme transition */
+.theme-transition {
+    transition: background-color 0.5s ease, color 0.5s ease;
+    animation: themeFadeIn 0.5s ease;
+}
+
+@keyframes themeFadeIn {
+    0% {
+        opacity: 0.7;
+    }
+    100% {
+        opacity: 1;
     }
 }
