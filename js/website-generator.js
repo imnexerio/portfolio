@@ -525,15 +525,37 @@ function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
                     zip.file(file.path, content);
                 });
                 
-                updateProgress(90, 'Creating download package...');
-                
-                // Generate the ZIP file
-                zip.generateAsync({ type: 'blob' })
-                    .then(blob => {
-                        resolve(blob);
+                // Also include this website-generator.js file
+                fetch('js/website-generator.js')
+                    .then(response => response.text())
+                    .then(content => {
+                        zip.file('js/website-generator.js', content);
+                        
+                        updateProgress(90, 'Creating download package...');
+                        
+                        // Generate the ZIP file
+                        zip.generateAsync({ type: 'blob' })
+                            .then(blob => {
+                                resolve(blob);
+                            })
+                            .catch(err => {
+                                reject(err);
+                            });
                     })
                     .catch(err => {
-                        reject(err);
+                        // If we can't get the website-generator.js file, just continue
+                        console.warn('Could not include website-generator.js:', err);
+                        
+                        updateProgress(90, 'Creating download package...');
+                        
+                        // Generate the ZIP file
+                        zip.generateAsync({ type: 'blob' })
+                            .then(blob => {
+                                resolve(blob);
+                            })
+                            .catch(err => {
+                                reject(err);
+                            });
                     });
             })
             .catch(err => {
@@ -547,7 +569,7 @@ function collectWebsiteFiles() {
     return new Promise((resolve, reject) => {
         updateProgress(65, 'Collecting website files...');
         
-        // Initialize files array with index.html
+        // Initialize files array with index.html (unmodified)
         const html = document.documentElement.outerHTML;
         const files = [
             {
@@ -573,12 +595,13 @@ function collectWebsiteFiles() {
             'css/github-stats.css',
             'css/website-generator.css'
         ];
-          // Collect all JS files
+        
+        // Collect all JS files (excluding the ones we're already handling)
         const jsFiles = [
             'js/github-stats.js',
-            'js/optimized-main.js',
-            'js/website-generator.js',
-            'js/social-links.js'
+            'js/optimized-main.js'
+            // Don't include website-generator.js to avoid recursion issues
+            // Don't include social-links.js as we're generating it
         ];
         
         // Create promises to fetch each file
@@ -649,85 +672,6 @@ function collectWebsiteFiles() {
 }
 
 // Customize HTML based on configuration
-function customizeHTML(html, config) {
-    // Remove any active classes that could cause issues in the generated site
-    html = html.replace(/class="generator-overlay active"/g, 'class="generator-overlay"');
-    html = html.replace(/class="loading-indicator active"/g, 'class="loading-indicator"');
-    html = html.replace(/class="generator-progress active"/g, 'class="generator-progress"');
-    html = html.replace(/class="success-message active"/g, 'class="success-message"');
-    
-    // Create a RegExp for entire portfolio name
-    const nameRegExp = new RegExp('Santosh Prajapati', 'g');
-    const shortNameRegExp = new RegExp('SP', 'g'); // For the logo
-    
-    // Replace all instances of the original creator's name
-    html = html.replace(nameRegExp, config.personal.name);
-    
-    // Get initials for the logo
-    const initials = getInitials(config.personal.name);
-    html = html.replace(shortNameRegExp, initials);
-    
-    // Replace page title
-    html = html.replace(/<title>Santosh Prajapati - Portfolio<\/title>/g, 
-                      `<title>${config.personal.name} - Portfolio</title>`);
-    
-    // Replace location
-    const locationRegExp = new RegExp('Delhi, India', 'g');
-    html = html.replace(locationRegExp, config.personal.location);
-    
-    // Replace email
-    const emailRegExp = new RegExp('contact@example\\.com', 'g');
-    html = html.replace(emailRegExp, config.personal.email);
-      // Replace GitHub username in all links and references
-    const githubUsernameRegExp = new RegExp('imnexerio', 'g');
-    html = html.replace(githubUsernameRegExp, config.github.username);
-    
-    // Replace social media links if provided
-    if (config.social.linkedin) {
-        const linkedinRegExp = new RegExp('https://www\\.linkedin\\.com/in/imnexerio/', 'g');
-        html = html.replace(linkedinRegExp, config.social.linkedin);
-    }
-    
-    if (config.social.twitter) {
-        const twitterRegExp = new RegExp('https://www\\.twitter\\.com/imnexerio/', 'g');
-        html = html.replace(twitterRegExp, config.social.twitter);
-    }
-    
-    if (config.social.instagram) {
-        const instagramRegExp = new RegExp('https://www\\.instagram\\.com/imnexerio/', 'g');
-        html = html.replace(instagramRegExp, config.social.instagram);
-    }
-    
-    // Update copyright year
-    const currentYear = new Date().getFullYear();
-    html = html.replace(/&copy; 2025/g, `&copy; ${currentYear}`);
-    
-    // Update the "Generated By" section
-    html = html.replace(/"Create your own portfolio - It's free!"/g, 
-                      `"Generated using Santosh Prajapati's template"`);
-    
-    // Replace profile image if available
-    if (config.personal.avatar) {
-        // Find and replace the profile image placeholder
-        const imgPlaceholderRegExp = new RegExp('data:image/svg\\+xml,[^"]+', 'g');
-        html = html.replace(imgPlaceholderRegExp, config.personal.avatar);
-    }
-    
-    return html;
-}
-
-// Helper function to get initials from name
-function getInitials(name) {
-    if (!name) return 'ME';
-    
-    const parts = name.split(' ');
-    if (parts.length === 1) {
-        return parts[0].substring(0, 2).toUpperCase();
-    }
-    
-    return (parts[0].charAt(0) + parts[parts.length - 1].charAt(0)).toUpperCase();
-}
-
 function completeGeneration(config, zipBlob) {
     // Update progress and show success message
     updateProgress(100, 'Website updated successfully!');
@@ -780,59 +724,5 @@ function updateProgress(percentage, message) {
     } catch (error) {
         console.error('Error updating progress:', error);
     }
-}
-
-/**
- * Adds self-initializing bootstrap code to the website-generator.js file
- * to ensure that all event handlers are properly attached in the generated site
- */
-function addGenerationBootstrap(content) {
-    // Ensure the DOMContentLoaded event properly initializes everything
-    const bootstrapCode = `
-// Self-initializing code for the generated site
-(function() {
-    // Ensure everything is properly initialized when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize the generator
-        initWebsiteGenerator();
-        
-        // Directly attach event listeners to any existing form
-        const existingOverlay = document.querySelector('.generator-overlay');
-        if (existingOverlay) {
-            // Remove active class
-            existingOverlay.classList.remove('active');
-            
-            // Reset form state
-            const formContent = existingOverlay.querySelector('.form-content');
-            const formButtons = existingOverlay.querySelector('.form-buttons');
-            const loadingIndicator = existingOverlay.querySelector('.loading-indicator');
-            const successMessage = existingOverlay.querySelector('.success-message');
-            
-            if (formContent) formContent.style.display = 'block';
-            if (formButtons) formButtons.style.display = 'flex';
-            if (loadingIndicator) loadingIndicator.classList.remove('active');
-            if (successMessage) successMessage.classList.remove('active');
-            
-            // Re-attach event listeners
-            const closeButton = existingOverlay.querySelector('.close-form');
-            const cancelButton = existingOverlay.querySelector('button.cancel');
-            const generateButton = existingOverlay.querySelector('button.generate');
-            
-            if (closeButton) closeButton.addEventListener('click', hideGeneratorForm);
-            if (cancelButton) cancelButton.addEventListener('click', hideGeneratorForm);
-            if (generateButton) generateButton.addEventListener('click', validateAndGenerate);
-            
-            // Click outside to close
-            existingOverlay.addEventListener('click', function(event) {
-                if (event.target === existingOverlay) {
-                    hideGeneratorForm();
-                }
-            });
-        }
-    });
-})();`;
-
-    // Add the bootstrap code to the end of the file
-    return content + '\n\n' + bootstrapCode;
 }
 
