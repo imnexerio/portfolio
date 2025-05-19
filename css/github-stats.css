@@ -1,0 +1,117 @@
+/* GitHub Stats CSS */
+.github-stats {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: rgba(var(--card-bg-rgb), 0.8);
+    border-radius: 15px;
+    box-shadow: var(--card-shadow);
+}
+
+.github-stats-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.github-stats-header i {
+    font-size: 24px;
+    margin-right: 10px;
+    color: var(--primary-color);
+}
+
+.github-stats-header h3 {
+    margin: 0;
+}
+
+.github-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.github-stat-item {
+    background-color: rgba(var(--bg-rgb), 0.6);
+    padding: 15px;
+    border-radius: 10px;
+    text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.github-stat-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.github-stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--primary-color);
+}
+
+.github-stat-label {
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.github-activity-chart {
+    margin-top: 20px;
+    width: 100%;
+    height: 100px;
+    background-color: rgba(var(--bg-rgb), 0.6);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+}
+
+.activity-grid {
+    display: flex;
+    height: 100%;
+    width: 100%;
+    padding: 10px;
+    gap: 3px;
+}
+
+.activity-col {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 3px;
+}
+
+.activity-cell {
+    flex: 1;
+    border-radius: 2px;
+    background-color: rgba(var(--primary-rgb), 0.1);
+    transition: background-color 0.3s;
+}
+
+.activity-level-0 {
+    background-color: rgba(var(--primary-rgb), 0.1);
+}
+
+.activity-level-1 {
+    background-color: rgba(var(--primary-rgb), 0.25);
+}
+
+.activity-level-2 {
+    background-color: rgba(var(--primary-rgb), 0.5);
+}
+
+.activity-level-3 {
+    background-color: rgba(var(--primary-rgb), 0.75);
+}
+
+.activity-level-4 {
+    background-color: rgba(var(--primary-rgb), 1);
+}
+
+@media (max-width: 768px) {
+    .github-stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .github-activity-chart {
+        height: 80px;
+    }
+}
