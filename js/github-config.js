@@ -9,13 +9,12 @@
 window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = 'imnexerio';
-    
-    // Get token from environment variables
+      // Get token from environment variables
     // This works both for local development (with .env file) and deployed sites
     const _token = (function() {
-        // If Env is available, use it to get the token
+        // If Env is available, try to get the token from PAT_GITHUB
         if (window.Env) {
-            return window.Env.get('GITHUB_TOKEN', '');
+            return window.Env.get('PAT_GITHUB', '');
         }
         
         // Fallback to empty token if Env is not available
