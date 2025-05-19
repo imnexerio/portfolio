@@ -681,3 +681,25 @@ function showGenerationError(message) {
     alert(`Error generating website: ${message}`);
 }
 
+/**
+ * Updates the progress bar and status message during website generation
+ * @param {number} percentage - Progress percentage (0-100)
+ * @param {string} message - Status message to display
+ */
+function updateProgress(percentage, message) {
+    // Update progress bar
+    const progressBar = document.querySelector('.progress-bar-fill');
+    const progressStatus = document.querySelector('.progress-status');
+    
+    if (progressBar && progressStatus) {
+        // Set progress bar width
+        progressBar.style.width = `${percentage}%`;
+        
+        // Update status message
+        progressStatus.textContent = message;
+        
+        // Log progress for debugging
+        console.log(`Generation progress: ${percentage}% - ${message}`);
+    }
+}
+
