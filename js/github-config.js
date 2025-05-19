@@ -5,7 +5,6 @@
  * This file must be loaded BEFORE any other GitHub integration scripts.
  */
 
-// Create a namespace for GitHub configuration
 window.GitHubConfig = (function() {    // Private GitHub credentials
     const _username = 'imnexerio';
     
