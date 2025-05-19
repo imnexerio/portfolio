@@ -87,24 +87,6 @@
 }
 
 /* Green Theme */
-[data-theme="green"] {
-    --primary-color: #2ec4b6;
-    --secondary-color: #06d6a0;
-    --accent-color: #06d6a0;
-    --background-color: #ffffff;
-    --surface-color: #f8f9fa;
-    --surface-color-alt: #f0f2f5;
-    --text-color: #073b4c;
-    --text-color-light: #118ab2;
-    --card-bg: #ffffff;
-    --card-shadow: 0 10px 30px rgba(46, 196, 182, 0.1);
-    --header-bg: rgba(255, 255, 255, 0.95);
-    --footer-bg: #073b4c;
-    --footer-text: #f8f9fa;
-    --gradient-primary: linear-gradient(135deg, #2ec4b6, #06d6a0);
-    --gradient-secondary: linear-gradient(135deg, #06d6a0, #118ab2);
-}
-
 /* Global Reset & Base Styles */
 * {
     margin: 0;

@@ -4,6 +4,9 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Force random theme on every refresh
+    forceRandomThemeOnRefresh();
+    
     // Initialize all functions
     initThemeSwitcher();
     initNavigation();
@@ -24,6 +27,42 @@ document.addEventListener('DOMContentLoaded', function() {
     initParticleEffect();
 });
 
+// Function to apply custom color to CSS variables - moved outside to make it globally accessible
+function applyCustomColor(color) {
+    document.documentElement.style.setProperty('--primary-color', color);
+    document.documentElement.style.setProperty('--accent-color', color);
+    
+    // Adjust secondary color to be slightly darker
+    const darkerColor = adjustColorBrightness(color, -30);
+    document.documentElement.style.setProperty('--secondary-color', darkerColor);
+    
+    // Update gradients
+    document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
+    document.documentElement.style.setProperty('--gradient-secondary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
+    
+    // Update color of the custom theme button
+    const purpleButton = document.querySelector('.theme-btn.purple');
+    if (purpleButton) {
+        purpleButton.style.backgroundColor = color;
+    }
+}
+
+// Helper function to darken or lighten a color - moved outside to make it globally accessible
+function adjustColorBrightness(hex, percent) {
+    // Convert hex to RGB
+    var r = parseInt(hex.slice(1, 3), 16);
+    var g = parseInt(hex.slice(3, 5), 16);
+    var b = parseInt(hex.slice(5, 7), 16);
+    
+    // Adjust brightness
+    r = Math.max(0, Math.min(255, r + percent));
+    g = Math.max(0, Math.min(255, g + percent));
+    b = Math.max(0, Math.min(255, b + percent));
+    
+    // Convert back to hex
+    return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
+}
+
 /**
  * Theme Switcher
  */
@@ -34,24 +73,54 @@ function initThemeSwitcher() {
     const customColorPicker = document.getElementById('custom-color-picker');
     const purpleButton = document.querySelector('.theme-btn.purple');
     
-    // Check for saved theme preference
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    const savedCustomColor = localStorage.getItem('customThemeColor') || '#9d4edd';
+    // Get all available colors from the color options
+    const availableColors = Array.from(colorOptions).map(option => option.getAttribute('data-color'));
     
-    // Apply saved theme
-    htmlElement.setAttribute('data-theme', savedTheme);
-    
-    // Apply saved custom color if theme is custom
-    if (savedTheme === 'custom') {
-        applyCustomColor(savedCustomColor);
-        customColorPicker.value = savedCustomColor;
+    // Select random color on first visit or page refresh if no theme is saved
+    const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
+    if (!hasVisitedBefore || !localStorage.getItem('theme')) {
+        // Pick a random color from available colors
+        const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+        
+        // Apply the random color
+        applyCustomColor(randomColor);
+        customColorPicker.value = randomColor;
+        localStorage.setItem('customThemeColor', randomColor);
+        
+        // Set theme to custom with the random color
+        htmlElement.setAttribute('data-theme', 'custom');
+        localStorage.setItem('theme', 'custom');
+        
+        // Mark that user has visited before
+        localStorage.setItem('hasVisitedBefore', 'true');
+        
+        // Update active button
+        themeButtons.forEach(btn => btn.classList.remove('active'));
+        purpleButton.classList.add('active');
+    } else {
+        // Check for saved theme preference
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        const savedCustomColor = localStorage.getItem('customThemeColor') || '#9d4edd';
+        
+        // Apply saved theme
+        htmlElement.setAttribute('data-theme', savedTheme);
+        
+        // Apply saved custom color if theme is custom
+        if (savedTheme === 'custom') {
+            applyCustomColor(savedCustomColor);
+            customColorPicker.value = savedCustomColor;
+        }
+        
+        // Add active class to current theme button
+        themeButtons.forEach(button => {
+            if (button.getAttribute('data-theme') === savedTheme) {
+                button.classList.add('active');
+            }
+        });
     }
     
-    // Add active class to current theme button
+    // Theme button click handlers
     themeButtons.forEach(button => {
-        if (button.getAttribute('data-theme') === savedTheme) {
-            button.classList.add('active');
-        }
         button.addEventListener('click', (event) => {
             const theme = button.getAttribute('data-theme');
             
@@ -135,44 +204,66 @@ function initThemeSwitcher() {
         // Keep the palette open
         purpleButton.classList.add('palette-open');
     });
-    
-    // Close color palette when clicking outside
+      // Close color palette when clicking outside
     document.addEventListener('click', (e) => {
         if (!e.target.closest('.theme-btn.purple') && !e.target.closest('.color-palette')) {
             purpleButton.classList.remove('palette-open');
         }
     });
-    
-    // Function to apply custom color to CSS variables
-    function applyCustomColor(color) {
-        document.documentElement.style.setProperty('--primary-color', color);
-        document.documentElement.style.setProperty('--accent-color', color);
+}
+
+/**
+ * Force Random Theme on Every Refresh
+ */
+function forceRandomThemeOnRefresh() {
+    // We need to wait for the DOM to be ready to get the color options
+    const colorOptions = document.querySelectorAll('.color-option');
+    if(colorOptions.length === 0) {
+        // If color options aren't available yet, set a fallback random color
+        const fallbackColors = ['#9d4edd', '#ff6b6b', '#4cc9f0', '#f72585', '#4361ee', '#fb8500', '#43aa8b', '#f94144'];
+        const randomColor = fallbackColors[Math.floor(Math.random() * fallbackColors.length)];
         
-        // Adjust secondary color to be slightly darker
-        const darkerColor = adjustColorBrightness(color, -30);
-        document.documentElement.style.setProperty('--secondary-color', darkerColor);
+        // Apply the random color
+        applyCustomColor(randomColor);
         
-        // Update gradients
-        document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
-        document.documentElement.style.setProperty('--gradient-secondary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
+        // Save the custom color
+        localStorage.setItem('customThemeColor', randomColor);
         
-        // Update color of the custom theme button
-        document.querySelector('.theme-btn.purple').style.backgroundColor = color;
+        // Set theme to custom with the random color
+        document.documentElement.setAttribute('data-theme', 'custom');
+        localStorage.setItem('theme', 'custom');
+        
+        return;
     }
-      // Helper function to darken or lighten a color
-    function adjustColorBrightness(hex, percent) {
-        // Convert hex to RGB
-        var r = parseInt(hex.slice(1, 3), 16);
-        var g = parseInt(hex.slice(3, 5), 16);
-        var b = parseInt(hex.slice(5, 7), 16);
-        
-        // Adjust brightness
-        r = Math.max(0, Math.min(255, r + percent));
-        g = Math.max(0, Math.min(255, g + percent));
-        b = Math.max(0, Math.min(255, b + percent));
-        
-        // Convert back to hex
-        return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
+    
+    // Get all available colors from the color options
+    const availableColors = Array.from(colorOptions).map(option => option.getAttribute('data-color'));
+    
+    // Pick a random color from available colors
+    const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+    
+    // Apply the random color
+    applyCustomColor(randomColor);
+    
+    // Update the custom color picker value
+    const customColorPicker = document.getElementById('custom-color-picker');
+    if (customColorPicker) {
+        customColorPicker.value = randomColor;
+    }
+    
+    // Save the custom color
+    localStorage.setItem('customThemeColor', randomColor);
+    
+    // Set theme to custom with the random color
+    document.documentElement.setAttribute('data-theme', 'custom');
+    localStorage.setItem('theme', 'custom');
+    
+    // Update active button
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    themeButtons.forEach(btn => btn.classList.remove('active'));
+    const purpleButton = document.querySelector('.theme-btn.purple');
+    if (purpleButton) {
+        purpleButton.classList.add('active');
     }
 }
 
