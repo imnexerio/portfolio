@@ -284,7 +284,7 @@ function initCreatorTypingEffect() {
         
         if (!isDeleting && charIndex === message.length) {
             isDeleting = true;
-            typingSpeed = 1000; // Pause at the end of message
+            typingSpeed = 2000; // Pause at the end of message
         } else if (isDeleting && charIndex === 0) {
             isDeleting = false;
             typingSpeed = 500; // Pause before retyping
@@ -294,7 +294,7 @@ function initCreatorTypingEffect() {
     }
     
     // Start typing immediately
-    type();
+    setTimeout(type, 1000);
 }
 
 // Initialize the creator button typing effect
