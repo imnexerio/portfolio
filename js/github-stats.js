@@ -39,6 +39,7 @@ async function initGitHubStats() {
         
         // Update profile image with GitHub avatar
         setGitHubProfileImage(userData.avatar_url);
+        updateUserInfoFromGitHub(userData);
           
         // Update stats elements
         document.getElementById('repo-count').textContent = userData.public_repos || '-';
@@ -102,6 +103,84 @@ function setGitHubProfileImage(avatarUrl) {
     }
 }
 
+// Function to update user information from GitHub profile
+function updateUserInfoFromGitHub(userData) {
+    if (!userData) return;
+
+    // Update page title
+    const pageTitle = document.querySelector('title');
+    if (pageTitle && userData.name) {
+        pageTitle.textContent = `${userData.name} - Portfolio`;
+    }
+
+    // Update hero section
+    const heroName = document.querySelector('#hero .hero-content h1 .highlight');
+    if (heroName && userData.name) {
+        heroName.textContent = userData.name;
+    }
+
+    // Update about section
+    const aboutName = document.querySelector('.info-item:nth-child(1) .info-value');
+    if (aboutName && userData.name) {
+        aboutName.textContent = userData.name;
+    }
+
+    const aboutGitHubUsername = document.querySelector('.info-item:nth-child(2) .info-value');
+    if (aboutGitHubUsername) {
+        aboutGitHubUsername.textContent = userData.login;
+    }
+
+    const aboutLocation = document.querySelector('.info-item:nth-child(3) .info-value');
+    if (aboutLocation && userData.location) {
+        aboutLocation.textContent = userData.location;
+    }
+
+    // Update bio if available
+    const userBio = document.getElementById('user-bio');
+    if (userBio && userData.bio) {
+        userBio.textContent = userData.bio;
+    }
+
+    // Update contact section
+    const contactLocation = document.querySelector('.contact-item:nth-child(1) .contact-text p');
+    if (contactLocation && userData.location) {
+        contactLocation.textContent = userData.location;
+    }
+
+    const contactEmail = document.querySelector('.contact-item:nth-child(2) .contact-text p');
+    if (contactEmail && userData.email) {
+        contactEmail.textContent = userData.email;
+    } else if (contactEmail) {
+        // GitHub API doesn't expose email if user has set it to private
+        // We'll keep the existing email or set a placeholder
+        if (contactEmail.textContent.includes('example.com')) {
+            contactEmail.textContent = 'Contact via GitHub';
+        }
+    }
+
+    const contactGitHub = document.querySelector('.contact-item:nth-child(3) .contact-text p a');
+    if (contactGitHub) {
+        contactGitHub.textContent = `github.com/${userData.login}`;
+        contactGitHub.href = userData.html_url;
+    }
+
+    const contactRepos = document.querySelector('.contact-item:nth-child(4) .contact-text p');
+    if (contactRepos) {
+        contactRepos.textContent = `${userData.public_repos} Public Repositories`;
+    }
+
+    // Update footer
+    const footerName = document.querySelector('#footer .footer-logo h3');
+    if (footerName && userData.name) {
+        footerName.textContent = userData.name;
+    }
+
+    const footerCopyright = document.querySelector('#footer .footer-bottom p');
+    if (footerCopyright && userData.name) {
+        const currentYear = new Date().getFullYear();
+        footerCopyright.textContent = `© ${currentYear} ${userData.name}. All Rights Reserved.`;
+    }
+}
 // Extract skills (languages) from repositories and update the skills section
 async function extractAndDisplaySkills(repos, headers) {
     try {
@@ -721,8 +800,3 @@ function generateActivityChart() {
         grid.appendChild(column);
     }
 }
-
-// For a more complete implementation, you would need to use the GitHub GraphQL API with authentication
-// to fetch the actual contribution data. This would typically be done through a backend service to
-// protect your API token. The implementation above provides a visual demonstration of what it would
-// look like without requiring server-side code.

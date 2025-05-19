@@ -83,13 +83,12 @@ function showGeneratorForm() {
             <div class="generator-form">
                 <button class="close-form">&times;</button>
                 <h2>Create Your Portfolio Website</h2>
-                <p>Enter your information below to generate a personalized portfolio website like this one.</p>
-                <div class="form-content">
+                <p>Enter your information below to generate a personalized portfolio website like this one.</p>                <div class="form-content">
                     <div class="form-group">
                         <label for="generator-github-username">GitHub Username <span class="form-field-required">*</span></label>
                         <input type="text" id="generator-github-username" placeholder="e.g. octocat" required>
                         <div class="error-message" id="github-username-error">Please enter a valid GitHub username</div>
-                        <div class="input-help">Your GitHub profile will be used to populate projects and stats</div>
+                        <div class="input-help">Your GitHub profile will be used to populate projects, stats, and personal information</div>
                     </div>
                     
                     <div class="form-group">
