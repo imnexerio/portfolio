@@ -927,6 +927,7 @@ section:nth-child(even) {
 .contact-content {
     display: flex;
     gap: 50px;
+    width: 100%;
 }
 
 .contact-info {
@@ -981,6 +982,19 @@ section:nth-child(even) {
     padding: 40px;
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
+    width: 100%;
+    display: block;
+    height: auto;
+}
+
+/* Ensure slide-in-right animation is properly applied for contact form */
+.contact-form.slide-in-right {
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.contact-form.slide-in-right.active {
+    opacity: 1;
+    transform: translateX(0);
 }
 
 .form-group {
@@ -1327,4 +1341,42 @@ section:nth-child(even) {
 
 ::-webkit-scrollbar-thumb:hover {
     background: var(--secondary-color);
+}
+
+/* Contact Section - Dynamic sizing */
+#contact {
+    display: flex;
+    flex-direction: column;
+}
+
+#contact .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Additional responsive styling for contact form */
+@media screen and (max-width: 992px) {
+    .contact-content {
+        overflow: visible;
+        margin-bottom: 20px;
+    }
+    
+    .contact-form.scroll-reveal.slide-in-right {
+        opacity: 1;
+        transform: translateX(0);
+        transition-delay: 0.3s;
+    }
+    
+    .contact-form {
+        width: 100%;
+        margin-bottom: 50px;
+    }
+    
+    #contact {
+        height: auto !important;
+        min-height: fit-content;
+        padding-bottom: 100px; /* Ensure there's always room at the bottom */
+    }
 }
