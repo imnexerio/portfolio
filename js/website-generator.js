@@ -6,6 +6,12 @@
 // Initialize the generator when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     initWebsiteGenerator();
+    
+    // Ensure no active overlay on page load
+    const existingOverlay = document.querySelector('.generator-overlay.active');
+    if (existingOverlay) {
+        existingOverlay.classList.remove('active');
+    }
 });
 
 function initWebsiteGenerator() {
@@ -15,23 +21,28 @@ function initWebsiteGenerator() {
     
     // Add click event to the creator button
     creatorBtn.addEventListener('click', showGeneratorForm);
+    
+    // Check if generator overlay exists and remove active class
+    const existingOverlay = document.querySelector('.generator-overlay');
+    if (existingOverlay && existingOverlay.classList.contains('active')) {
+        existingOverlay.classList.remove('active');
+    }
 }
 
 function showGeneratorForm() {
     // Check if the form already exists
     if (document.querySelector('.generator-overlay')) {
+        // Only make it active if it was triggered by a button click
         document.querySelector('.generator-overlay').classList.add('active');
         return;
     }
-    
-    // Create the generator form
+      // Create the generator form
     const formHTML = `
         <div class="generator-overlay">
             <div class="generator-form">
                 <button class="close-form">&times;</button>
                 <h2>Create Your Portfolio Website</h2>
                 <p>Enter your information below to generate a personalized portfolio website like this one.</p>
-                
                 <div class="form-content">
                     <div class="form-group">
                         <label for="generator-github-username">GitHub Username <span class="form-field-required">*</span></label>
@@ -88,8 +99,7 @@ function showGeneratorForm() {
                         <p>You'll receive a ZIP file that you can upload to any web hosting service or GitHub Pages.</p>
                     </div>
                 </div>
-                
-                <div class="loading-indicator">
+                  <div class="loading-indicator">
                     <p>Generating your portfolio website...</p>
                     <div class="generator-progress">
                         <div class="progress-bar">
@@ -132,7 +142,7 @@ function showGeneratorForm() {
     const cancelButton = generatorOverlay.querySelector('button.cancel');
     const generateButton = generatorOverlay.querySelector('button.generate');
     
-    // Show the form
+    // Show the form with a slight delay
     setTimeout(() => {
         generatorOverlay.classList.add('active');
     }, 10);
