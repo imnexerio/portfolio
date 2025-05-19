@@ -4,8 +4,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Force random theme on every refresh
-    forceRandomThemeOnRefresh();
+    // Force random theme on every refresh - after DOM is fully loaded
+    setTimeout(forceRandomThemeOnRefresh, 0);
     
     // Initialize all functions
     initThemeSwitcher();
@@ -73,53 +73,14 @@ function initThemeSwitcher() {
     const customColorPicker = document.getElementById('custom-color-picker');
     const purpleButton = document.querySelector('.theme-btn.purple');
     
-    // Get all available colors from the color options
-    const availableColors = Array.from(colorOptions).map(option => option.getAttribute('data-color'));
-    
-    // Select random color on first visit or page refresh if no theme is saved
-    const hasVisitedBefore = localStorage.getItem('hasVisitedBefore');
-    if (!hasVisitedBefore || !localStorage.getItem('theme')) {
-        // Pick a random color from available colors
-        const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
-        
-        // Apply the random color
-        applyCustomColor(randomColor);
-        customColorPicker.value = randomColor;
-        localStorage.setItem('customThemeColor', randomColor);
-        
-        // Set theme to custom with the random color
-        htmlElement.setAttribute('data-theme', 'custom');
-        localStorage.setItem('theme', 'custom');
-        
-        // Mark that user has visited before
-        localStorage.setItem('hasVisitedBefore', 'true');
-        
-        // Update active button
-        themeButtons.forEach(btn => btn.classList.remove('active'));
+    // Add active class to current theme button - always the custom (purple) button
+    // since we're using random themes on page load
+    themeButtons.forEach(btn => btn.classList.remove('active'));
+    if (purpleButton) {
         purpleButton.classList.add('active');
-    } else {
-        // Check for saved theme preference
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        const savedCustomColor = localStorage.getItem('customThemeColor') || '#9d4edd';
-        
-        // Apply saved theme
-        htmlElement.setAttribute('data-theme', savedTheme);
-        
-        // Apply saved custom color if theme is custom
-        if (savedTheme === 'custom') {
-            applyCustomColor(savedCustomColor);
-            customColorPicker.value = savedCustomColor;
-        }
-        
-        // Add active class to current theme button
-        themeButtons.forEach(button => {
-            if (button.getAttribute('data-theme') === savedTheme) {
-                button.classList.add('active');
-            }
-        });
     }
     
-    // Theme button click handlers
+    // Theme button click handlers - maintain this for user manual selections
     themeButtons.forEach(button => {
         button.addEventListener('click', (event) => {
             const theme = button.getAttribute('data-theme');
