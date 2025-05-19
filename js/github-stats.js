@@ -423,11 +423,14 @@ async function fetchGitHubProjects() {
             
             // Set delay class for animation (max delay-5)
             const delay = Math.min(index + 1, 5);
-            
-            // Create the portfolio item HTML
+              // Create the portfolio item HTML
             const portfolioItem = document.createElement('div');
             portfolioItem.className = `portfolio-item card-3d scroll-scale delay-${delay}`;
             portfolioItem.setAttribute('data-category', language.toLowerCase());
+            
+            // Set initial styles for proper rendering
+            portfolioItem.style.opacity = '1';
+            portfolioItem.style.transform = 'scale(1)';
             
             // Create project image (using placeholder or GitHub identicon as fallback)
             const imageUrl = `images/project-placeholder-${(index % 6) + 1}.jpg`; // Reuse existing placeholder images
@@ -496,13 +499,20 @@ async function fetchGitHubProjects() {
         
         // Update the project details data in the global scope
         window.projectDetailsData = projectDetails;
-        
-        // Reinitialize portfolio modal with new data
+          // Reinitialize portfolio modal with new data
         initPortfolioModal(projectDetails);
         
         // Reinitialize 3D effects on portfolio items
         const portfolioItems = document.querySelectorAll('.portfolio-item.card-3d');
         initializeCardEffects(portfolioItems);
+        
+        // Trigger a click on the "All" filter button to show all projects by default
+        const allFilterButton = document.querySelector('.filter-btn[data-filter="all"]');
+        if (allFilterButton) {
+            setTimeout(() => {
+                allFilterButton.click();
+            }, 100);
+        }
           } catch (error) {
         console.error('Error fetching GitHub projects:', error);
         projectsContainer.innerHTML = `
@@ -559,6 +569,13 @@ function initPortfolioFilters() {
         return;
     }
     
+    // Make all items visible initially
+    portfolioItems.forEach(item => {
+        item.style.display = 'block';
+        item.style.opacity = '1';
+        item.style.transform = 'scale(1)';
+    });
+    
     // Debounce function to improve performance
     function debounce(func, wait) {
         let timeout;
@@ -588,15 +605,15 @@ function initPortfolioFilters() {
             
             // Get filter value
             const filterValue = this.getAttribute('data-filter');
-            
-            // Filter items
+              // Filter items
             portfolioItems.forEach(item => {
-                if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                const itemCategory = item.getAttribute('data-category');
+                if (filterValue === 'all' || itemCategory === filterValue) {
                     item.style.display = 'block';
                     setTimeout(() => {
                         item.style.opacity = '1';
                         item.style.transform = 'scale(1)';
-                    }, 50);
+                    }, 10);
                 } else {
                     item.style.opacity = '0';
                     item.style.transform = 'scale(0.8)';
