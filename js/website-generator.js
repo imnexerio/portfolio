@@ -23,7 +23,23 @@ document.addEventListener('DOMContentLoaded', function() {
         if (successMessage) successMessage.classList.remove('active');
     }
     
-    initWebsiteGenerator();
+    // Check if JSZip is available and load it if not
+    if (typeof JSZip === 'undefined') {
+        console.log("Loading JSZip library");
+        const jsZipScript = document.createElement('script');
+        jsZipScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+        jsZipScript.onload = function() {
+            console.log("JSZip library loaded");
+            initWebsiteGenerator();
+        };
+        jsZipScript.onerror = function() {
+            console.error("Failed to load JSZip library");
+            initWebsiteGenerator();
+        };
+        document.head.appendChild(jsZipScript);
+    } else {
+        initWebsiteGenerator();
+    }
 });
 
 function initWebsiteGenerator() {
@@ -218,93 +234,132 @@ function hideGeneratorForm() {
 }
 
 function validateAndGenerate() {
+    console.log("validateAndGenerate called"); // Debug log
+    
     // Reset all error messages first
     document.querySelectorAll('.error-message').forEach(el => el.classList.remove('active'));
     document.querySelectorAll('input.error').forEach(el => el.classList.remove('error'));
     
     // Get form values
-    const githubUsername = document.getElementById('generator-github-username').value.trim();
-    const name = document.getElementById('generator-name').value.trim();
+    const githubUsernameInput = document.getElementById('generator-github-username');
+    const nameInput = document.getElementById('generator-name');
+    
+    if (!githubUsernameInput || !nameInput) {
+        console.error("Required form elements not found");
+        alert("Error: Required form elements not found. Please refresh the page and try again.");
+        return;
+    }
+    
+    const githubUsername = githubUsernameInput.value.trim();
+    const name = nameInput.value.trim();
     
     // Validate required fields
     let isValid = true;
     
     if (!githubUsername) {
-        document.getElementById('generator-github-username').classList.add('error');
-        document.getElementById('github-username-error').classList.add('active');
-        document.getElementById('github-username-error').textContent = 'Please enter your GitHub username';
+        githubUsernameInput.classList.add('error');
+        const errorElement = document.getElementById('github-username-error');
+        if (errorElement) {
+            errorElement.classList.add('active');
+            errorElement.textContent = 'Please enter your GitHub username';
+        }
         isValid = false;
     }
     
     if (!name) {
-        document.getElementById('generator-name').classList.add('error');
-        document.getElementById('name-error').classList.add('active');
+        nameInput.classList.add('error');
+        const errorElement = document.getElementById('name-error');
+        if (errorElement) {
+            errorElement.classList.add('active');
+        }
         isValid = false;
     }
-      if (isValid) {
+    
+    if (isValid) {
+        console.log("Form valid, generating website..."); // Debug log
         // Proceed with generation without validating GitHub username
         generateWebsite();
+    } else {
+        console.log("Form validation failed"); // Debug log
     }
 }
 
 function generateWebsite() {
-    // Get form values
-    const githubUsername = document.getElementById('generator-github-username').value.trim();
-    const githubToken = document.getElementById('generator-github-token').value.trim();
-    const name = document.getElementById('generator-name').value.trim();
-    const location = document.getElementById('generator-location').value.trim();
-    const email = document.getElementById('generator-email').value.trim();
-    const linkedin = document.getElementById('generator-linkedin').value.trim();
-    const twitter = document.getElementById('generator-twitter').value.trim();
-    const instagram = document.getElementById('generator-instagram').value.trim();
+    console.log("generateWebsite called"); // Debug log
     
-    // Show loading indicator
-    document.querySelector('.form-content').style.display = 'none';
-    document.querySelector('.form-buttons').style.display = 'none';
-    document.querySelector('.loading-indicator').classList.add('active');
-    document.querySelector('.generator-progress').classList.add('active');
-    
-    // Update progress - skip verification
-    updateProgress(10, 'Preparing website files...');
-    updateProgress(30, 'Customizing content...');
-    
-    // Create a configuration object with all the user's information
-    const siteConfig = {
-        github: {
-            username: githubUsername,
-            token: githubToken
-        },
-        personal: {
-            name: name,
-            location: location || 'Earth',
-            email: email || 'contact@example.com',
-            avatar: '' // No avatar since we're not fetching user data
-        },
-        social: {
-            linkedin: linkedin || '',
-            twitter: twitter || '',
-            instagram: instagram || ''
-        },
-        theme: {
-            color: document.documentElement.style.getPropertyValue('--primary-color') || '#9d4edd'
+    try {
+        // Get form values
+        const githubUsername = document.getElementById('generator-github-username').value.trim();
+        const githubToken = document.getElementById('generator-github-token')?.value.trim() || '';
+        const name = document.getElementById('generator-name').value.trim();
+        const location = document.getElementById('generator-location')?.value.trim() || '';
+        const email = document.getElementById('generator-email')?.value.trim() || '';
+        const linkedin = document.getElementById('generator-linkedin')?.value.trim() || '';
+        const twitter = document.getElementById('generator-twitter')?.value.trim() || '';
+        const instagram = document.getElementById('generator-instagram')?.value.trim() || '';
+        
+        // Show loading indicator
+        const formContent = document.querySelector('.form-content');
+        const formButtons = document.querySelector('.form-buttons');
+        const loadingIndicator = document.querySelector('.loading-indicator');
+        const generatorProgress = document.querySelector('.generator-progress');
+        
+        if (formContent) formContent.style.display = 'none';
+        if (formButtons) formButtons.style.display = 'none';
+        if (loadingIndicator) loadingIndicator.classList.add('active');
+        if (generatorProgress) generatorProgress.classList.add('active');
+        
+        // Update progress - skip verification
+        updateProgress(10, 'Preparing website files...');
+        updateProgress(30, 'Customizing content...');
+        
+        // Create a configuration object with all the user's information
+        const siteConfig = {
+            github: {
+                username: githubUsername,
+                token: githubToken
+            },
+            personal: {
+                name: name,
+                location: location || 'Earth',
+                email: email || 'contact@example.com',
+                avatar: '' // No avatar since we're not fetching user data
+            },
+            social: {
+                linkedin: linkedin || '',
+                twitter: twitter || '',
+                instagram: instagram || ''
+            },
+            theme: {
+                color: document.documentElement.style.getPropertyValue('--primary-color') || '#9d4edd'
+            }
+        };
+        
+        // Generate the website files
+        updateProgress(50, 'Cloning website files...');
+        
+        // Create GitHub configuration file
+        const githubConfigJS = generateGithubConfigFile(siteConfig);
+        
+        // Make sure JSZip is available
+        if (typeof JSZip === 'undefined') {
+            console.error("JSZip library not found");
+            throw new Error("Required JSZip library not found. Please check your internet connection and try again.");
         }
-    };
-    
-    // Generate the website files
-    updateProgress(50, 'Cloning website files...');
-    
-    // Create GitHub configuration file
-    const githubConfigJS = generateGithubConfigFile(siteConfig);
-    
-    // Create a ZIP file with all the necessary website files
-    createWebsiteZip(siteConfig, githubConfigJS)
-        .then(zipBlob => {
-            completeGeneration(siteConfig, zipBlob);
-        })
-        .catch(error => {
-            console.error('Error creating website files:', error);
-            showGenerationError('Failed to create website files');
-        });
+        
+        // Create a ZIP file with all the necessary website files
+        createWebsiteZip(siteConfig, githubConfigJS)
+            .then(zipBlob => {
+                completeGeneration(siteConfig, zipBlob);
+            })
+            .catch(error => {
+                console.error('Error creating website files:', error);
+                showGenerationError('Failed to create website files: ' + error.message);
+            });
+    } catch (error) {
+        console.error('Error in generateWebsite:', error);
+        showGenerationError('An unexpected error occurred: ' + error.message);
+    }
 }
 
 // Generate GitHub configuration file
@@ -435,6 +490,9 @@ function createWebsiteZip(config, githubConfigJS) {
                         content = content.replace(/class="loading-indicator active"/g, 'class="loading-indicator"');
                         content = content.replace(/class="generator-progress active"/g, 'class="generator-progress"');
                         content = content.replace(/class="success-message active"/g, 'class="success-message"');
+                        
+                        // Make sure all event listeners are properly reattached in the generated site
+                        content = addGenerationBootstrap(content);
                     }
                     
                     // Add the file to the ZIP
@@ -681,19 +739,78 @@ function showGenerationError(message) {
  * @param {string} message - Status message to display
  */
 function updateProgress(percentage, message) {
-    // Update progress bar
-    const progressBar = document.querySelector('.progress-bar-fill');
-    const progressStatus = document.querySelector('.progress-status');
+    console.log(`Generation progress: ${percentage}% - ${message}`);
     
-    if (progressBar && progressStatus) {
-        // Set progress bar width
-        progressBar.style.width = `${percentage}%`;
+    try {
+        // Update progress bar
+        const progressBar = document.querySelector('.progress-bar-fill');
+        const progressStatus = document.querySelector('.progress-status');
         
-        // Update status message
-        progressStatus.textContent = message;
+        if (progressBar) {
+            // Set progress bar width
+            progressBar.style.width = `${percentage}%`;
+        }
         
-        // Log progress for debugging
-        console.log(`Generation progress: ${percentage}% - ${message}`);
+        if (progressStatus) {
+            // Update status message
+            progressStatus.textContent = message;
+        }
+    } catch (error) {
+        console.error('Error updating progress:', error);
     }
+}
+
+/**
+ * Adds self-initializing bootstrap code to the website-generator.js file
+ * to ensure that all event handlers are properly attached in the generated site
+ */
+function addGenerationBootstrap(content) {
+    // Ensure the DOMContentLoaded event properly initializes everything
+    const bootstrapCode = `
+// Self-initializing code for the generated site
+(function() {
+    // Ensure everything is properly initialized when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize the generator
+        initWebsiteGenerator();
+        
+        // Directly attach event listeners to any existing form
+        const existingOverlay = document.querySelector('.generator-overlay');
+        if (existingOverlay) {
+            // Remove active class
+            existingOverlay.classList.remove('active');
+            
+            // Reset form state
+            const formContent = existingOverlay.querySelector('.form-content');
+            const formButtons = existingOverlay.querySelector('.form-buttons');
+            const loadingIndicator = existingOverlay.querySelector('.loading-indicator');
+            const successMessage = existingOverlay.querySelector('.success-message');
+            
+            if (formContent) formContent.style.display = 'block';
+            if (formButtons) formButtons.style.display = 'flex';
+            if (loadingIndicator) loadingIndicator.classList.remove('active');
+            if (successMessage) successMessage.classList.remove('active');
+            
+            // Re-attach event listeners
+            const closeButton = existingOverlay.querySelector('.close-form');
+            const cancelButton = existingOverlay.querySelector('button.cancel');
+            const generateButton = existingOverlay.querySelector('button.generate');
+            
+            if (closeButton) closeButton.addEventListener('click', hideGeneratorForm);
+            if (cancelButton) cancelButton.addEventListener('click', hideGeneratorForm);
+            if (generateButton) generateButton.addEventListener('click', validateAndGenerate);
+            
+            // Click outside to close
+            existingOverlay.addEventListener('click', function(event) {
+                if (event.target === existingOverlay) {
+                    hideGeneratorForm();
+                }
+            });
+        }
+    });
+})();`;
+
+    // Add the bootstrap code to the end of the file
+    return content + '\n\n' + bootstrapCode;
 }
 
