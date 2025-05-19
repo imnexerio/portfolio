@@ -99,28 +99,6 @@
   padding: 0 20px;
 }
 
-/* Horizontal Scroll Section */
-.horizontal-scroll-container {
-  height: 100vh;
-  overflow-x: hidden;
-  position: relative;
-}
-
-.horizontal-scroll-section {
-  position: absolute;
-  height: 100%;
-  display: flex;
-  will-change: transform;
-}
-
-.horizontal-scroll-item {
-  height: 100%;
-  width: 100vw;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
 /* Text Split Animation */
 .split-text {
   overflow: hidden;

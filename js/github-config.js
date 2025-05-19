@@ -1,0 +1,90 @@
+/**
+ * GitHub Configuration Manager
+ * 
+ * Central configuration for all GitHub-related functionality across the portfolio.
+ * This file must be loaded BEFORE any other GitHub integration scripts.
+ */
+
+// Create a namespace for GitHub configuration
+window.GitHubConfig = (function() {
+    // Private GitHub credentials
+    const _username = 'imnexerio';
+    const _token = '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';
+    
+    // Configuration options
+    const _config = {
+        maxLanguages: 6,              // Maximum number of languages to display
+        minLanguagePercentage: 1,     // Minimum percentage to include a language
+        perPage: 100,                 // Number of repos to fetch per page
+        sortBy: 'updated'             // How to sort repositories
+    };
+    
+    // Public API
+    return {
+        // Get GitHub username
+        getUsername: function() {
+            return _username;
+        },
+        
+        // Get GitHub token
+        getToken: function() {
+            return _token;
+        },
+        
+        // Get config settings
+        getConfig: function(key) {
+            return key ? _config[key] : _config;
+        },
+        
+        // Get authorization headers for GitHub API requests
+        getAuthHeaders: function() {
+            const headers = {};
+            if (_token) {
+                headers['Authorization'] = `Bearer ${_token}`;
+            }
+            return headers;
+        },
+        
+        // Build GitHub API URL
+        buildApiUrl: function(endpoint, params = {}) {
+            const baseUrl = `https://api.github.com/${endpoint}`;
+            const queryParams = new URLSearchParams(params).toString();
+            return queryParams ? `${baseUrl}?${queryParams}` : baseUrl;
+        },
+        
+        // Get user repositories URL with parameters
+        getUserReposUrl: function() {
+            return this.buildApiUrl(`users/${_username}/repos`, {
+                per_page: _config.perPage,
+                sort: _config.sortBy
+            });
+        },
+        
+        // Check if token is valid
+        validateToken: function(token = _token) {
+            if (!token || token.trim() === '') {
+                return { valid: false, message: 'No token provided' };
+            }
+            
+            // Check if token is a fine-grained token (starts with github_pat_)
+            if (token.startsWith('github_pat_')) {
+                // These tokens have a specific format we can check
+                if (!/^github_pat_[A-Za-z0-9_]{22}_[A-Za-z0-9]{59}$/.test(token)) {
+                    return { valid: false, message: 'Invalid fine-grained token format' };
+                }
+                return { valid: true, message: 'Fine-grained token format is valid' };
+            }
+            
+            // Classic tokens are harder to validate by format
+            // At minimum it should be of reasonable length
+            if (token.length < 30) {
+                return { valid: false, message: 'Token appears too short to be valid' };
+            }
+            
+            return { valid: true, message: 'Token format appears valid' };
+        }
+    };
+})();
+
+// Log that the config has been initialized
+console.log('GitHub Config: Initialized successfully');

@@ -4,6 +4,9 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
+    // Force random theme on every refresh - after DOM is fully loaded
+    setTimeout(forceRandomThemeOnRefresh, 0);
+    
     // Initialize all functions
     initThemeSwitcher();
     initNavigation();
@@ -15,15 +18,51 @@ document.addEventListener('DOMContentLoaded', function() {
     initContactForm();
     initBackToTop();
     initScrollProgress();
+    initCreatorTypingEffect();  // Initialize the creator button typing effect
     init3DCardEffect();
     initMagneticElements();
     initParallaxEffect();
-    initHorizontalScroll();
     initSplitTextAnimation();
     initWowFactorElements();
     initMouseTrailer();
     initParticleEffect();
 });
+
+// Function to apply custom color to CSS variables - moved outside to make it globally accessible
+function applyCustomColor(color) {
+    document.documentElement.style.setProperty('--primary-color', color);
+    document.documentElement.style.setProperty('--accent-color', color);
+    
+    // Adjust secondary color to be slightly darker
+    const darkerColor = adjustColorBrightness(color, -30);
+    document.documentElement.style.setProperty('--secondary-color', darkerColor);
+    
+    // Update gradients
+    document.documentElement.style.setProperty('--gradient-primary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
+    document.documentElement.style.setProperty('--gradient-secondary', `linear-gradient(135deg, ${color}, ${darkerColor})`);
+    
+    // Update color of the custom theme button
+    const purpleButton = document.querySelector('.theme-btn.purple');
+    if (purpleButton) {
+        purpleButton.style.backgroundColor = color;
+    }
+}
+
+// Helper function to darken or lighten a color - moved outside to make it globally accessible
+function adjustColorBrightness(hex, percent) {
+    // Convert hex to RGB
+    var r = parseInt(hex.slice(1, 3), 16);
+    var g = parseInt(hex.slice(3, 5), 16);
+    var b = parseInt(hex.slice(5, 7), 16);
+    
+    // Adjust brightness
+    r = Math.max(0, Math.min(255, r + percent));
+    g = Math.max(0, Math.min(255, g + percent));
+    b = Math.max(0, Math.min(255, b + percent));
+    
+    // Convert back to hex
+    return '#' + r.toString(16).padStart(2, '0') + g.toString(16).padStart(2, '0') + b.toString(16).padStart(2, '0');
+}
 
 /**
  * Theme Switcher
@@ -31,31 +70,44 @@ document.addEventListener('DOMContentLoaded', function() {
 function initThemeSwitcher() {
     const themeButtons = document.querySelectorAll('.theme-btn');
     const htmlElement = document.documentElement;
+    const colorOptions = document.querySelectorAll('.color-option');
+    const customColorPicker = document.getElementById('custom-color-picker');
+    const purpleButton = document.querySelector('.theme-btn.purple');
+    const toggleButton = document.querySelector('.theme-btn.toggle-theme');
+    const sunIcon = toggleButton ? toggleButton.querySelector('.fa-sun') : null;
+    const moonIcon = toggleButton ? toggleButton.querySelector('.fa-moon') : null;
     
-    // Check for saved theme preference
-    const savedTheme = localStorage.getItem('theme') || 'light';
-    htmlElement.setAttribute('data-theme', savedTheme);
-    
-    // Add active class to current theme button
-    themeButtons.forEach(button => {
-        if (button.getAttribute('data-theme') === savedTheme) {
-            button.classList.add('active');
-        }
-        
-        button.addEventListener('click', () => {
-            const theme = button.getAttribute('data-theme');
+    // Theme toggle button click handler
+    if (toggleButton) {
+        toggleButton.addEventListener('click', () => {
+            const currentTheme = toggleButton.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            // Toggle the icon display
+            if (sunIcon && moonIcon) {
+                if (newTheme === 'dark') {
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'inline-block';
+                } else {
+                    sunIcon.style.display = 'inline-block';
+                    moonIcon.style.display = 'none';
+                }
+            }
+            
+            // Update button attribute
+            toggleButton.setAttribute('data-theme', newTheme);
             
             // Remove active class from all buttons
             themeButtons.forEach(btn => btn.classList.remove('active'));
             
-            // Add active class to clicked button
-            button.classList.add('active');
+            // Add active class to toggle button
+            toggleButton.classList.add('active');
             
             // Set theme
-            htmlElement.setAttribute('data-theme', theme);
+            htmlElement.setAttribute('data-theme', newTheme);
             
             // Save theme preference
-            localStorage.setItem('theme', theme);
+            localStorage.setItem('theme', newTheme);
             
             // Add animation effect when changing theme
             document.body.classList.add('theme-transition');
@@ -63,7 +115,69 @@ function initThemeSwitcher() {
                 document.body.classList.remove('theme-transition');
             }, 1000);
         });
-    });
+    }
+    
+    // Add active class to current theme button - always the custom (purple) button
+    // since we're using random themes on page load
+    themeButtons.forEach(btn => btn.classList.remove('active'));
+    if (purpleButton) {
+        purpleButton.classList.add('active');
+    }
+}
+
+/**
+ * Force Random Theme on Every Refresh
+ */
+function forceRandomThemeOnRefresh() {
+    // We need to wait for the DOM to be ready to get the color options
+    const colorOptions = document.querySelectorAll('.color-option');
+    if(colorOptions.length === 0) {
+        // If color options aren't available yet, set a fallback random color
+        const fallbackColors = ['#9d4edd', '#ff6b6b', '#4cc9f0', '#f72585', '#4361ee', '#fb8500', '#43aa8b', '#f94144'];
+        const randomColor = fallbackColors[Math.floor(Math.random() * fallbackColors.length)];
+        
+        // Apply the random color
+        applyCustomColor(randomColor);
+        
+        // Save the custom color
+        localStorage.setItem('customThemeColor', randomColor);
+        
+        // Set theme to custom with the random color
+        document.documentElement.setAttribute('data-theme', 'custom');
+        localStorage.setItem('theme', 'custom');
+        
+        return;
+    }
+    
+    // Get all available colors from the color options
+    const availableColors = Array.from(colorOptions).map(option => option.getAttribute('data-color'));
+    
+    // Pick a random color from available colors
+    const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+    
+    // Apply the random color
+    applyCustomColor(randomColor);
+    
+    // Update the custom color picker value
+    const customColorPicker = document.getElementById('custom-color-picker');
+    if (customColorPicker) {
+        customColorPicker.value = randomColor;
+    }
+    
+    // Save the custom color
+    localStorage.setItem('customThemeColor', randomColor);
+    
+    // Set theme to custom with the random color
+    document.documentElement.setAttribute('data-theme', 'custom');
+    localStorage.setItem('theme', 'custom');
+    
+    // Update active button
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    themeButtons.forEach(btn => btn.classList.remove('active'));
+    const purpleButton = document.querySelector('.theme-btn.purple');
+    if (purpleButton) {
+        purpleButton.classList.add('active');
+    }
 }
 
 /**
@@ -144,6 +258,47 @@ function initTypingEffect() {
     // Start the typing effect
     setTimeout(type, 1000);
 }
+
+/**
+ * Creator Button Typing Animation
+ */
+function initCreatorTypingEffect() {
+    const typedMessage = document.querySelector('.typed-message');
+    if (!typedMessage) return;
+    
+    const message = "Developed by imnexerio - Get for yourself!";
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 100;
+    
+    function type() {
+        if (isDeleting) {
+            typedMessage.textContent = message.substring(0, charIndex - 1);
+            charIndex--;
+            typingSpeed = 50;
+        } else {
+            typedMessage.textContent = message.substring(0, charIndex + 1);
+            charIndex++;
+            typingSpeed = 100;
+        }
+        
+        if (!isDeleting && charIndex === message.length) {
+            isDeleting = true;
+            typingSpeed = 2000; // Pause at the end of message
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            typingSpeed = 500; // Pause before retyping
+        }
+        
+        setTimeout(type, typingSpeed);
+    }
+    
+    // Start typing immediately
+    setTimeout(type, 1000);
+}
+
+// Initialize the creator button typing effect
+initCreatorTypingEffect();
 
 /**
  * Advanced Scroll Animations with Intersection Observer for performance
@@ -233,6 +388,28 @@ function initSkillsAnimation() {
     skillLevels.forEach(level => {
         observer.observe(level);
     });
+    
+    // Re-initialize scroll animations for newly added skill items
+    const newScrollElements = document.querySelectorAll('.skill-item.scroll-scale:not(.active)');
+    if (newScrollElements.length > 0) {
+        // Use the same observer options as in initAdvancedScrollAnimations
+        const scrollObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        });
+        
+        newScrollElements.forEach(element => {
+            scrollObserver.observe(element);
+        });
+    }
 }
 
 /**
@@ -289,81 +466,41 @@ function initPortfolioFilter() {
 /**
  * Portfolio Modal
  */
-function initPortfolioModal() {
+function initPortfolioModal(dynamicProjectDetails) {
     const modal = document.querySelector('.portfolio-modal');
     const modalContent = document.querySelector('.modal-body');
     const closeModal = document.querySelector('.close-modal');
     const detailButtons = document.querySelectorAll('.portfolio-details');
 
-    // Project details data (updated with GitHub projects)
-    const projectDetails = {
-        1: {
-            title: 'EyerisAndroid',
-            category: 'Kotlin',
-            client: 'Open Source',
-            date: '2023',
-            description: 'Opensource Project build to track eye blinks using camera. This project utilizes computer vision techniques to detect and track eye blinks in real-time using the device camera.',
-            technologies: ['Kotlin', 'Android', 'Computer Vision', 'Camera API'],
-            image: 'images/project-placeholder-1.jpg',
-            url: 'https://github.com/imnexerio/EyerisAndroid'
-        },
-        2: {
-            title: 'i2Step',
-            category: 'Kotlin',
-            client: 'Open Source',
-            date: '2023',
-            description: 'An opensource Project to manage business easily. This application provides tools and features to help businesses streamline their operations and improve efficiency.',
-            technologies: ['Kotlin', 'Android', 'Business Management'],
-            image: 'images/project-placeholder-2.jpg',
-            url: 'https://github.com/imnexerio/i2Step'
-        },
-        3: {
-            title: 'MPHolistic',
-            category: 'Kotlin',
-            client: 'Open Source',
-            date: '2022',
-            description: 'This Android app can be used to extract holistic landmark and is based on Google\'s Mediapipe. It provides a framework for detecting and tracking human body landmarks in real-time.',
-            technologies: ['Kotlin', 'Android', 'Mediapipe', 'Computer Vision'],
-            image: 'images/project-placeholder-3.jpg',
-            url: 'https://github.com/imnexerio/MPHolistic'
-        },
-        4: {
-            title: 'reTracker',
-            category: 'Dart',
-            client: 'Open Source',
-            date: '2022',
-            description: 'A cross platform application to track any task easily. Built with Flutter, this app allows users to create, manage, and track tasks across different platforms.',
-            technologies: ['Dart', 'Flutter', 'Cross-Platform', 'Task Management'],
-            image: 'images/project-placeholder-4.jpg',
-            url: 'https://github.com/imnexerio/reTracker'
-        },
-        5: {
-            title: 'Arduino_java',
-            category: 'Java',
-            client: 'Open Source',
-            date: '2021',
-            description: 'A Java-based project for Arduino integration. This project allows for communication and control between Java applications and Arduino hardware.',
-            technologies: ['Java', 'Arduino', 'Hardware Integration'],
-            image: 'images/project-placeholder-5.jpg',
-            url: 'https://github.com/imnexerio/Arduino_java'
-        },
-        6: {
-            title: 'BookLibConnect',
-            category: 'Other',
-            client: 'Open Source',
-            date: '2021',
-            description: 'A standalone Audible downloader and decrypter. This tool allows users to download and decrypt Audible audiobooks for personal use.',
-            technologies: ['Audio Processing', 'Decryption', 'File Management'],
-            image: 'images/project-placeholder-6.jpg',
-            url: 'https://github.com/imnexerio/BookLibConnect'
-        }
-    };
-
-    // Open modal with project details
+    // Project details data - only use dynamic data, no fallback
+    const projectDetails = dynamicProjectDetails;    // Open modal with project details
     detailButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
             const projectId = button.getAttribute('data-id');
+            
+            if (!projectDetails) {
+                // Display error message when no project details are provided
+                modalContent.innerHTML = `
+                    <div class="modal-project">
+                        <div class="modal-error">
+                            <h2>Error</h2>
+                            <p>Project details are not available. Please check the GitHub integration.</p>
+                        </div>
+                    </div>
+                `;
+                
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+                
+                // Add animation class to modal content
+                setTimeout(() => {
+                    modalContent.classList.add('modal-animate');
+                }, 50);
+                
+                return;
+            }
+            
             const project = projectDetails[projectId];
             
             if (project) {
@@ -407,6 +544,23 @@ function initPortfolioModal() {
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
                 
                 // Add animation class to modal content
+                setTimeout(() => {
+                    modalContent.classList.add('modal-animate');
+                }, 50);
+            } else {
+                // Display error message for specific project not found
+                modalContent.innerHTML = `
+                    <div class="modal-project">
+                        <div class="modal-error">
+                            <h2>Error</h2>
+                            <p>Project with ID ${projectId} was not found.</p>
+                        </div>
+                    </div>
+                `;
+                
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
                 setTimeout(() => {
                     modalContent.classList.add('modal-animate');
                 }, 50);
@@ -744,65 +898,6 @@ function initParallaxEffect() {
 }
 
 /**
- * Horizontal Scroll with Intersection Observer for performance
- */
-function initHorizontalScroll() {
-    const horizontalContainer = document.querySelector('.horizontal-scroll-container');
-    
-    if (horizontalContainer) {
-        const horizontalSection = horizontalContainer.querySelector('.horizontal-scroll-section');
-        const items = horizontalSection.querySelectorAll('.horizontal-scroll-item');
-        const totalWidth = items.length * 100; // 100vw per item
-        
-        horizontalSection.style.width = `${totalWidth}vw`;
-        
-        // Use Intersection Observer for better performance
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                // Throttle function to improve performance
-                function throttle(func, limit) {
-                    let lastFunc;
-                    let lastRan;
-                    return function() {
-                        const context = this;
-                        const args = arguments;
-                        if (!lastRan) {
-                            func.apply(context, args);
-                            lastRan = Date.now();
-                        } else {
-                            clearTimeout(lastFunc);
-                            lastFunc = setTimeout(function() {
-                                if ((Date.now() - lastRan) >= limit) {
-                                    func.apply(context, args);
-                                    lastRan = Date.now();
-                                }
-                            }, limit - (Date.now() - lastRan));
-                        }
-                    };
-                }
-                
-                const scrollHandler = throttle(() => {
-                    const containerRect = horizontalContainer.getBoundingClientRect();
-                    const scrollProgress = -containerRect.top / (containerRect.height - window.innerHeight);
-                    const translateX = scrollProgress * (totalWidth - 100);
-                    
-                    // Use requestAnimationFrame for smoother animation
-                    requestAnimationFrame(() => {
-                        horizontalSection.style.transform = `translateX(-${translateX}vw)`;
-                    });
-                }, 50);
-                
-                window.addEventListener('scroll', scrollHandler);
-            }
-        }, {
-            threshold: 0.1
-        });
-        
-        observer.observe(horizontalContainer);
-    }
-}
-
-/**
  * Split Text Animation
  */
 function initSplitTextAnimation() {
@@ -1056,8 +1151,7 @@ style.textContent = `
     .mouse-trailer {
         will-change: transform, width, height;
     }
-    
-    /* Reduce animation complexity on mobile */
+      /* Reduce animation complexity on mobile */
     @media (max-width: 768px) {
         .cube-container {
             display: none;
@@ -1072,6 +1166,25 @@ style.textContent = `
         .mouse-trailer {
             display: none;
         }
+    }
+    
+    /* Modal error styling */
+    .modal-error {
+        text-align: center;
+        padding: 30px;
+        background-color: rgba(255, 0, 0, 0.1);
+        border-radius: 8px;
+        margin: 20px;
+    }
+    
+    .modal-error h2 {
+        color: #ff3333;
+        margin-bottom: 15px;
+    }
+    
+    .modal-error p {
+        font-size: 1.1rem;
+        line-height: 1.6;
     }
 `;
 document.head.appendChild(style);

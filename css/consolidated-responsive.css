@@ -1,0 +1,306 @@
+/* 
+======================
+    Consolidated Responsive Styles
+    A more efficient approach with grouped media queries
+======================
+*/
+
+/* ======================
+   Extra Small Devices (< 380px)
+   ====================== */
+@media screen and (max-width: 380px) {
+    /* Hero section */
+    .hero-content h1 {
+        font-size: 1.8rem;
+    }
+    
+    .hero-content h2 {
+        font-size: 1.3rem;
+    }
+    
+    .social-icons {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+    
+    /* Theme switcher */
+    .theme-switcher {
+        top: 70px;
+        right: 10px;
+    }
+    
+    .theme-btn {
+        width: 30px;
+        height: 30px;
+    }
+}
+
+/* ======================
+   Small Devices (< 576px)
+   ====================== */
+@media screen and (max-width: 576px) {
+    /* WOW section */
+    .wow-section {
+        padding: 60px 0;
+    }
+    
+    .wow-content {
+        padding: 0 15px;
+    }
+    
+    .wow-button {
+        padding: 12px 30px;
+        font-size: 0.9rem;
+    }
+    
+    /* Floating elements */
+    .floating-element {
+        transform: scale(0.7);
+    }
+    
+    .floating-element:nth-child(2),
+    .floating-element:nth-child(4) {
+        display: none;
+    }
+    
+    /* Back to top button */
+    .back-to-top {
+        width: 40px;
+        height: 40px;
+        right: 15px;
+        bottom: 15px;
+    }
+    
+    /* Form elements */
+    .form-group input,
+    .form-group textarea {
+        padding: 12px;
+    }
+    
+    .form-group textarea {
+        min-height: 120px;
+    }
+    
+    /* Footer social icons */
+    .footer-social {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+    
+    /* Theme switcher - Improved mobile experience */
+    .color-palette {
+        right: auto;
+        left: 50px;
+        z-index: 1010;
+    }
+    
+    /* Force the palette to be visible when open, even without hover */
+    .theme-btn.purple.palette-open .color-palette {
+        visibility: visible;
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+    }
+}
+
+/* ======================
+   Medium Devices (< 768px)
+   ====================== */
+@media screen and (max-width: 768px) {
+    /* Navigation menu */
+    body.menu-open {
+        overflow: hidden;
+    }
+    
+    #header .container {
+        padding: 0 15px;
+    }
+    
+    .nav-links {
+        padding-top: 20px;
+        overflow-y: auto;
+    }
+    
+    .nav-links a {
+        font-size: 1.2rem;
+        padding: 15px;
+        width: 100%;
+        text-align: center;
+    }
+    
+    /* Sticky header */
+    #header.scrolled {
+        padding: 10px 0;
+    }
+    
+    .logo a {
+        font-size: 1.5rem;
+    }
+    
+    /* Portfolio modal */
+    .modal-content {
+        width: 95%;
+        padding: 20px;
+    }
+    
+    .close-modal {
+        top: 10px;
+        right: 10px;
+    }
+    
+    /* Skill bars animation */
+    .skill-level {
+        transition: width 1s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+    
+    /* Parallax effect */
+    .parallax-section {
+        perspective: none;
+    }
+    
+    .parallax-bg {
+        transform: none;
+    }
+    
+    .parallax-content {
+        transform-style: flat;
+    }
+    
+    /* Scroll animations */
+    .scroll-reveal,
+    .scroll-scale,
+    .scroll-rotate {
+        transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1), 
+                    transform 1s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    
+    /* Staggered animations */
+    @keyframes staggerFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    /* Split text animation */
+    .split-text span {
+        transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+                    opacity 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+    }
+    
+    /* Scroll progress indicator */
+    .scroll-progress {
+        height: 3px;
+    }
+    
+    /* Section padding */
+    section {
+        padding: 80px 0;
+    }
+    
+    section:first-of-type {
+        padding-top: 100px;
+    }
+}
+
+/* ======================
+   Medium-Specific Devices (577px - 767px)
+   ====================== */
+@media screen and (min-width: 577px) and (max-width: 767px) {
+    /* Portfolio items */
+    .portfolio-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    
+    .portfolio-img {
+        height: 180px;
+    }
+}
+
+/* ======================
+   Medium to Large Devices (577px - 991px)
+   ====================== */
+@media screen and (min-width: 577px) and (max-width: 991px) {
+    /* About section image */
+    .about-image {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+    
+    /* Contact section */
+    .contact-content {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 40px;
+    }
+    
+    .contact-info {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+}
+
+/* ======================
+   Large-Specific Devices (769px - 991px)
+   ====================== */
+@media screen and (min-width: 769px) and (max-width: 991px) {
+    /* Skills section */
+    .skills-content {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .skill-category {
+        flex: 0 0 100%;
+        margin-bottom: 40px;
+    }
+}
+
+/* ======================
+   Very Large Screens (> 1800px)
+   ====================== */
+@media screen and (min-width: 1800px) {
+    html {
+        font-size: 20px;
+    }
+    
+    .container {
+        max-width: 1500px;
+    }
+}
+
+/* ======================
+   Touch Devices (Any Size)
+   ====================== */
+@media (hover: none) {
+    .card-3d:hover {
+        transform: none !important;
+    }
+    
+    .card-3d-inner:hover {
+        transform: none !important;
+    }
+}
+
+/* ======================
+   Devices with Notches
+   ====================== */
+@supports (padding: max(0px)) {
+    #header {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+    }
+    
+    .container {
+        padding-left: max(20px, env(safe-area-inset-left));
+        padding-right: max(20px, env(safe-area-inset-right));
+    }
+}
