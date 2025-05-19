@@ -9,8 +9,19 @@
 window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = 'imnexerio';
-    // replace your token here or leave it empty to use public access or use github environment variables
-    const _token = '';
+    
+    // Get token from environment variables
+    // This works both for local development (with .env file) and deployed sites
+    const _token = (function() {
+        // If Env is available, use it to get the token
+        if (window.Env) {
+            return window.Env.get('GITHUB_TOKEN', '');
+        }
+        
+        // Fallback to empty token if Env is not available
+        console.log('Environment utility not loaded - using public API access');
+        return '';
+    })();
     
     // Configuration options
     const _config = {
