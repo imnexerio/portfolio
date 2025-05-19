@@ -206,45 +206,9 @@ function validateAndGenerate() {
         document.getElementById('name-error').classList.add('active');
         isValid = false;
     }
-    
-    if (isValid) {
-        // Show loading indicator for GitHub username validation
-        const formContent = document.querySelector('.form-content');
-        const formButtons = document.querySelector('.form-buttons');
-        
-        // Show a validating message
-        formButtons.style.display = 'none';
-        const validatingElement = document.createElement('div');
-        validatingElement.className = 'validating-message';
-        validatingElement.innerHTML = `<p>Validating GitHub username: <strong>${githubUsername}</strong>...</p>`;
-        formContent.appendChild(validatingElement);
-        
-        // Check if GitHub username exists
-        fetch(`https://api.github.com/users/${githubUsername}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('GitHub user not found');
-                }
-                return response.json();
-            })            .then(() => {
-                // Username valid, proceed with generation
-                if (validatingElement && validatingElement.parentNode === formContent) {
-                    formContent.removeChild(validatingElement);
-                }
-                formButtons.style.display = 'flex';
-                generateWebsite();
-            })
-            .catch(error => {
-                // Username invalid, show error
-                if (validatingElement && validatingElement.parentNode === formContent) {
-                    formContent.removeChild(validatingElement);
-                }
-                formButtons.style.display = 'flex';
-                
-                document.getElementById('generator-github-username').classList.add('error');
-                document.getElementById('github-username-error').classList.add('active');
-                document.getElementById('github-username-error').textContent = 'GitHub username not found. Please check and try again.';
-            });
+      if (isValid) {
+        // Proceed with generation without validating GitHub username
+        generateWebsite();
     }
 }
 
@@ -265,63 +229,46 @@ function generateWebsite() {
     document.querySelector('.loading-indicator').classList.add('active');
     document.querySelector('.generator-progress').classList.add('active');
     
-    // Update progress
-    updateProgress(10, 'Verifying GitHub account...');
+    // Update progress - skip verification
+    updateProgress(10, 'Preparing website files...');
+    updateProgress(30, 'Customizing content...');
     
-    // Verify GitHub account exists
-    fetch(`https://api.github.com/users/${githubUsername}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('GitHub user not found');
-            }
-            return response.json();
-        })
-        .then(userData => {
-            // GitHub account exists, continue with website generation
-            updateProgress(30, 'Preparing website files...');
-            
-            // Create a configuration object with all the user's information
-            const siteConfig = {
-                github: {
-                    username: githubUsername,
-                    token: githubToken
-                },
-                personal: {
-                    name: name,
-                    location: location || userData.location || 'Earth',
-                    email: email || 'contact@example.com',
-                    avatar: userData.avatar_url || '' // Get avatar from GitHub
-                },
-                social: {
-                    linkedin: linkedin || '',
-                    twitter: twitter || '',
-                    instagram: instagram || ''
-                },
-                theme: {
-                    color: document.documentElement.style.getPropertyValue('--primary-color') || '#9d4edd'
-                }
-            };
-            
-            // Generate the website files
-            updateProgress(50, 'Cloning website files...');
-            
-            // Create GitHub configuration file
-            const githubConfigJS = generateGithubConfigFile(siteConfig);
-            
-            // Create a ZIP file with all the necessary website files
-            createWebsiteZip(siteConfig, githubConfigJS)
-                .then(zipBlob => {
-                    completeGeneration(siteConfig, zipBlob);
-                })
-                .catch(error => {
-                    console.error('Error creating website files:', error);
-                    showGenerationError('Failed to create website files');
-                });
+    // Create a configuration object with all the user's information
+    const siteConfig = {
+        github: {
+            username: githubUsername,
+            token: githubToken
+        },
+        personal: {
+            name: name,
+            location: location || 'Earth',
+            email: email || 'contact@example.com',
+            avatar: '' // No avatar since we're not fetching user data
+        },
+        social: {
+            linkedin: linkedin || '',
+            twitter: twitter || '',
+            instagram: instagram || ''
+        },
+        theme: {
+            color: document.documentElement.style.getPropertyValue('--primary-color') || '#9d4edd'
+        }
+    };
+    
+    // Generate the website files
+    updateProgress(50, 'Cloning website files...');
+    
+    // Create GitHub configuration file
+    const githubConfigJS = generateGithubConfigFile(siteConfig);
+    
+    // Create a ZIP file with all the necessary website files
+    createWebsiteZip(siteConfig, githubConfigJS)
+        .then(zipBlob => {
+            completeGeneration(siteConfig, zipBlob);
         })
         .catch(error => {
-            // Handle errors
-            console.error('Website generation error:', error);
-            showGenerationError(error.message);
+            console.error('Error creating website files:', error);
+            showGenerationError('Failed to create website files');
         });
 }
 
