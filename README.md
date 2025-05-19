@@ -19,22 +19,36 @@ A modern, responsive portfolio website that dynamically displays your GitHub pro
 
 1. Clone this repository
 2. Open `js/github-config.js` and update your GitHub username
-3. Customize your personal information in the profile sections
-4. Deploy to your preferred hosting service (GitHub Pages, Netlify, Vercel, etc.)
+3. For local development, create a `.env` file based on `.env.example` with your GitHub token
+4. Customize your personal information in the profile sections
+5. Deploy to your preferred hosting service (GitHub Pages, Netlify, Vercel, etc.)
 
 ## 🛠️ Configuration
 
 ### GitHub Integration
 
-Edit the `js/github-config.js` file to set your GitHub username and optional access token:
+Edit the `js/github-config.js` file to set your GitHub username:
 
 ```javascript
 // Private GitHub credentials
 const _username = 'your-github-username';
-const _token = 'your-github-token'; // Optional but recommended for higher API limits
 ```
 
-> **Note**: If you include a GitHub token in your code, make sure the repository is private or use environment variables for deployment.
+### Environment Variables
+
+For local development:
+1. Copy `.env.example` to `.env` in the root directory
+2. Add your GitHub Personal Access Token:
+```
+PAT_GITHUB=your_github_personal_access_token_here
+```
+
+For GitHub Pages deployment:
+1. Go to your repository Settings > Secrets and variables > Actions
+2. Add a new repository secret named `PAT_GITHUB` with your GitHub token
+3. The GitHub workflow will automatically substitute this value during deployment
+
+> **Note**: This implementation keeps your GitHub token secure by using environment variables instead of hardcoding them.
 
 ### Social Links
 
