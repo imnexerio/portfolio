@@ -432,8 +432,10 @@ async function fetchGitHubProjects() {
             portfolioItem.style.opacity = '1';
             portfolioItem.style.transform = 'scale(1)';
             
-            // Create project image (using placeholder or GitHub identicon as fallback)
-            const imageUrl = `images/project-placeholder-${(index % 6) + 1}.jpg`; // Reuse existing placeholder images
+            // Get GitHub social preview image or fallback to GitHub repository identicon
+            const socialPreviewUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
+            const fallbackImageUrl = repo.owner ? repo.owner.avatar_url : `https://github.com/identicons/${repo.name}.png`;
+            const imageUrl = repo.fork ? fallbackImageUrl : socialPreviewUrl;
             
             // Prepare date string
             const createdDate = new Date(repo.created_at);
