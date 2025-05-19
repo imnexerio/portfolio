@@ -4,11 +4,13 @@
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Force random theme on every refresh - after DOM is fully loaded
+    // Initialize theme switcher first to properly set up the theme
+    initThemeSwitcher();
+    
+    // Apply random color theme but preserve light/dark preference
     setTimeout(forceRandomThemeOnRefresh, 0);
     
-    // Initialize all functions
-    initThemeSwitcher();
+    // Initialize all other functions
     initNavigation();
     initTypingEffect();
     initAdvancedScrollAnimations();
@@ -77,6 +79,28 @@ function initThemeSwitcher() {
     const sunIcon = toggleButton ? toggleButton.querySelector('.fa-sun') : null;
     const moonIcon = toggleButton ? toggleButton.querySelector('.fa-moon') : null;
     
+    // Load saved theme preference
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+        htmlElement.setAttribute('data-theme', savedTheme);
+        
+        // Set the toggle button state based on the saved theme
+        if (toggleButton) {
+            toggleButton.setAttribute('data-theme', savedTheme);
+            
+            // Update icon visibility
+            if (sunIcon && moonIcon) {
+                if (savedTheme === 'dark') {
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'inline-block';
+                } else {
+                    sunIcon.style.display = 'inline-block';
+                    moonIcon.style.display = 'none';
+                }
+            }
+        }
+    }
+    
     // Theme toggle button click handler
     if (toggleButton) {
         toggleButton.addEventListener('click', () => {
@@ -117,18 +141,36 @@ function initThemeSwitcher() {
         });
     }
     
-    // Add active class to current theme button - always the custom (purple) button
-    // since we're using random themes on page load
-    themeButtons.forEach(btn => btn.classList.remove('active'));
-    if (purpleButton) {
-        purpleButton.classList.add('active');
+    // Apply saved custom color if available
+    const savedCustomColor = localStorage.getItem('customThemeColor');
+    if (savedCustomColor) {
+        applyCustomColor(savedCustomColor);
+        if (customColorPicker) {
+            customColorPicker.value = savedCustomColor;
+        }
     }
+    
+    // Add active class to current theme button
+    themeButtons.forEach(btn => {
+        btn.classList.remove('active');
+        
+        // Add active class to the appropriate button based on current theme
+        if (toggleButton && savedTheme === toggleButton.getAttribute('data-theme')) {
+            toggleButton.classList.add('active');
+        } else if (purpleButton) {
+            purpleButton.classList.add('active');
+        }
+    });
 }
 
 /**
  * Force Random Theme on Every Refresh
  */
 function forceRandomThemeOnRefresh() {
+    // Get user's theme preference (light/dark mode)
+    const savedTheme = localStorage.getItem('theme');
+    const isDarkMode = savedTheme === 'dark';
+    
     // We need to wait for the DOM to be ready to get the color options
     const colorOptions = document.querySelectorAll('.color-option');
     if(colorOptions.length === 0) {
@@ -142,9 +184,8 @@ function forceRandomThemeOnRefresh() {
         // Save the custom color
         localStorage.setItem('customThemeColor', randomColor);
         
-        // Set theme to custom with the random color
-        document.documentElement.setAttribute('data-theme', 'custom');
-        localStorage.setItem('theme', 'custom');
+        // Set theme to custom with the random color but preserve light/dark preference
+        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
         
         return;
     }
@@ -167,9 +208,14 @@ function forceRandomThemeOnRefresh() {
     // Save the custom color
     localStorage.setItem('customThemeColor', randomColor);
     
-    // Set theme to custom with the random color
-    document.documentElement.setAttribute('data-theme', 'custom');
-    localStorage.setItem('theme', 'custom');
+    // Preserve light/dark theme preference but apply custom color
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', savedTheme);
+    } else {
+        // Default to light if no preference
+        document.documentElement.setAttribute('data-theme', 'light');
+        localStorage.setItem('theme', 'light');
+    }
     
     // Update active button
     const themeButtons = document.querySelectorAll('.theme-btn');
@@ -177,6 +223,26 @@ function forceRandomThemeOnRefresh() {
     const purpleButton = document.querySelector('.theme-btn.purple');
     if (purpleButton) {
         purpleButton.classList.add('active');
+    }
+    
+    // Update toggle button icon if it exists
+    const toggleButton = document.querySelector('.theme-btn.toggle-theme');
+    if (toggleButton) {
+        const sunIcon = toggleButton.querySelector('.fa-sun');
+        const moonIcon = toggleButton.querySelector('.fa-moon');
+        
+        if (sunIcon && moonIcon) {
+            if (savedTheme === 'dark') {
+                sunIcon.style.display = 'none';
+                moonIcon.style.display = 'inline-block';
+                toggleButton.setAttribute('data-theme', 'dark');
+                toggleButton.classList.add('active');
+            } else {
+                sunIcon.style.display = 'inline-block';
+                moonIcon.style.display = 'none';
+                toggleButton.setAttribute('data-theme', 'light');
+            }
+        }
     }
 }
 
