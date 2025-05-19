@@ -66,7 +66,7 @@ portfolio/
 │   ├── optimized-main.js       # Main functionality
 │   ├── social-links.js         # Social media links handler
 │   └── website-generator.js    # Portfolio generator
-└── LICENSE               # MIT License file
+└── LICENSE               # AGPL License file
 ```
 
 ## 🎨 Customization
