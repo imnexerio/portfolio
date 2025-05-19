@@ -289,6 +289,7 @@ section {
     padding: 100px 0;
     position: relative;
     overflow: hidden;
+    min-height: max-content; /* Ensure section is at least as tall as its content */
 }
 
 section:nth-child(even) {
@@ -635,6 +636,7 @@ section:nth-child(even) {
 .skills-content {
     display: flex;
     gap: 50px;
+
 }
 
 .skill-category {
@@ -663,6 +665,7 @@ section:nth-child(even) {
 .skills-grid {
     display: grid;
     gap: 25px;
+    width: 100%;
 }
 
 .skill-item {
@@ -671,6 +674,8 @@ section:nth-child(even) {
     border-radius: var(--border-radius);
     box-shadow: var(--card-shadow);
     transition: var(--transition);
+    width: 100%;
+    height: auto;
 }
 
 .skill-item:hover {
@@ -716,6 +721,37 @@ section:nth-child(even) {
     border-radius: 50%;
     background: white;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Skills Section - Additional dynamic sizing */
+#skills {
+    display: flex;
+    flex-direction: column;
+}
+
+#skills .container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Additional responsive styling to ensure content visibility */
+@media screen and (max-width: 992px) {
+    .skills-content {
+        overflow: visible;
+        margin-bottom: 20px;
+    }
+    
+    .skill-category:last-of-type {
+        margin-bottom: 50px; /* This ensures visibility of the last category */
+    }
+    
+    #skills {
+        height: auto !important;
+        min-height: fit-content;
+        padding-bottom: 100px; /* Ensure there's always room at the bottom */
+    }
 }
 
 /* Portfolio Section */
@@ -1113,8 +1149,22 @@ section:nth-child(even) {
         margin-bottom: 40px;
     }
 
+    /* Use flexbox and min-height to ensure content is visible */
+    .skills-content {
+        display: flex;
+        flex-direction: column;
+        min-height: auto;
+    }
+
     .skill-category {
-        margin-bottom: 40px;
+        width: 100%;
+        /* Using padding instead of margin for better spacing */
+        padding-bottom: 50px;
+    }
+
+    /* Ensure the last skill category has proper spacing */
+    .skill-category:last-child {
+        padding-bottom: 20px;
     }
 
     .contact-info {
