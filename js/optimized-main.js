@@ -316,75 +316,35 @@ function initPortfolioModal(dynamicProjectDetails) {
     const closeModal = document.querySelector('.close-modal');
     const detailButtons = document.querySelectorAll('.portfolio-details');
 
-    // Project details data - use dynamic data if provided, otherwise use static fallback
-    const projectDetails = dynamicProjectDetails || {
-        1: {
-            title: 'EyerisAndroid',
-            category: 'Kotlin',
-            client: 'Open Source',
-            date: '2023',
-            description: 'Opensource Project build to track eye blinks using camera. This project utilizes computer vision techniques to detect and track eye blinks in real-time using the device camera.',
-            technologies: ['Kotlin', 'Android', 'Computer Vision', 'Camera API'],
-            image: 'images/project-placeholder-1.jpg',
-            url: 'https://github.com/imnexerio/EyerisAndroid'
-        },
-        2: {
-            title: 'i2Step',
-            category: 'Kotlin',
-            client: 'Open Source',
-            date: '2023',
-            description: 'An opensource Project to manage business easily. This application provides tools and features to help businesses streamline their operations and improve efficiency.',
-            technologies: ['Kotlin', 'Android', 'Business Management'],
-            image: 'images/project-placeholder-2.jpg',
-            url: 'https://github.com/imnexerio/i2Step'
-        },
-        3: {
-            title: 'MPHolistic',
-            category: 'Kotlin',
-            client: 'Open Source',
-            date: '2022',
-            description: 'This Android app can be used to extract holistic landmark and is based on Google\'s Mediapipe. It provides a framework for detecting and tracking human body landmarks in real-time.',
-            technologies: ['Kotlin', 'Android', 'Mediapipe', 'Computer Vision'],
-            image: 'images/project-placeholder-3.jpg',
-            url: 'https://github.com/imnexerio/MPHolistic'
-        },
-        4: {
-            title: 'reTracker',
-            category: 'Dart',
-            client: 'Open Source',
-            date: '2022',
-            description: 'A cross platform application to track any task easily. Built with Flutter, this app allows users to create, manage, and track tasks across different platforms.',
-            technologies: ['Dart', 'Flutter', 'Cross-Platform', 'Task Management'],
-            image: 'images/project-placeholder-4.jpg',
-            url: 'https://github.com/imnexerio/reTracker'
-        },
-        5: {
-            title: 'Arduino_java',
-            category: 'Java',
-            client: 'Open Source',
-            date: '2021',
-            description: 'A Java-based project for Arduino integration. This project allows for communication and control between Java applications and Arduino hardware.',
-            technologies: ['Java', 'Arduino', 'Hardware Integration'],
-            image: 'images/project-placeholder-5.jpg',
-            url: 'https://github.com/imnexerio/Arduino_java'
-        },
-        6: {
-            title: 'BookLibConnect',
-            category: 'Other',
-            client: 'Open Source',
-            date: '2021',
-            description: 'A standalone Audible downloader and decrypter. This tool allows users to download and decrypt Audible audiobooks for personal use.',
-            technologies: ['Audio Processing', 'Decryption', 'File Management'],
-            image: 'images/project-placeholder-6.jpg',
-            url: 'https://github.com/imnexerio/BookLibConnect'
-        }
-    };
-
-    // Open modal with project details
+    // Project details data - only use dynamic data, no fallback
+    const projectDetails = dynamicProjectDetails;    // Open modal with project details
     detailButtons.forEach(button => {
         button.addEventListener('click', (e) => {
             e.preventDefault();
             const projectId = button.getAttribute('data-id');
+            
+            if (!projectDetails) {
+                // Display error message when no project details are provided
+                modalContent.innerHTML = `
+                    <div class="modal-project">
+                        <div class="modal-error">
+                            <h2>Error</h2>
+                            <p>Project details are not available. Please check the GitHub integration.</p>
+                        </div>
+                    </div>
+                `;
+                
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+                
+                // Add animation class to modal content
+                setTimeout(() => {
+                    modalContent.classList.add('modal-animate');
+                }, 50);
+                
+                return;
+            }
+            
             const project = projectDetails[projectId];
             
             if (project) {
@@ -428,6 +388,23 @@ function initPortfolioModal(dynamicProjectDetails) {
                 document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
                 
                 // Add animation class to modal content
+                setTimeout(() => {
+                    modalContent.classList.add('modal-animate');
+                }, 50);
+            } else {
+                // Display error message for specific project not found
+                modalContent.innerHTML = `
+                    <div class="modal-project">
+                        <div class="modal-error">
+                            <h2>Error</h2>
+                            <p>Project with ID ${projectId} was not found.</p>
+                        </div>
+                    </div>
+                `;
+                
+                modal.style.display = 'block';
+                document.body.style.overflow = 'hidden';
+                
                 setTimeout(() => {
                     modalContent.classList.add('modal-animate');
                 }, 50);
@@ -1018,8 +995,7 @@ style.textContent = `
     .mouse-trailer {
         will-change: transform, width, height;
     }
-    
-    /* Reduce animation complexity on mobile */
+      /* Reduce animation complexity on mobile */
     @media (max-width: 768px) {
         .cube-container {
             display: none;
@@ -1034,6 +1010,25 @@ style.textContent = `
         .mouse-trailer {
             display: none;
         }
+    }
+    
+    /* Modal error styling */
+    .modal-error {
+        text-align: center;
+        padding: 30px;
+        background-color: rgba(255, 0, 0, 0.1);
+        border-radius: 8px;
+        margin: 20px;
+    }
+    
+    .modal-error h2 {
+        color: #ff3333;
+        margin-bottom: 15px;
+    }
+    
+    .modal-error p {
+        font-size: 1.1rem;
+        line-height: 1.6;
     }
 `;
 document.head.appendChild(style);
