@@ -72,52 +72,41 @@ function initThemeSwitcher() {
     const colorOptions = document.querySelectorAll('.color-option');
     const customColorPicker = document.getElementById('custom-color-picker');
     const purpleButton = document.querySelector('.theme-btn.purple');
+    const toggleButton = document.querySelector('.theme-btn.toggle-theme');
+    const sunIcon = toggleButton ? toggleButton.querySelector('.fa-sun') : null;
+    const moonIcon = toggleButton ? toggleButton.querySelector('.fa-moon') : null;
     
-    // Add active class to current theme button - always the custom (purple) button
-    // since we're using random themes on page load
-    themeButtons.forEach(btn => btn.classList.remove('active'));
-    if (purpleButton) {
-        purpleButton.classList.add('active');
-    }
-    
-    // Theme button click handlers - maintain this for user manual selections
-    themeButtons.forEach(button => {
-        button.addEventListener('click', (event) => {
-            const theme = button.getAttribute('data-theme');
+    // Theme toggle button click handler
+    if (toggleButton) {
+        toggleButton.addEventListener('click', () => {
+            const currentTheme = toggleButton.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
-            // Toggle palette-open class for the purple button
-            if (theme === 'custom') {
-                // Toggle the palette visibility
-                purpleButton.classList.toggle('palette-open');
-                event.stopPropagation(); // Prevent document click from immediately closing it
-                return;
+            // Toggle the icon display
+            if (sunIcon && moonIcon) {
+                if (newTheme === 'dark') {
+                    sunIcon.style.display = 'none';
+                    moonIcon.style.display = 'inline-block';
+                } else {
+                    sunIcon.style.display = 'inline-block';
+                    moonIcon.style.display = 'none';
+                }
             }
             
-            // Skip if clicking inside the color palette
-            if (event.target.closest('.color-palette')) {
-                return;
-            }
-            
-            // Close color palette if open
-            purpleButton.classList.remove('palette-open');
+            // Update button attribute
+            toggleButton.setAttribute('data-theme', newTheme);
             
             // Remove active class from all buttons
             themeButtons.forEach(btn => btn.classList.remove('active'));
             
-            // Add active class to clicked button
-            button.classList.add('active');
+            // Add active class to toggle button
+            toggleButton.classList.add('active');
             
             // Set theme
-            htmlElement.setAttribute('data-theme', theme);
-            
-            // Apply custom color if selecting the custom theme
-            if (theme === 'custom') {
-                const customColor = localStorage.getItem('customThemeColor') || '#9d4edd';
-                applyCustomColor(customColor);
-            }
+            htmlElement.setAttribute('data-theme', newTheme);
             
             // Save theme preference
-            localStorage.setItem('theme', theme);
+            localStorage.setItem('theme', newTheme);
             
             // Add animation effect when changing theme
             document.body.classList.add('theme-transition');
@@ -125,52 +114,14 @@ function initThemeSwitcher() {
                 document.body.classList.remove('theme-transition');
             }, 1000);
         });
-    });
-      // Color palette options click handlers
-    colorOptions.forEach(option => {
-        option.addEventListener('click', (e) => {
-            e.stopPropagation(); // Prevent the click from propagating to the theme button
-            const color = option.getAttribute('data-color');
-            applyCustomColor(color);
-            customColorPicker.value = color;
-            localStorage.setItem('customThemeColor', color);
-            
-            // Set theme to custom
-            htmlElement.setAttribute('data-theme', 'custom');
-            localStorage.setItem('theme', 'custom');
-            
-            // Update active button
-            themeButtons.forEach(btn => btn.classList.remove('active'));
-            document.querySelector('.theme-btn.purple').classList.add('active');
-            
-            // Keep the palette open
-            purpleButton.classList.add('palette-open');
-        });
-    });
+    }
     
-    // Custom color picker handler
-    customColorPicker.addEventListener('input', (e) => {
-        e.stopPropagation(); // Prevent the click from propagating to the theme button
-        const color = e.target.value;
-        applyCustomColor(color);
-        localStorage.setItem('customThemeColor', color);
-        
-        // Set theme to custom
-        htmlElement.setAttribute('data-theme', 'custom');
-        localStorage.setItem('theme', 'custom');
-          // Update active button
-        themeButtons.forEach(btn => btn.classList.remove('active'));
-        document.querySelector('.theme-btn.purple').classList.add('active');
-        
-        // Keep the palette open
-        purpleButton.classList.add('palette-open');
-    });
-      // Close color palette when clicking outside
-    document.addEventListener('click', (e) => {
-        if (!e.target.closest('.theme-btn.purple') && !e.target.closest('.color-palette')) {
-            purpleButton.classList.remove('palette-open');
-        }
-    });
+    // Add active class to current theme button - always the custom (purple) button
+    // since we're using random themes on page load
+    themeButtons.forEach(btn => btn.classList.remove('active'));
+    if (purpleButton) {
+        purpleButton.classList.add('active');
+    }
 }
 
 /**
