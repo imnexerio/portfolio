@@ -36,7 +36,11 @@ async function initGitHubStats() {
         }
         
         const userData = await userResponse.json();
-          // Update stats elements
+        
+        // Update profile image with GitHub avatar
+        setGitHubProfileImage(userData.avatar_url);
+          
+        // Update stats elements
         document.getElementById('repo-count').textContent = userData.public_repos || '-';
           // Fetch repository data to calculate stars and forks
         const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?per_page=100`, 
@@ -81,6 +85,20 @@ async function initGitHubStats() {
         
     } catch (error) {
         console.error('Error initializing GitHub stats:', error);
+    }
+}
+
+// Function to set the GitHub profile image
+function setGitHubProfileImage(avatarUrl) {
+    if (!avatarUrl) return;
+    
+    // Find the profile image in the about section and replace its src
+    const profileImage = document.querySelector('.about-image img');
+    if (profileImage) {
+        profileImage.src = avatarUrl;
+        console.log('GitHub Stats: Profile image updated with GitHub avatar');
+    } else {
+        console.warn('GitHub Stats: Profile image element not found');
     }
 }
 
