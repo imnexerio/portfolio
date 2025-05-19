@@ -96,6 +96,9 @@ async function extractAndDisplaySkills(repos, headers) {
             'Open Source Contribution': { score: repos.length, category: 'professional' }
         };
         
+        // Add a fallback for empty repositories
+        let hasLanguages = false;
+        
         // Process repositories to extract languages
         for (const repo of repos) {
             // Skip forks to focus on original work
@@ -111,6 +114,11 @@ async function extractAndDisplaySkills(repos, headers) {
             }
             
             const languages = await languagesResponse.json();
+            
+            // If we found languages, mark flag as true
+            if (Object.keys(languages).length > 0) {
+                hasLanguages = true;
+            }
             
             // Calculate total bytes for this repo
             const totalBytes = Object.values(languages).reduce((sum, bytes) => sum + bytes, 0);
@@ -150,7 +158,16 @@ async function extractAndDisplaySkills(repos, headers) {
             }
         }
         
-        // Normalize and limit the number of programming languages
+        // If no languages were found, add default languages
+        if (!hasLanguages || Object.keys(languageData).length === 0) {
+            console.log('No languages found in repositories, using fallback languages');
+            languageData['JavaScript'] = { score: 90, repos: 1 };
+            languageData['Python'] = { score: 85, repos: 1 };
+            languageData['HTML/CSS'] = { score: 80, repos: 1 };
+            languageData['Java'] = { score: 75, repos: 1 };
+            languageData['C++'] = { score: 70, repos: 1 };
+        }
+          // Normalize and limit the number of programming languages
         const maxLanguages = GitHubConfig.getConfig('maxLanguages') || 6;
         const minLanguagePercentage = GitHubConfig.getConfig('minLanguagePercentage') || 1;
         
@@ -160,7 +177,7 @@ async function extractAndDisplaySkills(repos, headers) {
             .slice(0, maxLanguages);
             
         // Calculate max score for normalization
-        const maxLanguageScore = sortedLanguages[0][1].score;
+        const maxLanguageScore = sortedLanguages.length > 0 ? sortedLanguages[0][1].score : 100;
         
         // Prepare languages for display with normalized scores (between 50% and 95%)
         const languages = sortedLanguages.map(([name, data]) => {
@@ -177,7 +194,7 @@ async function extractAndDisplaySkills(repos, headers) {
         const maxProScore = Math.max(...proSkillsEntries.map(([_, data]) => data.score));
         
         const professionalSkillsArray = proSkillsEntries.map(([name, data]) => {
-            const normalizedScore = Math.round(65 + (data.score / maxProScore) * 30);
+            const normalizedScore = Math.round(65 + (data.score / (maxProScore || 1)) * 30);
             return {
                 name,
                 percentage: normalizedScore,
@@ -190,6 +207,24 @@ async function extractAndDisplaySkills(repos, headers) {
         
     } catch (error) {
         console.error('Error extracting skills:', error);
+        
+        // Fallback skills in case of error
+        const fallbackLanguages = [
+            { name: 'JavaScript', percentage: 90, category: 'language' },
+            { name: 'Python', percentage: 85, category: 'language' },
+            { name: 'HTML/CSS', percentage: 80, category: 'language' },
+            { name: 'Java', percentage: 75, category: 'language' },
+            { name: 'C++', percentage: 70, category: 'language' }
+        ];
+        
+        const fallbackProfessionalSkills = [
+            { name: 'Mobile Development', percentage: 90, category: 'professional' },
+            { name: 'Problem Solving', percentage: 85, category: 'professional' },
+            { name: 'Cross-Platform Development', percentage: 80, category: 'professional' },
+            { name: 'Open Source Contribution', percentage: 75, category: 'professional' }
+        ];
+        
+        updateSkillsSection(fallbackLanguages, fallbackProfessionalSkills);
     }
 }
 
@@ -222,6 +257,66 @@ function updateSkillsSection(languages, professionalSkills) {
     
     // Reinitialize the skills animation
     initSkillsAnimation();
+    
+    // Re-initialize 3D card effects and other interactive elements for new skill items
+    reinitializeCardEffects();
+}
+
+// Reinitialize card effects and other interactive animations on newly added elements
+function reinitializeCardEffects() {
+    // Use a slightly longer timeout to ensure DOM is fully updated
+    setTimeout(() => {
+        // Get all the newly added card elements
+        const newCards = document.querySelectorAll('#skills .skill-item.card-3d');
+        
+        console.log('Reinitializing 3D effects for', newCards.length, 'skill cards');
+        
+        // Apply 3D card effect manually to each new card
+        newCards.forEach(card => {
+            // Mouse move effect for 3D rotation
+            card.addEventListener('mousemove', (e) => {
+                const cardRect = card.getBoundingClientRect();
+                const cardCenterX = cardRect.left + cardRect.width / 2;
+                const cardCenterY = cardRect.top + cardRect.height / 2;
+                const mouseX = e.clientX - cardCenterX;
+                const mouseY = e.clientY - cardCenterY;
+                
+                // Calculate rotation based on mouse position
+                const rotateY = (mouseX / (cardRect.width / 2)) * 15; // Max 15 degrees
+                const rotateX = -((mouseY / (cardRect.height / 2)) * 15); // Max 15 degrees
+                
+                // Apply the transform
+                requestAnimationFrame(() => {
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+            });
+            
+            // Reset on mouse leave
+            card.addEventListener('mouseleave', () => {
+                requestAnimationFrame(() => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                });
+            });
+        });
+        
+        // Also reinitialize magnetic effect if available
+        if (typeof initMagneticElements === 'function') {
+            try {
+                initMagneticElements();
+            } catch (e) {
+                console.warn('Could not reinitialize magnetic elements:', e);
+            }
+        }
+        
+        // If there's a global init3DCardEffect function also try to call it
+        if (typeof init3DCardEffect === 'function') {
+            try {
+                init3DCardEffect();
+            } catch (e) {
+                console.warn('Could not call global init3DCardEffect:', e);
+            }
+        }
+    }, 300); // Longer timeout for reliable initialization
 }
 
 // Helper function to create a skill element with the same structure and classes as the original
