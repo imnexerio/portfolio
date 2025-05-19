@@ -99,7 +99,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.8);
+    background-color: rgba(0, 0, 0, 0.85);
     z-index: 9999;
     display: none;
     justify-content: center;
@@ -126,6 +126,7 @@
     transition: transform 0.3s ease;
     max-height: 90vh;
     overflow-y: auto;
+    border: 1px solid rgba(var(--primary-color-rgb), 0.3);
 }
 
 .generator-overlay.active .generator-form {
@@ -138,6 +139,7 @@
     text-align: center;
     margin-bottom: 20px;
     font-size: 1.8rem;
+    font-weight: 600;
 }
 
 .generator-form p {
@@ -145,6 +147,7 @@
     margin-bottom: 25px;
     color: var(--text-color);
     font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .generator-form .form-group {
@@ -162,12 +165,13 @@
 .generator-form input[type="password"] {
     width: 100%;
     padding: 12px 15px;
-    border: 2px solid var(--border-color);
+    border: 2px solid var(--border-color, rgba(125, 125, 125, 0.3));
     border-radius: 6px;
-    background-color: var(--input-bg);
+    background-color: var(--input-bg, var(--bg-color));
     color: var(--text-color);
     font-family: 'Poppins', sans-serif;
     transition: border-color 0.3s, box-shadow 0.3s;
+    font-size: 0.95rem;
 }
 
 .generator-form input[type="text"]:focus,
@@ -179,8 +183,17 @@
 
 .generator-form .input-help {
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-muted, rgba(125, 125, 125, 0.8));
     margin-top: 5px;
+}
+
+.generator-form .input-help a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.generator-form .input-help a:hover {
+    text-decoration: underline;
 }
 
 .generator-form .form-buttons {
@@ -196,10 +209,11 @@
     font-weight: 500;
     cursor: pointer;
     transition: transform 0.2s, background-color 0.2s;
+    font-size: 0.95rem;
 }
 
 .generator-form button.cancel {
-    background-color: var(--bg-secondary);
+    background-color: var(--bg-secondary, #f0f0f0);
     color: var(--text-color);
 }
 
@@ -393,4 +407,49 @@
     50% {
         background-color: rgba(var(--primary-color-rgb), 0.2);
     }
+}
+
+.form-info {
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-left: 3px solid var(--primary-color);
+    padding: 15px;
+    margin-top: 20px;
+    border-radius: 4px;
+}
+
+.form-info p {
+    margin: 5px 0;
+    text-align: left;
+    color: var(--text-color);
+}
+
+.form-info p strong {
+    color: var(--primary-color);
+    font-weight: 600;
+}
+
+.form-field-required {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .generator-form {
+    background-color: var(--bg-color);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .generator-form input[type="text"],
+[data-theme="dark"] .generator-form input[type="password"] {
+    background-color: rgba(0, 0, 0, 0.2);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: var(--text-color);
+}
+
+[data-theme="dark"] .generator-form button.cancel {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .form-info {
+    background-color: rgba(var(--primary-color-rgb), 0.15);
 }
