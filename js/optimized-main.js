@@ -310,14 +310,14 @@ function initPortfolioFilter() {
 /**
  * Portfolio Modal
  */
-function initPortfolioModal() {
+function initPortfolioModal(dynamicProjectDetails) {
     const modal = document.querySelector('.portfolio-modal');
     const modalContent = document.querySelector('.modal-body');
     const closeModal = document.querySelector('.close-modal');
     const detailButtons = document.querySelectorAll('.portfolio-details');
 
-    // Project details data (updated with GitHub projects)
-    const projectDetails = {
+    // Project details data - use dynamic data if provided, otherwise use static fallback
+    const projectDetails = dynamicProjectDetails || {
         1: {
             title: 'EyerisAndroid',
             category: 'Kotlin',

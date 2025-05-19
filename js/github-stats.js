@@ -72,10 +72,12 @@ async function initGitHubStats() {
             
             // Extract skills from repositories and update skills section
             extractAndDisplaySkills(repos, headers);
-        }
-        
+        }        
         // Generate a simulated activity chart
         generateActivityChart();
+        
+        // Fetch GitHub projects for portfolio
+        fetchGitHubProjects();
         
     } catch (error) {
         console.error('Error initializing GitHub stats:', error);
@@ -362,6 +364,250 @@ function showStatsError(message) {
         // Add a data attribute to hold the error message
         skillsSection.setAttribute('data-error', message);
     }
+}
+
+/**
+ * Fetch GitHub repositories to display as projects
+ */
+async function fetchGitHubProjects() {
+    const username = GitHubConfig.getUsername();
+    const headers = GitHubConfig.getAuthHeaders();
+    const projectsContainer = document.querySelector('.portfolio-grid');
+    const portfolioFilter = document.querySelector('.portfolio-filter');
+    
+    if (!projectsContainer) {
+        console.error('GitHub Projects: Projects container not found');
+        return;
+    }
+    
+    try {
+        console.log('GitHub Projects: Fetching repositories');
+        
+        // Fetch repositories
+        const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&direction=desc&per_page=10`, 
+            headers.Authorization ? { headers } : {});
+            
+        if (!reposResponse.ok) {
+            if (reposResponse.status === 403 && reposResponse.headers.get('X-RateLimit-Remaining') === '0') {
+                console.error('GitHub Projects: Rate limit exceeded');
+                throw new Error('GitHub API rate limit exceeded. Please try again later.');
+            }
+            throw new Error(`Failed to fetch repos: ${reposResponse.status}`);
+        }
+        
+        const repos = await reposResponse.json();
+        
+        if (!Array.isArray(repos) || repos.length === 0) {
+            console.error('GitHub Projects: No repositories found');
+            throw new Error('No GitHub repositories found.');
+        }
+        
+        // Clear existing projects
+        projectsContainer.innerHTML = '';
+        
+        // Track unique languages for filter
+        const languages = new Set(['all']);
+        
+        // Create project details object for modal
+        const projectDetails = {};
+        
+        // Process each repository and add it to the portfolio grid
+        repos.forEach((repo, index) => {
+            // Skip forked repositories if needed
+            if (repo.fork) return;
+            
+            // Determine the main language for filtering
+            const language = repo.language || 'Other';
+            languages.add(language.toLowerCase());
+            
+            // Set delay class for animation (max delay-5)
+            const delay = Math.min(index + 1, 5);
+            
+            // Create the portfolio item HTML
+            const portfolioItem = document.createElement('div');
+            portfolioItem.className = `portfolio-item card-3d scroll-scale delay-${delay}`;
+            portfolioItem.setAttribute('data-category', language.toLowerCase());
+            
+            // Create project image (using placeholder or GitHub identicon as fallback)
+            const imageUrl = `images/project-placeholder-${(index % 6) + 1}.jpg`; // Reuse existing placeholder images
+            
+            // Prepare date string
+            const createdDate = new Date(repo.created_at);
+            const dateString = createdDate.getFullYear().toString();
+            
+            // Store project details for modal
+            const projectId = index + 1;
+            projectDetails[projectId] = {
+                title: repo.name,
+                category: language,
+                client: 'Open Source',
+                date: dateString,
+                description: repo.description || `A ${language} project hosted on GitHub.`,
+                technologies: [language],
+                image: imageUrl,
+                url: repo.html_url
+            };
+            
+            // Create HTML for the portfolio item
+            portfolioItem.innerHTML = `
+                <div class="portfolio-img">
+                    <img src="${imageUrl}" alt="${repo.name}">
+                </div>
+                <div class="portfolio-info">
+                    <h3>${repo.name}</h3>
+                    <p>${language}</p>
+                    <div class="portfolio-links">
+                        <a href="${repo.html_url}" class="portfolio-link magnetic" target="_blank" title="View Repository"><i class="fas fa-link"></i></a>
+                        <a href="#" class="portfolio-details magnetic" data-id="${projectId}" title="View Details"><i class="fas fa-search"></i></a>
+                    </div>
+                </div>
+            `;
+            
+            projectsContainer.appendChild(portfolioItem);
+        });
+        
+        // Update filter buttons based on available languages
+        if (portfolioFilter) {
+            portfolioFilter.innerHTML = '';
+            
+            // Add "All" button
+            const allButton = document.createElement('button');
+            allButton.className = 'filter-btn active magnetic';
+            allButton.setAttribute('data-filter', 'all');
+            allButton.textContent = 'All';
+            portfolioFilter.appendChild(allButton);
+            
+            // Add language-specific filter buttons
+            Array.from(languages)
+                .filter(lang => lang !== 'all')
+                .sort()
+                .forEach(language => {
+                    const button = document.createElement('button');
+                    button.className = 'filter-btn magnetic';
+                    button.setAttribute('data-filter', language.toLowerCase());
+                    button.textContent = language.charAt(0).toUpperCase() + language.slice(1); // Capitalize
+                    portfolioFilter.appendChild(button);
+                });
+                
+            // Reinitialize portfolio filters
+            initPortfolioFilters();
+        }
+        
+        // Update the project details data in the global scope
+        window.projectDetailsData = projectDetails;
+        
+        // Reinitialize portfolio modal with new data
+        initPortfolioModal(projectDetails);
+        
+        // Reinitialize 3D effects on portfolio items
+        const portfolioItems = document.querySelectorAll('.portfolio-item.card-3d');
+        initializeCardEffects(portfolioItems);
+        
+    } catch (error) {
+        console.error('Error fetching GitHub projects:', error);
+        projectsContainer.innerHTML = `
+            <div class="error-message" style="grid-column: 1 / -1; text-align: center; padding: 40px;">
+                Failed to load projects. ${error.message}
+            </div>
+        `;
+    }
+}
+
+// Helper function to initialize card effects specifically for portfolio items
+function initializeCardEffects(cards) {
+    setTimeout(() => {
+        cards.forEach(card => {
+            // Mouse move effect for 3D rotation
+            card.addEventListener('mousemove', (e) => {
+                const cardRect = card.getBoundingClientRect();
+                const cardCenterX = cardRect.left + cardRect.width / 2;
+                const cardCenterY = cardRect.top + cardRect.height / 2;
+                const mouseX = e.clientX - cardCenterX;
+                const mouseY = e.clientY - cardCenterY;
+                
+                // Calculate rotation based on mouse position
+                const rotateY = (mouseX / (cardRect.width / 2)) * 15; // Max 15 degrees
+                const rotateX = -((mouseY / (cardRect.height / 2)) * 15); // Max 15 degrees
+                
+                // Apply the transform
+                requestAnimationFrame(() => {
+                    card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                });
+            });
+            
+            // Reset on mouse leave
+            card.addEventListener('mouseleave', () => {
+                requestAnimationFrame(() => {
+                    card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                });
+            });
+        });
+    }, 300);
+}
+
+/**
+ * Function to reinitialize portfolio filters
+ * This is called after dynamically loading projects from GitHub
+ */
+function initPortfolioFilters() {
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const portfolioItems = document.querySelectorAll('.portfolio-item');
+    
+    if (!filterButtons.length || !portfolioItems.length) {
+        console.error('GitHub Projects: Filter buttons or portfolio items not found');
+        return;
+    }
+    
+    // Debounce function to improve performance
+    function debounce(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
+
+    // Remove any existing event listeners (if possible)
+    filterButtons.forEach(button => {
+        button.replaceWith(button.cloneNode(true));
+    });
+    
+    // Add event listeners to new buttons
+    document.querySelectorAll('.filter-btn').forEach(button => {
+        button.addEventListener('click', debounce(function() {
+            // Remove active class from all buttons
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            this.classList.add('active');
+            
+            // Get filter value
+            const filterValue = this.getAttribute('data-filter');
+            
+            // Filter items
+            portfolioItems.forEach(item => {
+                if (filterValue === 'all' || item.getAttribute('data-category') === filterValue) {
+                    item.style.display = 'block';
+                    setTimeout(() => {
+                        item.style.opacity = '1';
+                        item.style.transform = 'scale(1)';
+                    }, 50);
+                } else {
+                    item.style.opacity = '0';
+                    item.style.transform = 'scale(0.8)';
+                    setTimeout(() => {
+                        item.style.display = 'none';
+                    }, 300);
+                }
+            });
+        }, 100));
+    });
+    
+    console.log('GitHub Projects: Portfolio filters reinitialized');
 }
 
 function generateActivityChart() {
