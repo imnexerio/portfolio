@@ -9,7 +9,8 @@
 window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = 'imnexerio';
-    const _token = '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';
+    // Do not store tokens in code - GitHub API allows public data access without a token
+    const _token = '';
     
     // Configuration options
     const _config = {
@@ -35,11 +36,12 @@ window.GitHubConfig = (function() {
         getConfig: function(key) {
             return key ? _config[key] : _config;
         },
-        
-        // Get authorization headers for GitHub API requests
+          // Get authorization headers for GitHub API requests
         getAuthHeaders: function() {
-            const headers = {};
-            if (_token) {
+            const headers = {
+                'Accept': 'application/vnd.github.v3+json'
+            };
+            if (_token && _token.trim() !== '') {
                 headers['Authorization'] = `Bearer ${_token}`;
             }
             return headers;
@@ -59,11 +61,11 @@ window.GitHubConfig = (function() {
                 sort: _config.sortBy
             });
         },
-        
-        // Check if token is valid
+          // Check if token is valid
         validateToken: function(token = _token) {
             if (!token || token.trim() === '') {
-                return { valid: false, message: 'No token provided' };
+                console.log('No token provided - using GitHub API with rate limitations');
+                return { valid: false, message: 'No token provided - using public API access' };
             }
             
             // Check if token is a fine-grained token (starts with github_pat_)
@@ -88,3 +90,6 @@ window.GitHubConfig = (function() {
 
 // Log that the config has been initialized
 console.log('GitHub Config: Initialized successfully');
+if (!window.GitHubConfig.getToken()) {
+    console.log('GitHub Config: No authentication token provided. Operating with GitHub API rate limits for public access.');
+}
