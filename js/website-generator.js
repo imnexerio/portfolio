@@ -76,14 +76,13 @@ function showGeneratorForm() {
         // Show the overlay
         overlay.classList.add('active');
         return;
-    }
-      // Create the generator form
+    }      // Create the generator form
     const formHTML = `
         <div class="generator-overlay">
             <div class="generator-form">
                 <button class="close-form">&times;</button>
-                <h2>Create Your Portfolio Website</h2>
-                <p>Enter your information below to generate a personalized portfolio website like this one.</p>                <div class="form-content">
+                <h2>Customize Your Portfolio</h2>
+                <p>Update your social links and GitHub information without recreating the entire website.</p>                <div class="form-content">
                     <div class="form-group">
                         <label for="generator-github-username">GitHub Username <span class="form-field-required">*</span></label>
                         <input type="text" id="generator-github-username" placeholder="e.g. octocat" required>
@@ -96,78 +95,58 @@ function showGeneratorForm() {
                         <input type="password" id="generator-github-token" placeholder="ghp_xxxxxxxxxxxx">
                         <div class="input-help">A token allows more GitHub API requests. <a href="https://github.com/settings/tokens" target="_blank">Create one here</a> with "public_repo" scope.</div>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="generator-name">Your Name <span class="form-field-required">*</span></label>
-                        <input type="text" id="generator-name" placeholder="e.g. John Doe" required>
-                        <div class="error-message" id="name-error">Please enter your name</div>
+                      <div class="form-group">
+                        <label for="generator-linkedin">LinkedIn URL <span class="form-field-optional">(optional)</span></label>
+                        <input type="text" id="generator-linkedin" placeholder="e.g. https://www.linkedin.com/in/johndoe/">
+                        <div class="input-help">Full LinkedIn profile URL including https://</div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="generator-location">Your Location <span class="form-field-optional">(optional)</span></label>
-                        <input type="text" id="generator-location" placeholder="e.g. San Francisco, CA">
-                        <div class="input-help">Used in the About and Contact sections</div>
+                        <label for="generator-twitter">Twitter/X URL <span class="form-field-optional">(optional)</span></label>
+                        <input type="text" id="generator-twitter" placeholder="e.g. https://twitter.com/johndoe">
+                        <div class="input-help">Complete Twitter/X profile URL including https://</div>
                     </div>
                     
                     <div class="form-group">
-                        <label for="generator-email">Your Email <span class="form-field-optional">(optional)</span></label>
-                        <input type="text" id="generator-email" placeholder="e.g. you@example.com">
-                        <div class="input-help">Displayed in the Contact section for potential employers</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="generator-linkedin">LinkedIn Username <span class="form-field-optional">(optional)</span></label>
-                        <input type="text" id="generator-linkedin" placeholder="e.g. johndoe">
-                        <div class="input-help">Just the username part of linkedin.com/in/username</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="generator-twitter">Twitter Username <span class="form-field-optional">(optional)</span></label>
-                        <input type="text" id="generator-twitter" placeholder="e.g. johndoe">
-                        <div class="input-help">Just the username without @</div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="generator-instagram">Instagram Username <span class="form-field-optional">(optional)</span></label>
-                        <input type="text" id="generator-instagram" placeholder="e.g. johndoe">
-                        <div class="input-help">Used for social links in the header and footer</div>
+                        <label for="generator-instagram">Instagram URL <span class="form-field-optional">(optional)</span></label>
+                        <input type="text" id="generator-instagram" placeholder="e.g. https://www.instagram.com/johndoe/">
+                        <div class="input-help">Complete Instagram profile URL including https://</div>
                     </div>
                     
                     <div class="form-info">
                         <p><strong>What happens next?</strong></p>
-                        <p>Clicking "Generate My Website" will create a custom portfolio website based on this template, personalized with your information and filled with your GitHub projects.</p>
+                        <p>Clicking "Update My Portfolio" will update the social links and GitHub information in the website.</p>
                         <p>You'll receive a ZIP file that you can upload to any web hosting service or GitHub Pages.</p>
                     </div>
-                </div>
-                  <div class="loading-indicator">
-                    <p>Generating your portfolio website...</p>
+                </div>                  <div class="loading-indicator">
+                    <p>Updating your portfolio website...</p>
                     <div class="generator-progress">
                         <div class="progress-bar">
                             <div class="progress-bar-fill"></div>
                         </div>
-                        <div class="progress-status">Preparing website files...</div>
+                        <div class="progress-status">Updating site files...</div>
                     </div>
                 </div>
                   <div class="success-message">
                     <h3>Success! 🎉</h3>
-                    <p>Your personalized portfolio website has been generated.</p>
-                    <p>Download the ZIP file and upload it to any web hosting service to make your portfolio live!</p>
+                    <p>Your portfolio website has been updated.</p>
+                    <p>Download the ZIP file and upload it to your existing web hosting service!</p>
                     <div class="hosting-tips">
-                        <h4>How to host your website:</h4>
+                        <h4>How to update your website:</h4>
                         <ol>
-                            <li><strong>GitHub Pages (Free):</strong> Upload to a GitHub repository and enable GitHub Pages</li>
-                            <li><strong>Netlify (Free):</strong> Drag and drop the ZIP folder to Netlify</li>
-                            <li><strong>Vercel (Free):</strong> Connect your GitHub repo to deploy automatically</li>
+                            <li><strong>GitHub Pages:</strong> Replace the files in your repository</li>
+                            <li><strong>Netlify:</strong> Drag and drop the ZIP folder to update your site</li>
+                            <li><strong>Vercel:</strong> Push updated files to your GitHub repo</li>
                         </ol>
                     </div>
                     <a href="#" id="download-website" class="download-button">
-                        <i class="fas fa-download"></i> Download Your Website
+                        <i class="fas fa-download"></i> Download Updated Website
                     </a>
                 </div>
                 
                 <div class="form-buttons">
                     <button class="cancel">Cancel</button>
-                    <button class="generate">Generate My Website</button>
+                    <button class="generate">Update My Portfolio</button>
                 </div>
             </div>
         </div>
@@ -241,16 +220,14 @@ function validateAndGenerate() {
     
     // Get form values
     const githubUsernameInput = document.getElementById('generator-github-username');
-    const nameInput = document.getElementById('generator-name');
     
-    if (!githubUsernameInput || !nameInput) {
+    if (!githubUsernameInput) {
         console.error("Required form elements not found");
         alert("Error: Required form elements not found. Please refresh the page and try again.");
         return;
     }
     
     const githubUsername = githubUsernameInput.value.trim();
-    const name = nameInput.value.trim();
     
     // Validate required fields
     let isValid = true;
@@ -265,17 +242,8 @@ function validateAndGenerate() {
         isValid = false;
     }
     
-    if (!name) {
-        nameInput.classList.add('error');
-        const errorElement = document.getElementById('name-error');
-        if (errorElement) {
-            errorElement.classList.add('active');
-        }
-        isValid = false;
-    }
-    
     if (isValid) {
-        console.log("Form valid, generating website..."); // Debug log
+        console.log("Form valid, updating website..."); // Debug log
         // Proceed with generation without validating GitHub username
         generateWebsite();
     } else {
@@ -285,17 +253,26 @@ function validateAndGenerate() {
 
 function generateWebsite() {
     console.log("generateWebsite called"); // Debug log
-    
-    try {
+      try {
         // Get form values
         const githubUsername = document.getElementById('generator-github-username').value.trim();
         const githubToken = document.getElementById('generator-github-token')?.value.trim() || '';
-        const name = document.getElementById('generator-name').value.trim();
-        const location = document.getElementById('generator-location')?.value.trim() || '';
-        const email = document.getElementById('generator-email')?.value.trim() || '';
         const linkedin = document.getElementById('generator-linkedin')?.value.trim() || '';
         const twitter = document.getElementById('generator-twitter')?.value.trim() || '';
         const instagram = document.getElementById('generator-instagram')?.value.trim() || '';
+        
+        // Validate URLs (optional step but ensures proper format)
+        const validateUrl = (url) => {
+            if (!url) return url;
+            try {
+                new URL(url);
+                return url;
+            } catch (e) {
+                // If not a valid URL, return empty string
+                console.warn(`Invalid URL format: ${url}`);
+                return '';
+            }
+        };
         
         // Show loading indicator
         const formContent = document.querySelector('.form-content');
@@ -308,37 +285,30 @@ function generateWebsite() {
         if (loadingIndicator) loadingIndicator.classList.add('active');
         if (generatorProgress) generatorProgress.classList.add('active');
         
-        // Update progress - skip verification
+        // Update progress
         updateProgress(10, 'Preparing website files...');
-        updateProgress(30, 'Customizing content...');
-        
-        // Create a configuration object with all the user's information
+        updateProgress(30, 'Updating social links...');
+          // Create a configuration object with the user's information
         const siteConfig = {
             github: {
                 username: githubUsername,
                 token: githubToken
             },
-            personal: {
-                name: name,
-                location: location || 'Earth',
-                email: email || 'contact@example.com',
-                avatar: '' // No avatar since we're not fetching user data
-            },
             social: {
-                linkedin: linkedin || '',
-                twitter: twitter || '',
-                instagram: instagram || ''
-            },
-            theme: {
-                color: document.documentElement.style.getPropertyValue('--primary-color') || '#9d4edd'
+                linkedin: validateUrl(linkedin) || '',
+                twitter: validateUrl(twitter) || '',
+                instagram: validateUrl(instagram) || ''
             }
         };
         
         // Generate the website files
-        updateProgress(50, 'Cloning website files...');
+        updateProgress(50, 'Updating website files...');
         
         // Create GitHub configuration file
         const githubConfigJS = generateGithubConfigFile(siteConfig);
+        
+        // Create social links file
+        const socialLinksJS = generateSocialLinksFile(siteConfig);
         
         // Make sure JSZip is available
         if (typeof JSZip === 'undefined') {
@@ -347,7 +317,7 @@ function generateWebsite() {
         }
         
         // Create a ZIP file with all the necessary website files
-        createWebsiteZip(siteConfig, githubConfigJS)
+        createWebsiteZip(siteConfig, githubConfigJS, socialLinksJS)
             .then(zipBlob => {
                 completeGeneration(siteConfig, zipBlob);
             })
@@ -428,6 +398,72 @@ window.GitHubConfig = (function() {
 })();`;
 }
 
+// Generate social links JS file
+function generateSocialLinksFile(config) {
+    // Set default social links with fallbacks
+    const linkedinUrl = config.social.linkedin || 'https://www.linkedin.com/in/imnexerio/';
+    const twitterUrl = config.social.twitter || 'https://www.twitter.com/imnexerio/';
+    const instagramUrl = config.social.instagram || 'https://www.instagram.com/imnexerio/';
+    
+    return `// Social media links configuration
+const socialLinks = [
+    {
+        platform: 'github',
+        url: 'https://github.com/${config.github.username}',
+        icon: 'fab fa-github',
+        title: 'GitHub'
+    },
+    {
+        platform: 'linkedin',
+        url: '${linkedinUrl}',
+        icon: 'fab fa-linkedin-in',
+        title: 'LinkedIn'
+    },
+    {
+        platform: 'twitter',
+        url: '${twitterUrl}',
+        icon: 'fab fa-twitter',
+        title: 'Twitter'
+    },
+    {
+        platform: 'instagram',
+        url: '${instagramUrl}',
+        icon: 'fab fa-instagram',
+        title: 'Instagram'
+    }
+];
+
+// Function to render social media links in specified containers
+function renderSocialLinks() {
+    // Find all containers with class 'social-icons'
+    const socialContainers = document.querySelectorAll('.social-icons');
+    
+    // For each container, render the social links
+    socialContainers.forEach(container => {
+        // Clear existing content
+        container.innerHTML = '';
+        
+        // Add each social link
+        socialLinks.forEach(link => {
+            const linkElement = document.createElement('a');
+            linkElement.href = link.url;
+            linkElement.target = '_blank';
+            linkElement.title = link.title;
+            linkElement.className = 'magnetic';
+            
+            const iconElement = document.createElement('i');
+            iconElement.className = link.icon;
+            
+            linkElement.appendChild(iconElement);
+            container.appendChild(linkElement);
+        });
+    });
+}
+
+// Initialize social links when the DOM is loaded
+document.addEventListener('DOMContentLoaded', renderSocialLinks);`;
+}
+
 // Generate a license file with proper attribution
 function generateLicense(config) {
     const currentYear = new Date().getFullYear();
@@ -455,9 +491,9 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.`;
 }
 
 // Create a ZIP file with all website files
-function createWebsiteZip(config, githubConfigJS) {
+function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
     return new Promise((resolve, reject) => {
-        updateProgress(60, 'Customizing HTML...');
+        updateProgress(60, 'Packaging updated files...');
         
         // Use the already loaded JSZip library
         if (typeof JSZip === 'undefined') {
@@ -470,7 +506,7 @@ function createWebsiteZip(config, githubConfigJS) {
         // Get all the files we need to include
         collectWebsiteFiles()
             .then(files => {
-                updateProgress(70, 'Personalizing content...');
+                updateProgress(70, 'Updating social links...');
                 
                 // Add all files to the ZIP with customizations
                 files.forEach(file => {
@@ -480,26 +516,24 @@ function createWebsiteZip(config, githubConfigJS) {
                     if (file.path === 'js/github-config.js') {
                         // Replace with our generated config
                         content = githubConfigJS;
+                    } else if (file.path === 'js/social-links.js') {
+                        // Replace with our generated social links
+                        content = socialLinksJS;
                     } else if (file.path === 'index.html') {
-                        // Replace name and social links in HTML
-                        content = customizeHTML(content, config);
+                        // We're keeping the existing HTML as is
+                        // Just make sure any generator overlay is reset
+                        content = content.replace(/class="generator-overlay active"/g, 'class="generator-overlay"');
                     } else if (file.path === 'js/website-generator.js') {
                         // Ensure form is shown correctly in the generated site
                         content = content.replace(/class="generator-overlay active"/g, 'class="generator-overlay"');
                         content = content.replace(/class="loading-indicator active"/g, 'class="loading-indicator"');
                         content = content.replace(/class="generator-progress active"/g, 'class="generator-progress"');
                         content = content.replace(/class="success-message active"/g, 'class="success-message"');
-                        
-                        // Make sure all event listeners are properly reattached in the generated site
-                        content = addGenerationBootstrap(content);
                     }
                     
                     // Add the file to the ZIP
                     zip.file(file.path, content);
                 });
-                
-                // Add license file
-                zip.file('LICENSE.txt', generateLicense(config));
                 
                 updateProgress(90, 'Creating download package...');
                 
@@ -549,12 +583,12 @@ function collectWebsiteFiles() {
             'css/github-stats.css',
             'css/website-generator.css'
         ];
-        
-        // Collect all JS files
+          // Collect all JS files
         const jsFiles = [
             'js/github-stats.js',
             'js/optimized-main.js',
-            'js/website-generator.js'
+            'js/website-generator.js',
+            'js/social-links.js'
         ];
         
         // Create promises to fetch each file
@@ -654,25 +688,24 @@ function customizeHTML(html, config) {
     // Replace email
     const emailRegExp = new RegExp('contact@example\\.com', 'g');
     html = html.replace(emailRegExp, config.personal.email);
-    
-    // Replace GitHub username in all links and references
+      // Replace GitHub username in all links and references
     const githubUsernameRegExp = new RegExp('imnexerio', 'g');
     html = html.replace(githubUsernameRegExp, config.github.username);
     
-    // Replace social media links
+    // Replace social media links if provided
     if (config.social.linkedin) {
-        const linkedinRegExp = new RegExp('linkedin\\.com/in/imnexerio', 'g');
-        html = html.replace(linkedinRegExp, `linkedin.com/in/${config.social.linkedin}`);
+        const linkedinRegExp = new RegExp('https://www\\.linkedin\\.com/in/imnexerio/', 'g');
+        html = html.replace(linkedinRegExp, config.social.linkedin);
     }
     
     if (config.social.twitter) {
-        const twitterRegExp = new RegExp('twitter\\.com/imnexerio', 'g');
-        html = html.replace(twitterRegExp, `twitter.com/${config.social.twitter}`);
+        const twitterRegExp = new RegExp('https://www\\.twitter\\.com/imnexerio/', 'g');
+        html = html.replace(twitterRegExp, config.social.twitter);
     }
     
     if (config.social.instagram) {
-        const instagramRegExp = new RegExp('instagram\\.com/imnexerio', 'g');
-        html = html.replace(instagramRegExp, `instagram.com/${config.social.instagram}`);
+        const instagramRegExp = new RegExp('https://www\\.instagram\\.com/imnexerio/', 'g');
+        html = html.replace(instagramRegExp, config.social.instagram);
     }
     
     // Update copyright year
@@ -707,7 +740,7 @@ function getInitials(name) {
 
 function completeGeneration(config, zipBlob) {
     // Update progress and show success message
-    updateProgress(100, 'Website generated successfully!');
+    updateProgress(100, 'Website updated successfully!');
     
     // Hide loading indicator and show success message
     setTimeout(() => {
@@ -718,7 +751,7 @@ function completeGeneration(config, zipBlob) {
         const downloadLink = document.getElementById('download-website');
         const url = URL.createObjectURL(zipBlob);
         downloadLink.href = url;
-        downloadLink.download = `${config.github.username}-portfolio.zip`;
+        downloadLink.download = `${config.github.username}-portfolio-updated.zip`;
     }, 500);
 }
 
