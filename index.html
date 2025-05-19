@@ -295,16 +295,28 @@
                 <!-- Content will be dynamically inserted here -->
             </div>
         </div>
-    </div>
-
-    <!-- Back to Top Button -->
-    <a href="#" class="back-to-top magnetic" title="Back to Top"><i class="fas fa-arrow-up"></i></a>    <!-- Scripts -->
-    <script src="js/github-config.js"></script>
-    <script src="js/github-stats.js"></script>
-    <script src="js/optimized-main.js"></script>
-    <script src="js/social-links.js"></script>
+    </div>    <!-- Back to Top Button -->
+    <a href="#" class="back-to-top magnetic" title="Back to Top"><i class="fas fa-arrow-up"></i></a>    <!-- Scripts -->    <script src="js/env-loader.js"></script>
+    <script>
+        // Initialize environment variables before loading other scripts
+        window.Env.init().then(() => {
+            // Now load the rest of the scripts
+            const scripts = [
+                'js/github-config.js',
+                'js/github-stats.js',
+                'js/optimized-main.js',
+                'js/social-links.js',
+                'js/website-generator.js'
+            ];
+            
+            scripts.forEach(src => {
+                const script = document.createElement('script');
+                script.src = src;
+                document.body.appendChild(script);
+            });
+        });
+    </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="js/website-generator.js"></script>
     <script>
         window.plausible =
             window.plausible ||

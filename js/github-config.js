@@ -9,7 +9,18 @@
 window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = 'imnexerio';
-    const _token = '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';
+      // Get token from environment variables
+    // This works both for local development (with .env file) and deployed sites
+    const _token = (function() {
+        // If Env is available, try to get the token from PAT_GITHUB
+        if (window.Env) {
+            return window.Env.get('PAT_GITHUB', '');
+        }
+        
+        // Fallback to empty token if Env is not available
+        console.log('Environment utility not loaded - using public API access');
+        return '';
+    })();
     
     // Configuration options
     const _config = {
@@ -35,11 +46,12 @@ window.GitHubConfig = (function() {
         getConfig: function(key) {
             return key ? _config[key] : _config;
         },
-        
-        // Get authorization headers for GitHub API requests
+          // Get authorization headers for GitHub API requests
         getAuthHeaders: function() {
-            const headers = {};
-            if (_token) {
+            const headers = {
+                'Accept': 'application/vnd.github.v3+json'
+            };
+            if (_token && _token.trim() !== '') {
                 headers['Authorization'] = `Bearer ${_token}`;
             }
             return headers;
@@ -59,11 +71,11 @@ window.GitHubConfig = (function() {
                 sort: _config.sortBy
             });
         },
-        
-        // Check if token is valid
+          // Check if token is valid
         validateToken: function(token = _token) {
             if (!token || token.trim() === '') {
-                return { valid: false, message: 'No token provided' };
+                console.log('No token provided - using GitHub API with rate limitations');
+                return { valid: false, message: 'No token provided - using public API access' };
             }
             
             // Check if token is a fine-grained token (starts with github_pat_)
@@ -88,3 +100,6 @@ window.GitHubConfig = (function() {
 
 // Log that the config has been initialized
 console.log('GitHub Config: Initialized successfully');
+if (!window.GitHubConfig.getToken()) {
+    console.log('GitHub Config: No authentication token provided. Operating with GitHub API rate limits for public access.');
+}
