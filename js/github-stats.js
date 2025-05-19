@@ -101,6 +101,66 @@ function setGitHubProfileImage(avatarUrl) {
     } else {
         console.warn('GitHub Stats: Profile image element not found');
     }
+
+    // Also set the GitHub avatar as the favicon
+    setFaviconFromGitHub(avatarUrl);
+}
+
+// Function to set the favicon using GitHub avatar
+function setFaviconFromGitHub(avatarUrl) {
+    if (!avatarUrl) return;
+    
+    // Create a new image to load the avatar
+    const img = new Image();
+    img.crossOrigin = 'anonymous'; // Enable CORS for the image
+    
+    img.onload = function() {
+        // Create a canvas to manipulate the image
+        const canvas = document.createElement('canvas');
+        const size = 64; // Standard favicon size
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        
+        // Draw a circular mask for the avatar
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, size/2, 0, Math.PI * 2, true);
+        ctx.closePath();
+        ctx.clip();
+        
+        // Draw the avatar image within the circular mask
+        ctx.drawImage(img, 0, 0, size, size);
+        
+        // Convert the canvas to a data URL
+        const dataUrl = canvas.toDataURL('image/png');
+        
+        // Create or update favicon links
+        const faviconLink = document.querySelector('link[rel="icon"]') || document.createElement('link');
+        faviconLink.rel = 'icon';
+        faviconLink.href = dataUrl;
+        faviconLink.type = 'image/png';
+        if (!document.querySelector('link[rel="icon"]')) {
+            document.head.appendChild(faviconLink);
+        }
+        
+        // Also set the shortcut icon for compatibility
+        const shortcutLink = document.querySelector('link[rel="shortcut icon"]') || document.createElement('link');
+        shortcutLink.rel = 'shortcut icon';
+        shortcutLink.href = dataUrl;
+        shortcutLink.type = 'image/png';
+        if (!document.querySelector('link[rel="shortcut icon"]')) {
+            document.head.appendChild(shortcutLink);
+        }
+        
+        console.log('GitHub Stats: Favicon updated with GitHub avatar');
+    };
+    
+    img.onerror = function() {
+        console.error('GitHub Stats: Failed to load avatar for favicon');
+    };
+    
+    // Start loading the image
+    img.src = avatarUrl;
 }
 
 // Function to update user information from GitHub profile
