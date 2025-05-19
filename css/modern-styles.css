@@ -1488,24 +1488,21 @@ section:nth-child(even) {
 .website-creator {
     position: fixed;
     bottom: 30px;
-    right: 30px;
+    left: 30px;
     z-index: 99;
     display: flex;
     align-items: center;
 }
 
 .website-creator-btn {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: var(--primary-color);
     display: flex;
     align-items: center;
-    justify-content: center;
+    padding: 10px 15px;
+    border-radius: 30px;
+    background: var(--primary-color);
     color: white;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
     cursor: pointer;
-    position: relative;
     transition: var(--transition);
 }
 
@@ -1514,35 +1511,12 @@ section:nth-child(even) {
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
-.creator-hover-text {
-    position: absolute;
+.website-creator-btn i {
+    margin-right: 10px;
+    font-size: 16px;
+}
+
+.creator-text {
     white-space: nowrap;
-    background: var(--secondary-color);
-    color: white;
-    padding: 8px 15px;
-    border-radius: var(--border-radius-sm);
     font-size: 14px;
-    right: 60px;
-    top: 50%;
-    transform: translateY(-50%) translateX(20px);
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-}
-
-.creator-hover-text::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    right: -8px;
-    transform: translateY(-50%);
-    border-top: 8px solid transparent;
-    border-bottom: 8px solid transparent;
-    border-left: 8px solid var(--secondary-color);
-}
-
-.website-creator-btn:hover .creator-hover-text {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(-50%) translateX(0);
 }
