@@ -681,8 +681,3 @@ function showGenerationError(message) {
     alert(`Error generating website: ${message}`);
 }
 
-// In a real implementation, you would need to:
-// 1. Clone the current website files
-// 2. Modify the configuration files with the user's information
-// 3. Create a zip file with all the modified files
-// 4. Provide a download link to the zip file
