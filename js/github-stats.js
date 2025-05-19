@@ -40,6 +40,9 @@ async function initGitHubStats() {
         // Update profile image with GitHub avatar
         setGitHubProfileImage(userData.avatar_url);
         updateUserInfoFromGitHub(userData);
+        
+        // Fetch and display user bio from README
+        fetchUserBioFromReadme(username, headers);
           
         // Update stats elements
         document.getElementById('repo-count').textContent = userData.public_repos || '-';
@@ -195,52 +198,121 @@ function updateUserInfoFromGitHub(userData) {
         aboutLocation.textContent = userData.location;
     }
 
-    // Update bio if available
+    // Update bio if available from user data (will be overwritten by README bio if available)
     const userBio = document.getElementById('user-bio');
+    const userBioContinued = document.getElementById('user-bio-continued');
+    
     if (userBio && userData.bio) {
         userBio.textContent = userData.bio;
-    }
-
-    // Update contact section
-    const contactLocation = document.querySelector('.contact-item:nth-child(1) .contact-text p');
-    if (contactLocation && userData.location) {
-        contactLocation.textContent = userData.location;
-    }
-
-    const contactEmail = document.querySelector('.contact-item:nth-child(2) .contact-text p');
-    if (contactEmail && userData.email) {
-        contactEmail.textContent = userData.email;
-    } else if (contactEmail) {
-        // GitHub API doesn't expose email if user has set it to private
-        // We'll keep the existing email or set a placeholder
-        if (contactEmail.textContent.includes('example.com')) {
-            contactEmail.textContent = 'Contact via GitHub';
+        // Clear the second paragraph since we have only one from the profile bio
+        if (userBioContinued) {
+            userBioContinued.innerHTML = '';
         }
     }
+}
 
-    const contactGitHub = document.querySelector('.contact-item:nth-child(3) .contact-text p a');
-    if (contactGitHub) {
-        contactGitHub.textContent = `github.com/${userData.login}`;
-        contactGitHub.href = userData.html_url;
+// Function to update GitHub bio with improved handling for multiple paragraphs
+function updateBioFromReadmeImproved(readmeData) {
+    if (!readmeData || !readmeData.content) return;
+    
+    // Decode the base64-encoded content
+    const decodedContent = atob(readmeData.content.replace(/\n/g, ''));
+    
+    // Extract bio section from README - looking for sections or paragraphs
+    let bioContent = '';
+    
+    // Try to find a section titled "About Me" or similar
+    const aboutSectionMatch = decodedContent.match(/#+\s*(About\s*Me|Bio|Introduction|Profile|About|Sobre\s*mí|Biografía)/i);
+    if (aboutSectionMatch) {
+        const sectionStart = decodedContent.indexOf(aboutSectionMatch[0]);
+        let sectionEnd = decodedContent.indexOf('#', sectionStart + 1);
+        if (sectionEnd === -1) sectionEnd = decodedContent.length;
+        
+        // Extract the section content
+        bioContent = decodedContent.substring(sectionStart, sectionEnd).trim();
+        
+        // Remove the section header
+        bioContent = bioContent.replace(aboutSectionMatch[0], '').trim();
+    } else {
+        // If no section found, use the first paragraphs
+        const paragraphs = decodedContent.split('\n\n').filter(p => p.trim() && !p.startsWith('#'));
+        if (paragraphs.length > 0) {
+            // Use first three paragraphs or what's available
+            bioContent = paragraphs.slice(0, Math.min(3, paragraphs.length)).join('\n\n');
+        }
     }
-
-    const contactRepos = document.querySelector('.contact-item:nth-child(4) .contact-text p');
-    if (contactRepos) {
-        contactRepos.textContent = `${userData.public_repos} Public Repositories`;
-    }
-
-    // Update footer
-    const footerName = document.querySelector('#footer .footer-logo h3');
-    if (footerName && userData.name) {
-        footerName.textContent = userData.name;
-    }
-
-    const footerCopyright = document.querySelector('#footer .footer-bottom p');
-    if (footerCopyright && userData.name) {
-        const currentYear = new Date().getFullYear();
-        footerCopyright.textContent = `© ${currentYear} ${userData.name}. All Rights Reserved.`;
+    
+    // Clean up markdown syntax for display
+    bioContent = cleanMarkdown(bioContent);
+    
+    // Update the bio element if content was found
+    if (bioContent) {
+        const userBio = document.getElementById('user-bio');
+        const userBioContinued = document.getElementById('user-bio-continued');
+        
+        if (userBio) {
+            // If there are multiple paragraphs, split them between the two elements
+            const bioParagraphs = bioContent.split('\n\n');
+            
+            userBio.innerHTML = bioParagraphs[0] || '';
+            console.log('GitHub Stats: Bio updated from README');
+            
+            if (bioParagraphs.length > 1 && userBioContinued) {
+                userBioContinued.innerHTML = bioParagraphs.slice(1).join('<br><br>');
+                userBioContinued.style.display = 'block'; // Ensure it's visible
+            } else if (userBioContinued) {
+                // If no second paragraph, make sure it's not empty
+                userBioContinued.innerHTML = '';
+                userBioContinued.style.display = 'none'; // Hide if empty
+            }
+        }
     }
 }
+
+// Helper function to clean markdown syntax for HTML display
+function cleanMarkdown(text) {
+    if (!text) return '';
+    
+    // Replace markdown links with HTML links
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Replace bold syntax
+    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    
+    // Replace italic syntax
+    text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+    
+    // Replace code blocks and inline code
+    text = text.replace(/```[\s\S]*?```/g, (match) => {
+        const code = match.replace(/```(?:\w+)?\n([\s\S]*?)```/g, '$1').trim();
+        return `<pre><code>${code}</code></pre>`;
+    });
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Replace headers (h4-h6 only since we're in a paragraph context)
+    text = text.replace(/####\s*([^\n]+)/g, '<h4>$1</h4>');
+    text = text.replace(/#####\s*([^\n]+)/g, '<h5>$1</h5>');
+    text = text.replace(/######\s*([^\n]+)/g, '<h6>$1</h6>');
+    
+    // Replace unordered lists
+    text = text.replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.+<\/li>\n?)+/g, '<ul>$&</ul>');
+    
+    // Replace ordered lists
+    text = text.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.+<\/li>\n?)+/g, (match) => {
+        // Only replace with ol if not already wrapped in ul
+        if (!match.startsWith('<ul>')) {
+            return `<ol>${match}</ol>`;
+        }
+        return match;
+    });
+    
+    return text;
+}
+
 // Extract skills (languages) from repositories and update the skills section
 async function extractAndDisplaySkills(repos, headers) {
     try {
@@ -859,4 +931,168 @@ function generateActivityChart() {
         
         grid.appendChild(column);
     }
+}
+
+async function fetchUserBioFromReadme(username, headers) {
+    try {
+        // Add loading animation to bio elements
+        const userBio = document.getElementById('user-bio');
+        const userBioContinued = document.getElementById('user-bio-continued');
+        
+        if (userBio) {
+            userBio.classList.add('bio-loading');
+        }
+        
+        // First, try to fetch the profile's README (username/username repository)
+        const readmeResponse = await fetch(`https://api.github.com/repos/${username}/${username}/readme`, 
+            headers.Authorization ? { headers } : {});
+        
+        // If profile README not found, try to fetch from a repository called "profile"
+        if (!readmeResponse.ok && readmeResponse.status === 404) {
+            console.log('GitHub Stats: Profile README not found, trying profile repository');
+            const profileReadmeResponse = await fetch(`https://api.github.com/repos/${username}/profile/readme`, 
+                headers.Authorization ? { headers } : {});
+                
+            if (!profileReadmeResponse.ok) {
+                throw new Error(`Failed to fetch README: ${profileReadmeResponse.status}`);
+            }
+            
+            const readmeData = await profileReadmeResponse.json();
+            updateBioFromReadmeImproved(readmeData);
+        } else if (!readmeResponse.ok) {
+            throw new Error(`Failed to fetch README: ${readmeResponse.status}`);
+        } else {
+            const readmeData = await readmeResponse.json();
+            updateBioFromReadmeImproved(readmeData);
+        }
+        
+        // Remove loading animation
+        if (userBio) {
+            userBio.classList.remove('bio-loading');
+        }
+    } catch (error) {
+        console.warn('GitHub Stats: Could not fetch bio from README:', error);
+        // If README fetch fails, use GitHub profile bio as fallback
+        const userBio = document.getElementById('user-bio');
+        const userBioContinued = document.getElementById('user-bio-continued');
+        
+        // Remove loading animation
+        if (userBio) {
+            userBio.classList.remove('bio-loading');
+        }
+        
+        const userData = await fetch(`https://api.github.com/users/${username}`, 
+            headers.Authorization ? { headers } : {}).then(res => res.json());
+            
+        if (userBio && userData.bio) {
+            userBio.textContent = userData.bio;
+            // Clear the continued bio element if using fallback
+            if (userBioContinued) {
+                userBioContinued.innerHTML = '';
+            }
+            console.log('GitHub Stats: Using GitHub profile bio as fallback');
+        }
+    }
+}
+
+// Function to update GitHub bio with improved handling for multiple paragraphs
+function updateBioFromReadmeImproved(readmeData) {
+    if (!readmeData || !readmeData.content) return;
+    
+    // Decode the base64-encoded content
+    const decodedContent = atob(readmeData.content.replace(/\n/g, ''));
+    
+    // Extract bio section from README - looking for sections or paragraphs
+    let bioContent = '';
+    
+    // Try to find a section titled "About Me" or similar
+    const aboutSectionMatch = decodedContent.match(/#+\s*(About\s*Me|Bio|Introduction|Profile|About|Sobre\s*mí|Biografía)/i);
+    if (aboutSectionMatch) {
+        const sectionStart = decodedContent.indexOf(aboutSectionMatch[0]);
+        let sectionEnd = decodedContent.indexOf('#', sectionStart + 1);
+        if (sectionEnd === -1) sectionEnd = decodedContent.length;
+        
+        // Extract the section content
+        bioContent = decodedContent.substring(sectionStart, sectionEnd).trim();
+        
+        // Remove the section header
+        bioContent = bioContent.replace(aboutSectionMatch[0], '').trim();
+    } else {
+        // If no section found, use the first paragraphs
+        const paragraphs = decodedContent.split('\n\n').filter(p => p.trim() && !p.startsWith('#'));
+        if (paragraphs.length > 0) {
+            // Use first three paragraphs or what's available
+            bioContent = paragraphs.slice(0, Math.min(3, paragraphs.length)).join('\n\n');
+        }
+    }
+    
+    // Clean up markdown syntax for display
+    bioContent = cleanMarkdown(bioContent);
+    
+    // Update the bio element if content was found
+    if (bioContent) {
+        const userBio = document.getElementById('user-bio');
+        const userBioContinued = document.getElementById('user-bio-continued');
+        
+        if (userBio) {
+            // If there are multiple paragraphs, split them between the two elements
+            const bioParagraphs = bioContent.split('\n\n');
+            
+            userBio.innerHTML = bioParagraphs[0] || '';
+            console.log('GitHub Stats: Bio updated from README');
+            
+            if (bioParagraphs.length > 1 && userBioContinued) {
+                userBioContinued.innerHTML = bioParagraphs.slice(1).join('<br><br>');
+                userBioContinued.style.display = 'block'; // Ensure it's visible
+            } else if (userBioContinued) {
+                // If no second paragraph, make sure it's not empty
+                userBioContinued.innerHTML = '';
+                userBioContinued.style.display = 'none'; // Hide if empty
+            }
+        }
+    }
+}
+
+// Helper function to clean markdown syntax for HTML display
+function cleanMarkdown(text) {
+    if (!text) return '';
+    
+    // Replace markdown links with HTML links
+    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
+    
+    // Replace bold syntax
+    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
+    
+    // Replace italic syntax
+    text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
+    
+    // Replace code blocks and inline code
+    text = text.replace(/```[\s\S]*?```/g, (match) => {
+        const code = match.replace(/```(?:\w+)?\n([\s\S]*?)```/g, '$1').trim();
+        return `<pre><code>${code}</code></pre>`;
+    });
+    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+    
+    // Replace headers (h4-h6 only since we're in a paragraph context)
+    text = text.replace(/####\s*([^\n]+)/g, '<h4>$1</h4>');
+    text = text.replace(/#####\s*([^\n]+)/g, '<h5>$1</h5>');
+    text = text.replace(/######\s*([^\n]+)/g, '<h6>$1</h6>');
+    
+    // Replace unordered lists
+    text = text.replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.+<\/li>\n?)+/g, '<ul>$&</ul>');
+    
+    // Replace ordered lists
+    text = text.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.+<\/li>\n?)+/g, (match) => {
+        // Only replace with ol if not already wrapped in ul
+        if (!match.startsWith('<ul>')) {
+            return `<ol>${match}</ol>`;
+        }
+        return match;
+    });
+    
+    return text;
 }

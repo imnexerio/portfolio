@@ -1529,3 +1529,44 @@ section:nth-child(even) {
     0%, 100% { opacity: 1; }
     50% { opacity: 0; }
 }
+
+#user-bio, #user-bio-continued {
+    margin-bottom: 1rem;
+    line-height: 1.7;
+}
+
+#user-bio a, #user-bio-continued a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+#user-bio a:hover, #user-bio-continued a:hover {
+    text-decoration: underline;
+}
+
+#user-bio code, #user-bio-continued code {
+    background: rgba(var(--color-accent-rgb), 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 3px;
+    font-size: 0.9em;
+    font-family: 'Consolas', monospace;
+}
+
+#user-bio pre, #user-bio-continued pre {
+    background: rgba(var(--color-text-rgb), 0.05);
+    padding: 1rem;
+    border-radius: 5px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+#user-bio ul, #user-bio-continued ul,
+#user-bio ol, #user-bio-continued ol {
+    padding-left: 2rem;
+    margin: 1rem 0;
+}
+
+#user-bio li, #user-bio-continued li {
+    margin-bottom: 0.5rem;
+}
