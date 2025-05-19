@@ -18,6 +18,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initContactForm();
     initBackToTop();
     initScrollProgress();
+    initCreatorTypingEffect();  // Initialize the creator button typing effect
     init3DCardEffect();
     initMagneticElements();
     initParallaxEffect();
@@ -257,6 +258,47 @@ function initTypingEffect() {
     // Start the typing effect
     setTimeout(type, 1000);
 }
+
+/**
+ * Creator Button Typing Animation
+ */
+function initCreatorTypingEffect() {
+    const typedMessage = document.querySelector('.typed-message');
+    if (!typedMessage) return;
+    
+    const message = "Developed by imnexerio - Get for yourself!";
+    let charIndex = 0;
+    let isDeleting = false;
+    let typingSpeed = 100;
+    
+    function type() {
+        if (isDeleting) {
+            typedMessage.textContent = message.substring(0, charIndex - 1);
+            charIndex--;
+            typingSpeed = 50;
+        } else {
+            typedMessage.textContent = message.substring(0, charIndex + 1);
+            charIndex++;
+            typingSpeed = 100;
+        }
+        
+        if (!isDeleting && charIndex === message.length) {
+            isDeleting = true;
+            typingSpeed = 1000; // Pause at the end of message
+        } else if (isDeleting && charIndex === 0) {
+            isDeleting = false;
+            typingSpeed = 500; // Pause before retyping
+        }
+        
+        setTimeout(type, typingSpeed);
+    }
+    
+    // Start typing immediately
+    type();
+}
+
+// Initialize the creator button typing effect
+initCreatorTypingEffect();
 
 /**
  * Advanced Scroll Animations with Intersection Observer for performance
