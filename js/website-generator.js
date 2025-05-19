@@ -5,13 +5,25 @@
 
 // Initialize the generator when the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
-    initWebsiteGenerator();
-    
-    // Ensure no active overlay on page load
-    const existingOverlay = document.querySelector('.generator-overlay.active');
+    // Check for and fix any existing generator overlays
+    const existingOverlay = document.querySelector('.generator-overlay');
     if (existingOverlay) {
+        // Remove active class
         existingOverlay.classList.remove('active');
+        
+        // Reset form state
+        const formContent = existingOverlay.querySelector('.form-content');
+        const formButtons = existingOverlay.querySelector('.form-buttons');
+        const loadingIndicator = existingOverlay.querySelector('.loading-indicator');
+        const successMessage = existingOverlay.querySelector('.success-message');
+        
+        if (formContent) formContent.style.display = 'block';
+        if (formButtons) formButtons.style.display = 'flex';
+        if (loadingIndicator) loadingIndicator.classList.remove('active');
+        if (successMessage) successMessage.classList.remove('active');
     }
+    
+    initWebsiteGenerator();
 });
 
 function initWebsiteGenerator() {
@@ -32,8 +44,21 @@ function initWebsiteGenerator() {
 function showGeneratorForm() {
     // Check if the form already exists
     if (document.querySelector('.generator-overlay')) {
-        // Only make it active if it was triggered by a button click
-        document.querySelector('.generator-overlay').classList.add('active');
+        const overlay = document.querySelector('.generator-overlay');
+        
+        // Reset form state
+        const formContent = overlay.querySelector('.form-content');
+        const formButtons = overlay.querySelector('.form-buttons');
+        const loadingIndicator = overlay.querySelector('.loading-indicator');
+        const successMessage = overlay.querySelector('.success-message');
+        
+        if (formContent) formContent.style.display = 'block';
+        if (formButtons) formButtons.style.display = 'flex';
+        if (loadingIndicator) loadingIndicator.classList.remove('active');
+        if (successMessage) successMessage.classList.remove('active');
+        
+        // Show the overlay
+        overlay.classList.add('active');
         return;
     }
       // Create the generator form
@@ -404,6 +429,12 @@ function createWebsiteZip(config, githubConfigJS) {
                     } else if (file.path === 'index.html') {
                         // Replace name and social links in HTML
                         content = customizeHTML(content, config);
+                    } else if (file.path === 'js/website-generator.js') {
+                        // Ensure form is shown correctly in the generated site
+                        content = content.replace(/class="generator-overlay active"/g, 'class="generator-overlay"');
+                        content = content.replace(/class="loading-indicator active"/g, 'class="loading-indicator"');
+                        content = content.replace(/class="generator-progress active"/g, 'class="generator-progress"');
+                        content = content.replace(/class="success-message active"/g, 'class="success-message"');
                     }
                     
                     // Add the file to the ZIP
@@ -538,6 +569,12 @@ function collectWebsiteFiles() {
 
 // Customize HTML based on configuration
 function customizeHTML(html, config) {
+    // Remove any active classes that could cause issues in the generated site
+    html = html.replace(/class="generator-overlay active"/g, 'class="generator-overlay"');
+    html = html.replace(/class="loading-indicator active"/g, 'class="loading-indicator"');
+    html = html.replace(/class="generator-progress active"/g, 'class="generator-progress"');
+    html = html.replace(/class="success-message active"/g, 'class="success-message"');
+    
     // Create a RegExp for entire portfolio name
     const nameRegExp = new RegExp('Santosh Prajapati', 'g');
     const shortNameRegExp = new RegExp('SP', 'g'); // For the logo
