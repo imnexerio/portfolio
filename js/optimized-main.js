@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', function() {
     init3DCardEffect();
     initMagneticElements();
     initParallaxEffect();
-    initHorizontalScroll();
     initSplitTextAnimation();
     initWowFactorElements();
     initMouseTrailer();
@@ -741,65 +740,6 @@ function initParallaxEffect() {
             }
         });
     }, 50));
-}
-
-/**
- * Horizontal Scroll with Intersection Observer for performance
- */
-function initHorizontalScroll() {
-    const horizontalContainer = document.querySelector('.horizontal-scroll-container');
-    
-    if (horizontalContainer) {
-        const horizontalSection = horizontalContainer.querySelector('.horizontal-scroll-section');
-        const items = horizontalSection.querySelectorAll('.horizontal-scroll-item');
-        const totalWidth = items.length * 100; // 100vw per item
-        
-        horizontalSection.style.width = `${totalWidth}vw`;
-        
-        // Use Intersection Observer for better performance
-        const observer = new IntersectionObserver((entries) => {
-            if (entries[0].isIntersecting) {
-                // Throttle function to improve performance
-                function throttle(func, limit) {
-                    let lastFunc;
-                    let lastRan;
-                    return function() {
-                        const context = this;
-                        const args = arguments;
-                        if (!lastRan) {
-                            func.apply(context, args);
-                            lastRan = Date.now();
-                        } else {
-                            clearTimeout(lastFunc);
-                            lastFunc = setTimeout(function() {
-                                if ((Date.now() - lastRan) >= limit) {
-                                    func.apply(context, args);
-                                    lastRan = Date.now();
-                                }
-                            }, limit - (Date.now() - lastRan));
-                        }
-                    };
-                }
-                
-                const scrollHandler = throttle(() => {
-                    const containerRect = horizontalContainer.getBoundingClientRect();
-                    const scrollProgress = -containerRect.top / (containerRect.height - window.innerHeight);
-                    const translateX = scrollProgress * (totalWidth - 100);
-                    
-                    // Use requestAnimationFrame for smoother animation
-                    requestAnimationFrame(() => {
-                        horizontalSection.style.transform = `translateX(-${translateX}vw)`;
-                    });
-                }, 50);
-                
-                window.addEventListener('scroll', scrollHandler);
-            }
-        }, {
-            threshold: 0.1
-        });
-        
-        observer.observe(horizontalContainer);
-    }
 }
 
 /**

@@ -56,24 +56,6 @@
     .portfolio-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-    
-    /* Horizontal scroll section */
-    .horizontal-scroll-container {
-        height: auto;
-        overflow-x: visible;
-    }
-    
-    .horizontal-scroll-section {
-        position: relative;
-        flex-direction: column;
-        height: auto;
-    }
-    
-    .horizontal-scroll-item {
-        width: 100%;
-        height: auto;
-        padding: 60px 0;
-    }
 }
 
 @media screen and (max-width: 768px) {

@@ -108,25 +108,6 @@
     }
 }
 
-/* Fix for horizontal scroll section */
-@media screen and (max-width: 991px) {
-    .horizontal-scroll-container {
-        height: auto;
-    }
-    
-    .horizontal-scroll-section {
-        position: static;
-        display: flex;
-        flex-direction: column;
-    }
-    
-    .horizontal-scroll-item {
-        width: 100%;
-        height: auto;
-        min-height: 50vh;
-    }
-}
-
 /* Fix for theme switcher on very small screens */
 @media screen and (max-width: 380px) {
     .theme-switcher {
