@@ -226,16 +226,19 @@ function validateAndGenerate() {
                     throw new Error('GitHub user not found');
                 }
                 return response.json();
-            })
-            .then(() => {
+            })            .then(() => {
                 // Username valid, proceed with generation
-                formContent.removeChild(validatingElement);
+                if (validatingElement && validatingElement.parentNode === formContent) {
+                    formContent.removeChild(validatingElement);
+                }
                 formButtons.style.display = 'flex';
                 generateWebsite();
             })
             .catch(error => {
                 // Username invalid, show error
-                formContent.removeChild(validatingElement);
+                if (validatingElement && validatingElement.parentNode === formContent) {
+                    formContent.removeChild(validatingElement);
+                }
                 formButtons.style.display = 'flex';
                 
                 document.getElementById('generator-github-username').classList.add('error');
