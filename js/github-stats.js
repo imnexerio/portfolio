@@ -378,27 +378,53 @@ async function fetchGitHubProjects() {
     if (!projectsContainer) {
         console.error('GitHub Projects: Projects container not found');
         return;
-    }    
+    }
+    
     try {
         console.log('GitHub Projects: Fetching repositories');
         
         // Show loading state (the loading message is already in the HTML)
         
-        // Fetch repositories
-        const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&direction=desc&per_page=10`, 
-            headers.Authorization ? { headers } : {});
+        // Fetch all repositories by making multiple API calls if needed
+        let allRepos = [];
+        let page = 1;
+        let hasMoreRepos = true;
+        
+        while (hasMoreRepos) {
+            console.log(`GitHub Projects: Fetching page ${page} of repositories`);
             
-        if (!reposResponse.ok) {
-            if (reposResponse.status === 403 && reposResponse.headers.get('X-RateLimit-Remaining') === '0') {
-                console.error('GitHub Projects: Rate limit exceeded');
-                throw new Error('GitHub API rate limit exceeded. Please try again later.');
+            const reposResponse = await fetch(`https://api.github.com/users/${username}/repos?sort=updated&direction=desc&per_page=100&page=${page}`, 
+                headers.Authorization ? { headers } : {});
+                
+            if (!reposResponse.ok) {
+                if (reposResponse.status === 403 && reposResponse.headers.get('X-RateLimit-Remaining') === '0') {
+                    console.error('GitHub Projects: Rate limit exceeded');
+                    throw new Error('GitHub API rate limit exceeded. Please try again later.');
+                }
+                throw new Error(`Failed to fetch repos: ${reposResponse.status}`);
             }
-            throw new Error(`Failed to fetch repos: ${reposResponse.status}`);
+            
+            const repos = await reposResponse.json();
+            
+            if (Array.isArray(repos) && repos.length > 0) {
+                allRepos = [...allRepos, ...repos];
+                
+                // If we got fewer repos than the max per page, we've reached the end
+                if (repos.length < 100) {
+                    hasMoreRepos = false;
+                } else {
+                    // Otherwise, fetch the next page
+                    page++;
+                }
+            } else {
+                // No more repos or empty response
+                hasMoreRepos = false;
+            }
         }
         
-        const repos = await reposResponse.json();
+        console.log(`GitHub Projects: Fetched a total of ${allRepos.length} repositories`);
         
-        if (!Array.isArray(repos) || repos.length === 0) {
+        if (allRepos.length === 0) {
             console.error('GitHub Projects: No repositories found');
             throw new Error('No GitHub repositories found.');
         }
@@ -413,7 +439,7 @@ async function fetchGitHubProjects() {
         const projectDetails = {};
         
         // Process each repository and add it to the portfolio grid
-        repos.forEach((repo, index) => {
+        allRepos.forEach((repo, index) => {
             // Skip forked repositories if needed
             if (repo.fork) return;
             
