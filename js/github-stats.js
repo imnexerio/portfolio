@@ -93,7 +93,7 @@ function setGitHubProfileImage(avatarUrl) {
     if (!avatarUrl) return;
     
     // Find the profile image in the about section and replace its src
-    const profileImage = document.querySelector('.about-image img');
+    const profileImage = document.getElementById('profile-image') || document.querySelector('.about-image img');
     if (profileImage) {
         profileImage.src = avatarUrl;
         console.log('GitHub Stats: Profile image updated with GitHub avatar');
