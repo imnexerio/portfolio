@@ -232,6 +232,28 @@ function initSkillsAnimation() {
     skillLevels.forEach(level => {
         observer.observe(level);
     });
+    
+    // Re-initialize scroll animations for newly added skill items
+    const newScrollElements = document.querySelectorAll('.skill-item.scroll-scale:not(.active)');
+    if (newScrollElements.length > 0) {
+        // Use the same observer options as in initAdvancedScrollAnimations
+        const scrollObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        });
+        
+        newScrollElements.forEach(element => {
+            scrollObserver.observe(element);
+        });
+    }
 }
 
 /**
