@@ -82,7 +82,7 @@
 ## 🖥️ Demo
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/imnexerio/portfolio/main/preview.gif" alt="Portfolio Demo" width="70%">
+  <img src="https://raw.githubusercontent.com/imnexerio/portfolio/main/preview.gif" alt="Portfolio Demo" width="90%">
   <br><br>
   <a href="https://imnexerio.github.io/portfolio/" target="_blank">
     <img src="https://img.shields.io/badge/View_Live_Demo-5C5C5C?style=for-the-badge&logo=github&logoColor=white" alt="View Live Demo">
