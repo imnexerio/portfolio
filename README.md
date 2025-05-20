@@ -22,6 +22,21 @@ A modern, responsive portfolio website that dynamically displays your GitHub pro
 3. Customize your personal information in the profile sections
 4. Deploy to your preferred hosting service (GitHub Pages, Netlify, Vercel, etc.)
 
+## 🔄 GitHub Actions Deployment (Recommended)
+
+This portfolio includes a GitHub Actions workflow for automatic deployment to GitHub Pages:
+
+1. Fork this repository
+2. Go to your repository's Settings > Secrets and variables > Actions
+3. Add a new repository secret named `PAT_GITHUB` with your GitHub token
+4. Go to Settings > Pages and set the source to "GitHub Actions"
+5. Any push to the main branch will automatically deploy your portfolio
+
+The deployment workflow will:
+- Build and deploy your site to GitHub Pages
+- Make your PAT_GITHUB token available during the build process
+- Keep your token secure by using GitHub's secret management
+
 ## 🛠️ Configuration
 
 ### GitHub Integration

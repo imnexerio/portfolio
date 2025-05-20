@@ -89,11 +89,10 @@ function showGeneratorForm() {
                         <div class="error-message" id="github-username-error">Please enter a valid GitHub username</div>
                         <div class="input-help">Your GitHub profile will be used to populate projects, stats, and personal information</div>
                     </div>
-                    
-                    <div class="form-group">
+                      <div class="form-group">
                         <label for="generator-github-token">GitHub Token <span class="form-field-optional">(optional)</span></label>
                         <input type="password" id="generator-github-token" placeholder="ghp_xxxxxxxxxxxx">
-                        <div class="input-help">A token allows more GitHub API requests. <a href="https://github.com/settings/tokens" target="_blank">Create one here</a> with "public_repo" scope.</div>
+                        <div class="input-help">A token allows more GitHub API requests. <a href="https://github.com/settings/tokens" target="_blank">Create one here</a> with "public_repo" scope. For enhanced security, use GitHub Actions for deployment and add your token as a repository secret named <code>PAT_GITHUB</code>.</div>
                     </div>
                       <div class="form-group">
                         <label for="generator-linkedin">LinkedIn URL <span class="form-field-optional">(optional)</span></label>
@@ -112,11 +111,11 @@ function showGeneratorForm() {
                         <input type="text" id="generator-instagram" placeholder="e.g. https://www.instagram.com/johndoe/">
                         <div class="input-help">Complete Instagram profile URL including https://</div>
                     </div>
-                    
-                    <div class="form-info">
+                      <div class="form-info">
                         <p><strong>What happens next?</strong></p>
                         <p>Clicking "Update My Portfolio" will update the social links and GitHub information in the website.</p>
                         <p>You'll receive a ZIP file that you can upload to any web hosting service or GitHub Pages.</p>
+                        <p><strong>Secure Deployment:</strong> The generated package includes a GitHub Actions workflow (<code>.github/workflows/deploy.yml</code>) for secure deployment. Add your token as a repository secret called <code>PAT_GITHUB</code> instead of including it in your code.</p>
                     </div>
                 </div>                  <div class="loading-indicator">
                     <p>Updating your portfolio website...</p>
@@ -131,10 +130,16 @@ function showGeneratorForm() {
                     <h3>Success! 🎉</h3>
                     <p>Your portfolio website has been updated.</p>
                     <p>Download the ZIP file and upload it to your existing web hosting service!</p>
-                    <div class="hosting-tips">
-                        <h4>How to update your website:</h4>
+                    <div class="hosting-tips">                        <h4>How to update your website:</h4>
                         <ol>
-                            <li><strong>GitHub Pages:</strong> Replace the files in your repository</li>
+                            <li><strong>GitHub Pages with Actions (Recommended):</strong> 
+                              <ul>
+                                <li>Add your GitHub token as a repository secret named <code>PAT_GITHUB</code></li>
+                                <li>Include the <code>.github/workflows/deploy.yml</code> file</li>
+                                <li>Set GitHub Pages source to "GitHub Actions" in repository settings</li>
+                              </ul>
+                            </li>
+                            <li><strong>GitHub Pages (Manual):</strong> Replace the files in your repository</li>
                             <li><strong>Netlify:</strong> Drag and drop the ZIP folder to update your site</li>
                             <li><strong>Vercel:</strong> Push updated files to your GitHub repo</li>
                         </ol>
@@ -370,7 +375,8 @@ function generateGithubConfigFile(config) {
 window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = '${config.github.username}';
-    const _token = '${config.github.token}';
+    // Get token from environment variable or leave empty for public access
+    const _token = ''; // Token should be set as PAT_GITHUB in GitHub repository secrets
     
     // Configuration options
     const _config = {
@@ -583,13 +589,11 @@ function collectWebsiteFiles() {
                 path: 'js/social-links.js',
                 content: '' // This will be replaced with our generated content
             },
-            {
-                path: 'README.md',
-                content: `# Personal Portfolio Website\n\nThis portfolio website was generated from the template by Santosh Prajapati.\n\n## Setup\n\n1. Edit the js/github-config.js file with your GitHub credentials if needed\n2. Host on any web server or GitHub Pages\n\n## Features\n\n- Responsive design that works on all devices\n- Dynamic GitHub project loading\n- GitHub statistics visualization\n- Light/dark theme switcher\n- Custom color picker\n\n## Credits\n\nOriginal template by [Santosh Prajapati](https://github.com/imnexerio)`
+            {                path: 'README.md',
+                content: `# Personal Portfolio Website\n\nThis portfolio website was generated from the template by Santosh Prajapati.\n\n## Setup\n\n1. Edit the js/github-config.js file with your GitHub credentials if needed\n2. Host on any web server or GitHub Pages\n\n## GitHub Actions Deployment\n\nFor secure deployment with GitHub Actions:\n1. Add your GitHub token as a repository secret named \`PAT_GITHUB\`\n2. Use the included workflow file in \`.github/workflows/deploy.yml\`\n3. Set GitHub Pages source to "GitHub Actions" in repository settings\n\n## Features\n\n- Responsive design that works on all devices\n- Dynamic GitHub project loading\n- GitHub statistics visualization\n- Light/dark theme switcher\n- Custom color picker\n\n## Credits\n\nOriginal template by [Santosh Prajapati](https://github.com/imnexerio)`
             }
         ];
-        
-        // Files to fetch from the repository
+          // Files to fetch from the repository
         const filesToFetch = [
             'index.html',
             'css/modern-styles.css',
@@ -600,7 +604,8 @@ function collectWebsiteFiles() {
             'css/website-generator.css',
             'js/github-stats.js',
             'js/optimized-main.js',
-            'js/website-generator.js'
+            'js/website-generator.js',
+            '.github/workflows/deploy.yml'
         ];
         
         // Create promises to fetch each file from GitHub
@@ -677,13 +682,14 @@ function completeGeneration(config, zipBlob) {
         const successMessage = document.querySelector('.success-message');
         if (successMessage) {
             const updateNote = document.createElement('div');
-            updateNote.className = 'update-details';
-            updateNote.innerHTML = `
+            updateNote.className = 'update-details';                updateNote.innerHTML = `
                 <p><small>Files updated:</small></p>
                 <ul>
                     <li><small>GitHub Configuration (username: ${config.github.username})</small></li>
                     <li><small>Social Media Links</small></li>
+                    <li><small>GitHub Actions workflow for secure deployment</small></li>
                 </ul>
+                <p><small><strong>Secure Deployment Tip:</strong> For better security, set up your GitHub token as a repository secret named <code>PAT_GITHUB</code> in your GitHub repository settings instead of including it in the code.</small></p>
             `;
             
             // Insert after the first paragraph
