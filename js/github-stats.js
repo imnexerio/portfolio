@@ -753,8 +753,7 @@ async function fetchGitHubProjects() {
                 technologies: [language],
                 image: imageUrl,
                 url: repo.html_url
-            };
-              // Create HTML for the portfolio item
+            };            // Create HTML for the portfolio item
             portfolioItem.innerHTML = `
                 <div class="portfolio-img">
                     <img src="${imageUrl}" alt="${repo.name}">
@@ -764,13 +763,49 @@ async function fetchGitHubProjects() {
                     <p>${language}</p>
                     <div class="portfolio-links">
                         <a href="${repo.html_url}" class="portfolio-link magnetic" target="_blank" title="View Repository"><i class="fas fa-link"></i></a>
-                        <a href="#" class="portfolio-details magnetic" data-id="${projectId}" title="View Details"><i class="fas fa-search"></i></a>
+                        <a href="#" class="portfolio-details magnetic" data-id="${projectId}" data-repo="${repo.name}" title="View Details"><i class="fas fa-search"></i></a>
                     </div>
                 </div>
             `;
-            
-            // Add to the DOM
+              // Add to the DOM
             container.appendChild(portfolioItem);
+              // Set up hover functionality to prefetch README when user hovers over the item
+            portfolioItem.addEventListener('mouseenter', () => {
+                // Set a data attribute to track if we've already started fetching the README
+                if (!portfolioItem.dataset.readmeFetching) {
+                    portfolioItem.dataset.readmeFetching = 'true';
+                    
+                    // Small delay to avoid unnecessary fetches if user is just moving the mouse across items
+                    portfolioItem.readmeTimer = setTimeout(() => {
+                        const repoName = repo.name;
+                        // Store the repo object in the DOM element for later access                        portfolioItem.repoData = portfolioItem.repoData || {};
+                        
+                        // Begin fetching the README but don't display it yet
+                        // This preload will make it faster when the modal is actually opened
+                        console.log(`Pre-fetching README for ${repoName}`);
+                        portfolioItem.repoData.readmePromise = fetch(`https://api.github.com/repos/${user}/${repoName}/readme`)
+                            .then(response => {
+                                if (response.ok) {
+                                    console.log(`Successfully pre-fetched README for ${repoName}`);
+                                    return response.json();
+                                }
+                                console.warn(`No README found for ${repoName}`);
+                                return null; // README not found or other error
+                            })
+                            .catch(error => {
+                                console.warn(`Error pre-fetching README for ${repoName}:`, error);
+                                return null;
+                            });
+                    }, 300); // 300ms delay before starting to fetch
+                }
+            });
+            
+            // Clear the timer if user moves away before the delay
+            portfolioItem.addEventListener('mouseleave', () => {
+                if (portfolioItem.readmeTimer) {
+                    clearTimeout(portfolioItem.readmeTimer);
+                }
+            });
             
             // Apply card effect to this specific item
             setTimeout(() => {
@@ -1049,104 +1084,121 @@ async function fetchUserBioFromReadme(username, headers) {
     }
 }
 
-// Function to update GitHub bio with improved handling for multiple paragraphs
-function updateBioFromReadmeImproved(readmeData) {
-    if (!readmeData || !readmeData.content) return;
+// Function to fetch repository README and update the modal
+async function fetchRepoReadme(username, repoName, displayElement) {
+    // Show loading indicator
+    displayElement.innerHTML = '<div class="readme-loading"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>';
     
-    // Decode the base64-encoded content
-    const decodedContent = atob(readmeData.content.replace(/\n/g, ''));
-    
-    // Extract bio section from README - looking for sections or paragraphs
-    let bioContent = '';
-    
-    // Try to find a section titled "About Me" or similar
-    const aboutSectionMatch = decodedContent.match(/#+\s*(About\s*Me|Bio|Introduction|Profile|About|Sobre\s*mí|Biografía)/i);
-    if (aboutSectionMatch) {
-        const sectionStart = decodedContent.indexOf(aboutSectionMatch[0]);
-        let sectionEnd = decodedContent.indexOf('#', sectionStart + 1);
-        if (sectionEnd === -1) sectionEnd = decodedContent.length;
+    try {
+        let readmeData = null;        // Check if we have a prefetched README promise for this repo
+        const portfolioItems = document.querySelectorAll(`.portfolio-details[data-repo="${repoName}"]`);
+        let prefetchedData = null;
         
-        // Extract the section content
-        bioContent = decodedContent.substring(sectionStart, sectionEnd).trim();
-        
-        // Remove the section header
-        bioContent = bioContent.replace(aboutSectionMatch[0], '').trim();
-    } else {
-        // If no section found, use the first paragraphs
-        const paragraphs = decodedContent.split('\n\n').filter(p => p.trim() && !p.startsWith('#'));
-        if (paragraphs.length > 0) {
-            // Use first three paragraphs or what's available
-            bioContent = paragraphs.slice(0, Math.min(3, paragraphs.length)).join('\n\n');
-        }
-    }
-    
-    // Clean up markdown syntax for display
-    bioContent = cleanMarkdown(bioContent);
-    
-    // Update the bio element if content was found
-    if (bioContent) {
-        const userBio = document.getElementById('user-bio');
-        const userBioContinued = document.getElementById('user-bio-continued');
-        
-        if (userBio) {
-            // If there are multiple paragraphs, split them between the two elements
-            const bioParagraphs = bioContent.split('\n\n');
+        if (portfolioItems.length > 0) {
+            const portfolioItem = portfolioItems[0].closest('.portfolio-item');
             
-            userBio.innerHTML = bioParagraphs[0] || '';
-            console.log('GitHub Stats: Bio updated from README');
-            
-            if (bioParagraphs.length > 1 && userBioContinued) {
-                userBioContinued.innerHTML = bioParagraphs.slice(1).join('<br><br>');
-                userBioContinued.style.display = 'block'; // Ensure it's visible
-            } else if (userBioContinued) {
-                // If no second paragraph, make sure it's not empty
-                userBioContinued.innerHTML = '';
-                userBioContinued.style.display = 'none'; // Hide if empty
+            if (portfolioItem && portfolioItem.repoData && portfolioItem.repoData.readmePromise) {
+                console.log(`Using prefetched README data for ${repoName}`);
+                try {
+                    prefetchedData = await portfolioItem.repoData.readmePromise;
+                } catch (err) {
+                    console.warn(`Error retrieving prefetched README for ${repoName}:`, err);
+                    // We'll continue and fetch it directly below
+                }
             }
         }
-    }
-}
-
-// Helper function to clean markdown syntax for HTML display
-function cleanMarkdown(text) {
-    if (!text) return '';
-    
-    // Replace markdown links with HTML links
-    text = text.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>');
-    
-    // Replace bold syntax
-    text = text.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    text = text.replace(/__([^_]+)__/g, '<strong>$1</strong>');
-    
-    // Replace italic syntax
-    text = text.replace(/\*([^*]+)\*/g, '<em>$1</em>');
-    text = text.replace(/_([^_]+)_/g, '<em>$1</em>');
-    
-    // Replace code blocks and inline code
-    text = text.replace(/```[\s\S]*?```/g, (match) => {
-        const code = match.replace(/```(?:\w+)?\n([\s\S]*?)```/g, '$1').trim();
-        return `<pre><code>${code}</code></pre>`;
-    });
-    text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
-    
-    // Replace headers (h4-h6 only since we're in a paragraph context)
-    text = text.replace(/####\s*([^\n]+)/g, '<h4>$1</h4>');
-    text = text.replace(/#####\s*([^\n]+)/g, '<h5>$1</h5>');
-    text = text.replace(/######\s*([^\n]+)/g, '<h6>$1</h6>');
-    
-    // Replace unordered lists
-    text = text.replace(/^\s*[-*+]\s+(.+)$/gm, '<li>$1</li>');
-    text = text.replace(/(<li>.+<\/li>\n?)+/g, '<ul>$&</ul>');
-    
-    // Replace ordered lists
-    text = text.replace(/^\s*\d+\.\s+(.+)$/gm, '<li>$1</li>');
-    text = text.replace(/(<li>.+<\/li>\n?)+/g, (match) => {
-        // Only replace with ol if not already wrapped in ul
-        if (!match.startsWith('<ul>')) {
-            return `<ol>${match}</ol>`;
+        
+        // If we have prefetched data, use it; otherwise, fetch it now
+        if (prefetchedData) {
+            console.log(`Using prefetched README for ${repoName}`);
+            readmeData = prefetchedData;
+        } else {
+            // Fetch the README file
+            const readmeResponse = await fetch(`https://api.github.com/repos/${username}/${repoName}/readme`);
+            
+            if (readmeResponse.ok) {
+                readmeData = await readmeResponse.json();
+            } else {
+                // README not found
+                displayElement.innerHTML = '<div class="readme-not-found">No README available for this repository.</div>';
+                return;
+            }
         }
-        return match;
-    });
-    
-    return text;
+        
+        // If we have README data, decode and display it
+        if (readmeData) {            // Decode content from base64
+            const content = atob(readmeData.content);
+            
+            // Format the last updated date if available
+            let lastUpdatedText = '';
+            if (readmeData.sha) {
+                const readmeUrl = readmeData.html_url || `https://github.com/${username}/${repoName}/blob/main/README.md`;
+                lastUpdatedText = `
+                    <div class="readme-meta">
+                        <a href="${readmeUrl}" target="_blank" class="view-on-github">View full README on GitHub</a>
+                    </div>
+                `;
+            }
+              // Clean up and format the content
+            let formattedContent = cleanMarkdown(content);
+            
+            // Basic safety check - if suspicious content is detected, use text-only version
+            if (formattedContent.includes('<script') || 
+                formattedContent.includes('javascript:') || 
+                formattedContent.includes('onerror=')) {
+                console.warn('Potentially unsafe content detected in README, using text-only version');
+                formattedContent = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+                formattedContent = '<pre style="white-space: pre-wrap;">' + formattedContent + '</pre>';
+            }
+              // Update the display element with the README content
+            displayElement.innerHTML = `
+                <div class="readme-content">
+                    <h3>README ${lastUpdatedText}</h3>
+                    <div class="markdown-body">${formattedContent}</div>
+                    <div class="readme-expand-container">
+                        <button class="readme-expand-btn">Show More</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add event listener for the show more button
+            const readmeContent = displayElement.querySelector('.markdown-body');
+            const expandBtn = displayElement.querySelector('.readme-expand-btn');
+            const expandContainer = displayElement.querySelector('.readme-expand-container');
+            
+            if (readmeContent && expandBtn) {
+                // Check if the content is overflowing
+                setTimeout(() => {
+                    if (readmeContent.scrollHeight > readmeContent.clientHeight) {
+                        // Content is overflowing, show the expand button
+                        expandContainer.style.display = 'flex';
+                        
+                        // Add click handler
+                        expandBtn.addEventListener('click', () => {
+                            if (readmeContent.classList.contains('expanded')) {
+                                // Collapse
+                                readmeContent.classList.remove('expanded');
+                                expandBtn.textContent = 'Show More';
+                                
+                                // Scroll back to the top of the README
+                                readmeContent.scrollTop = 0;
+                            } else {
+                                // Expand
+                                readmeContent.classList.add('expanded');
+                                expandBtn.textContent = 'Show Less';
+                            }
+                        });
+                    } else {
+                        // Content fits, hide the button
+                        expandContainer.style.display = 'none';
+                    }
+                }, 100);
+            }
+        } else {
+            displayElement.innerHTML = '<div class="readme-not-found">No README available for this repository.</div>';
+        }
+    } catch (error) {
+        console.error('Error fetching README:', error);
+        displayElement.innerHTML = '<div class="readme-error">Failed to load README: ' + error.message + '</div>';
+    }
 }

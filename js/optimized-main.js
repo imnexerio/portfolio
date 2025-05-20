@@ -631,8 +631,7 @@ function initPortfolioModal(dynamicProjectDetails) {
                 project.technologies.forEach(tech => {
                     techHtml += `<span class="tech-tag">${tech}</span>`;
                 });
-                
-                modalContent.innerHTML = `
+                  modalContent.innerHTML = `
                     <div class="modal-project">
                         <div class="modal-image">
                             <img src="${project.image}" alt="${project.title}">
@@ -658,7 +657,9 @@ function initPortfolioModal(dynamicProjectDetails) {
                                 <h3>Project Description</h3>
                                 <p>${project.description}</p>
                             </div>
-                            <a href="${project.url}" class="btn primary-btn" target="_blank">View Project on GitHub</a>
+                            <div id="readme-container" class="readme-container">
+                                <!-- README content will be loaded here -->
+                            </div>                            <a href="${project.url}" class="btn primary-btn" target="_blank">View Project on GitHub</a>
                         </div>
                     </div>
                 `;
@@ -669,6 +670,19 @@ function initPortfolioModal(dynamicProjectDetails) {
                 // Add animation class to modal content
                 setTimeout(() => {
                     modalContent.classList.add('modal-animate');
+                      // Fetch and display README content after modal is displayed
+                    const readmeContainer = document.getElementById('readme-container');
+                    if (readmeContainer) {
+                        // Extract repo name from the URL
+                        const repoName = project.url.split('/').pop();
+                        const username = project.url.split('/')[3]; // GitHub username from URL
+                        
+                        // Store the repo name in the modal for easier access
+                        readmeContainer.setAttribute('data-repo', repoName);
+                        
+                        // Fetch README only when needed (when modal is shown)
+                        fetchRepoReadme(username, repoName, readmeContainer);
+                    }
                 }, 50);
             } else {
                 // Display error message for specific project not found

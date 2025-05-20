@@ -1,0 +1,257 @@
+/* GitHub README styling in modal */
+.readme-container {
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+}
+
+.readme-loading {
+    padding: 20px;
+    text-align: center;
+    color: #888;
+    font-style: italic;
+}
+
+.readme-loading i {
+    margin-right: 8px;
+    animation: spin 1.5s linear infinite;
+}
+
+.readme-error, .readme-not-found {
+    padding: 15px;
+    background-color: rgba(255, 100, 100, 0.1);
+    border-left: 3px solid #ff5252;
+    border-radius: 3px;
+    color: #ff5252;
+}
+
+.readme-not-found {
+    background-color: rgba(255, 255, 100, 0.1);
+    border-left: 3px solid #ffcc00;
+    color: #ffcc00;
+}
+
+.readme-content {
+    max-height: 400px;
+    overflow: hidden;
+    padding-right: 15px;
+    position: relative;
+}
+
+.markdown-body {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    max-height: 300px;
+    overflow-y: auto;
+    transition: max-height 0.3s ease;
+}
+
+.markdown-body.expanded {
+    max-height: 800px;
+}
+
+.readme-expand-container {
+    display: none;
+    justify-content: center;
+    margin-top: 15px;
+    padding-top: 10px;
+    position: relative;
+}
+
+.readme-expand-container:before {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    height: 40px;
+    background: linear-gradient(to top, rgba(30, 30, 30, 1), rgba(30, 30, 30, 0));
+    pointer-events: none;
+}
+
+.readme-expand-btn {
+    background: var(--primary-color, #3498db);
+    color: #fff;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.readme-expand-btn:hover {
+    background: var(--primary-color-hover, #2980b9);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.readme-content h3 {
+    margin-bottom: 15px;
+    font-size: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.readme-meta {
+    font-size: 0.85rem;
+    font-weight: normal;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.view-on-github {
+    display: inline-flex;
+    align-items: center;
+    color: var(--primary-color, #3498db);
+    font-size: 0.8rem;
+    text-decoration: none;
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: rgba(52, 152, 219, 0.1);
+    transition: all 0.2s ease;
+}
+
+.view-on-github:hover {
+    background: rgba(52, 152, 219, 0.2);
+    text-decoration: none;
+}
+
+.view-on-github:before {
+    content: "\f09b"; /* GitHub icon */
+    font-family: "Font Awesome 6 Brands";
+    margin-right: 5px;
+}
+
+.markdown-body {
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.markdown-body h1, 
+.markdown-body h2, 
+.markdown-body h3, 
+.markdown-body h4, 
+.markdown-body h5, 
+.markdown-body h6 {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    color: var(--text-bright, #ffffff);
+}
+
+.markdown-body h1 {
+    font-size: 1.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+.markdown-body h2 {
+    font-size: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 5px;
+}
+
+.markdown-body p {
+    margin-bottom: 16px;
+}
+
+.markdown-body a {
+    color: var(--primary-color, #3498db);
+    text-decoration: none;
+}
+
+.markdown-body a:hover {
+    text-decoration: underline;
+}
+
+.markdown-body ul, 
+.markdown-body ol {
+    padding-left: 25px;
+    margin-bottom: 16px;
+}
+
+.markdown-body li {
+    margin-bottom: 5px;
+}
+
+.markdown-body img {
+    max-width: 100%;
+    border-radius: 5px;
+    margin: 10px 0;
+}
+
+.markdown-body code {
+    font-family: monospace;
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 2px 5px;
+    border-radius: 3px;
+    font-size: 0.85em;
+}
+
+.markdown-body pre {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 16px;
+    border-radius: 5px;
+    margin-bottom: 16px;
+    overflow-x: auto;
+}
+
+.markdown-body pre code {
+    background-color: transparent;
+    padding: 0;
+    font-size: 0.9em;
+    display: block;
+}
+
+.markdown-body blockquote {
+    border-left: 3px solid var(--primary-color, #3498db);
+    padding-left: 15px;
+    margin-left: 0;
+    margin-right: 0;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.markdown-body table {
+    border-collapse: collapse;
+    width: 100%;
+    margin-bottom: 16px;
+}
+
+.markdown-body table th,
+.markdown-body table td {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    text-align: left;
+}
+
+.markdown-body table th {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Custom scrollbar for readme section */
+.readme-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.readme-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+}
+
+.readme-content::-webkit-scrollbar-thumb {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+}
+
+.readme-content::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
