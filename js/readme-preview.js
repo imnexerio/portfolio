@@ -276,18 +276,18 @@ function initReadmeHoverBehavior() {
 
 // Call this function after portfolio items are loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Check if the global portfolioConfig exists and respects its settings
+    const shouldUsePreview = 
+        typeof window.portfolioConfig !== 'undefined' 
+            ? !window.portfolioConfig.useModalPopup && window.portfolioConfig.useHoverPreview
+            : true; // Default to true if config isn't available
+    
+    if (!shouldUsePreview) return;
+    
     // Wait for GitHub projects to load before initializing preview behavior
     const checkPortfolioLoaded = setInterval(() => {
         if (document.querySelectorAll('.portfolio-item').length > 0) {
             clearInterval(checkPortfolioLoaded);
-            
-            // First ensure the original click behavior is disabled
-            const detailButtons = document.querySelectorAll('.portfolio-details');
-            detailButtons.forEach(button => {
-                // Replace with a cloned element to remove event listeners
-                const newButton = button.cloneNode(true);
-                button.parentNode.replaceChild(newButton, button);
-            });
             
             // Now initialize our custom preview behavior
             setTimeout(initReadmeHoverBehavior, 500);

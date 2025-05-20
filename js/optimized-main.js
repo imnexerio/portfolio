@@ -3,6 +3,15 @@
  * Adds advanced animations and optimizes for performance
  */
 
+// Configuration object for portfolio behavior
+const portfolioConfig = {
+    useModalPopup: false, // Set to false to use hover/click preview instead of modal popup
+    useHoverPreview: true // Set to true to enable hover preview
+};
+
+// Make configuration globally available
+window.portfolioConfig = portfolioConfig;
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme switcher first to properly set up the theme
     initThemeSwitcher();
@@ -17,8 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initSkillsAnimation();
     initPortfolioFilter();
     initPortfolioModal();
-    initContactForm();
-    initBackToTop();
+    initContactForm();    initBackToTop();
     initScrollProgress();
     initCreatorTypingEffect();  // Initialize the creator button typing effect
     init3DCardEffect();
@@ -28,6 +36,9 @@ document.addEventListener('DOMContentLoaded', function() {
     initWowFactorElements();
     initMouseTrailer();
     initParticleEffect();
+    
+    // Initialize the portfolio modal only if it's enabled in the configuration
+    initPortfolioModal(window.projectDetailsData);
 });
 
 // Function to apply custom color to CSS variables - moved outside to make it globally accessible
@@ -594,6 +605,18 @@ function initPortfolioModal(dynamicProjectDetails) {
     const modalContent = document.querySelector('.modal-body');
     const closeModal = document.querySelector('.close-modal');
     const detailButtons = document.querySelectorAll('.portfolio-details');
+
+    // If modal popup is disabled via config, set the modal display to none and return early
+    if (!portfolioConfig.useModalPopup) {
+        if (modal) {
+            modal.style.display = 'none';
+            modal.style.visibility = 'hidden';
+            modal.style.opacity = '0';
+            modal.style.pointerEvents = 'none';
+        }
+        // Don't add click handlers for the modal when it's disabled
+        return;
+    }
 
     // Project details data - only use dynamic data, no fallback
     const projectDetails = dynamicProjectDetails;    // Open modal with project details
