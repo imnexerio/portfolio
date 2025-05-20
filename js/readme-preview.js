@@ -36,28 +36,40 @@ function initReadmeHoverBehavior() {
                         
                         const project = window.projectDetailsData[projectId];
                         
-                        if (project) {                            // Position the preview exactly over the portfolio item
+                        if (project) {
+                            // Position the preview exactly over the portfolio item but make it larger
                             const rect = item.getBoundingClientRect();
+                              // Calculate dimensions for the enlarged preview (30% larger than the original item)
+                            const scaleFactor = 1.3; // Make the preview 30% larger
+                            const enlargedWidth = rect.width * scaleFactor;
+                            const enlargedHeight = rect.height * scaleFactor;
+                            
+                            // Calculate position to keep it centered (accounting for the size increase)
+                            const topOffset = rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2);
+                            const leftOffset = rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2);
                             
                             // Create and style an absolutely positioned container that overlays the portfolio item
                             modalPreview.style.position = 'absolute';
                             modalPreview.style.zIndex = '1000';
-                            modalPreview.style.top = `${rect.top + window.scrollY}px`;
-                            modalPreview.style.left = `${rect.left + window.scrollX}px`;
-                            modalPreview.style.width = `${rect.width}px`;
-                            modalPreview.style.height = `${rect.height}px`;
+                            modalPreview.style.top = `${topOffset}px`;
+                            modalPreview.style.left = `${leftOffset}px`;
+                            modalPreview.style.width = `${enlargedWidth}px`;
+                            modalPreview.style.height = `${enlargedHeight}px`;
                             modalPreview.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
                             modalPreview.style.backdropFilter = 'blur(5px)';
-                            modalPreview.style.borderRadius = '8px';
+                            modalPreview.style.borderRadius = '10px'; // Slightly larger border radius
                             modalPreview.style.overflow = 'hidden'; // Hide scrollbars initially
                             modalPreview.style.display = 'flex';
                             modalPreview.style.flexDirection = 'column';
                             modalPreview.style.alignItems = 'center';
                             modalPreview.style.justifyContent = 'flex-start';
                             modalPreview.style.color = '#fff';
-                            modalPreview.style.boxShadow = '0 10px 30px rgba(0, 0, 0, 0.4)';
-                            modalPreview.style.padding = '15px';
-                            modalPreview.style.opacity = '0';                            modalPreview.style.cursor = 'pointer';
+                            modalPreview.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.5)'; // Enhanced shadow
+                            modalPreview.style.padding = '20px'; // Larger padding for the bigger container
+                            modalPreview.style.opacity = '0';
+                            modalPreview.style.cursor = 'pointer';
+                            modalPreview.style.transform = 'scale(0.95)'; // Start slightly smaller for growth animation
+                            modalPreview.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                             
                             // Create content for the preview
                             modalPreview.innerHTML = `
@@ -97,11 +109,11 @@ function initReadmeHoverBehavior() {
                                 detailsBtn.click();
                             });
                             
-                            // Show the preview with a fade-in effect
+                            // Show the preview with a fade-in and grow effect
                             modalPreview.style.display = 'flex';
                             setTimeout(() => {
-                                modalPreview.style.transition = 'opacity 0.3s ease';
                                 modalPreview.style.opacity = '1';
+                                modalPreview.style.transform = 'scale(1)';
                                 
                                 // Allow scrolling once visible
                                 modalPreview.style.overflow = 'auto';
@@ -128,13 +140,15 @@ function initReadmeHoverBehavior() {
                 }
             }, 400); // Delay for hover preview to avoid flickering
         });
-          // On leave, hide README preview after short delay
+        
+        // On leave, hide README preview after short delay
         item.addEventListener('mouseleave', () => {
             clearTimeout(hoverTimer);
             
             leaveTimer = setTimeout(() => {
                 if (modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') {
                     modalPreview.style.opacity = '0';
+                    modalPreview.style.transform = 'scale(0.95)';
                     setTimeout(() => {
                         modalPreview.style.display = 'none';
                     }, 300);
@@ -153,6 +167,7 @@ function initReadmeHoverBehavior() {
         leaveTimer = setTimeout(() => {
             if (modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') {
                 modalPreview.style.opacity = '0';
+                modalPreview.style.transform = 'scale(0.95)';
                 setTimeout(() => {
                     modalPreview.style.display = 'none';
                 }, 300);
@@ -173,66 +188,67 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Add the necessary styles
-document.addEventListener('DOMContentLoaded', () => {
-    const style = document.createElement('style');
-    style.textContent = `
-        .portfolio-overlay-preview {
+document.addEventListener('DOMContentLoaded', () => {    const style = document.createElement('style');
+    style.textContent = `        .portfolio-overlay-preview {
             display: none;
             box-sizing: border-box;
+            transform-origin: center center;
+            will-change: transform, opacity;
         }
         
         .portfolio-overlay-preview .readme-container {
-            max-height: 70%;
+            max-height: 65%;
             overflow-y: auto;
             width: 100%;
-            margin: 10px 0;
-            padding: 10px;
+            margin: 15px 0;
+            padding: 15px;
             background-color: rgba(30, 30, 30, 0.5);
-            border-radius: 5px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         }
-          .portfolio-overlay-preview .readme-content {
+          
+        .portfolio-overlay-preview .readme-content {
             overflow: hidden;
             position: relative;
             max-height: 65%;
             width: 100%;
         }
-        
-        .portfolio-overlay-preview .markdown-body {
+          .portfolio-overlay-preview .markdown-body {
             font-size: 0.85rem;
             line-height: 1.5;
             color: #f0f0f0;
-            max-height: 140px;
+            max-height: 160px;  /* Increased height for larger preview */
             overflow-y: auto;
-            padding-right: 10px;
+            padding-right: 12px;
         }
         
         .portfolio-overlay-preview .markdown-body.expanded {
             max-height: 70%;
-        }
-        
-        .portfolio-overlay-preview h3 {
+        }        .portfolio-overlay-preview h3 {
             margin-top: 0;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             color: var(--primary-color, #3498db);
+            font-size: 1.2rem;
+            text-align: center;
         }
         
         .portfolio-overlay-preview .view-details-btn {
             display: inline-block;
             background-color: var(--primary-color, #3498db);
             color: #fff;
-            padding: 6px 15px;
+            padding: 8px 18px;
             border-radius: 20px;
             text-decoration: none;
             font-weight: 500;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-top: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-        
-        .portfolio-overlay-preview .view-details-btn:hover {
+          .portfolio-overlay-preview .view-details-btn:hover {
             background-color: var(--primary-hover, #2980b9);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
         }
         
         .portfolio-overlay-preview .readme-meta {
@@ -266,26 +282,26 @@ document.addEventListener('DOMContentLoaded', () => {
         .portfolio-overlay-preview .readme-expand-btn:hover {
             background-color: var(--primary-color, #3498db);
             color: #fff;
-        }
-          .portfolio-overlay-preview .preview-click-hint {
+        }        .portfolio-overlay-preview .preview-click-hint {
             position: absolute;
-            bottom: 10px;
+            bottom: 15px;
             left: 0;
             right: 0;
             text-align: center;
-            font-size: 0.75rem;
-            color: rgba(255, 255, 255, 0.7);
-            padding: 5px;
-            background-color: rgba(0, 0, 0, 0.4);
-            border-radius: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 6px 12px;
+            background-color: rgba(0, 0, 0, 0.5);
+            border-radius: 20px;
             margin: 0 auto;
             width: fit-content;
-            padding: 3px 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(3px);
         }
         
         .readme-loading {
             text-align: center;
-            padding: 20px;
+            padding: 25px;
             color: #ccc;
         }
         
