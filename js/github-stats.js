@@ -614,10 +614,20 @@ async function fetchGitHubProjects() {
         
         // Show loading state (the loading message is already in the HTML)
         
-        // Fetch all repositories by making multiple API calls if needed
+        // Clear existing projects immediately
+        projectsContainer.innerHTML = '';
+        
+        // Track unique languages for filter
+        const languages = new Set(['all']);
+        
+        // Create project details object for modal
+        const projectDetails = {};
+        
+        // Track all repos for final processing
         let allRepos = [];
         let page = 1;
         let hasMoreRepos = true;
+        let processedCount = 0;
         
         while (hasMoreRepos) {
             console.log(`GitHub Projects: Fetching page ${page} of repositories`);
@@ -636,7 +646,19 @@ async function fetchGitHubProjects() {
             const repos = await reposResponse.json();
             
             if (Array.isArray(repos) && repos.length > 0) {
+                // Process this batch immediately
+                console.log(`GitHub Projects: Processing batch of ${repos.length} repositories`);
+                
+                // Add to total repos collection
                 allRepos = [...allRepos, ...repos];
+                
+                // Process repositories from this batch and add them to the grid immediately
+                repos.forEach((repo, batchIndex) => {                    // Skip forked repositories
+                    if (repo.fork) return;
+                    
+                    // Add to the portfolio grid with progressive loading
+                    processRepositoryItem(repo, processedCount, projectsContainer, projectDetails, languages, username);
+                    processedCount++;});
                 
                 // If we got fewer repos than the max per page, we've reached the end
                 if (repos.length < 100) {
@@ -655,40 +677,32 @@ async function fetchGitHubProjects() {
         
         if (allRepos.length === 0) {
             console.error('GitHub Projects: No repositories found');
-            throw new Error('No GitHub repositories found.');
-        }
+            throw new Error('No GitHub repositories found.');        }
         
-        // Clear existing projects
-        projectsContainer.innerHTML = '';
-        
-        // Track unique languages for filter
-        const languages = new Set(['all']);
-        
-        // Create project details object for modal
-        const projectDetails = {};
-        
-        // Process each repository and add it to the portfolio grid
-        allRepos.forEach((repo, index) => {
+        // Helper function to process a single repository
+        function processRepositoryItem(repo, index, container, details, langs, user) {
             // Skip forked repositories if needed
             if (repo.fork) return;
-            
-            // Determine the main language for filtering
+              // Determine the main language for filtering
             const language = repo.language || 'Other';
-            languages.add(language.toLowerCase());
+            langs.add(language.toLowerCase());
             
             // Set delay class for animation (max delay-5)
             const delay = Math.min(index + 1, 5);
-              // Create the portfolio item HTML
+            
+            // Create the portfolio item HTML
             const portfolioItem = document.createElement('div');
             portfolioItem.className = `portfolio-item card-3d scroll-scale delay-${delay}`;
-            portfolioItem.setAttribute('data-category', language.toLowerCase());            // Set initial styles for proper rendering
+            portfolioItem.setAttribute('data-category', language.toLowerCase());
+            // Set initial styles for proper rendering
             portfolioItem.style.opacity = '1';
             portfolioItem.style.transform = 'scale(1)';
-              // Try to use custom preview images from the repository's main branch
+            
+            // Try to use custom preview images from the repository's main branch
             // First try PNG (faster loading) then switch to GIF (for animation)
-            const customPreviewPngUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/public-portfolio/preview.png`;
-            const customPreviewGifUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/public-portfolio/preview.gif`;
-            const githubOgPreviewUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
+            const customPreviewPngUrl = `https://raw.githubusercontent.com/${user}/${repo.name}/main/public-portfolio/preview.png`;
+            const customPreviewGifUrl = `https://raw.githubusercontent.com/${user}/${repo.name}/main/public-portfolio/preview.gif`;
+            const githubOgPreviewUrl = `https://opengraph.githubassets.com/1/${user}/${repo.name}`;
             const fallbackImageUrl = `https://github.com/identicons/${repo.name}.png`;
             
             // Use the GitHub OpenGraph image as initial fallback
@@ -696,15 +710,14 @@ async function fetchGitHubProjects() {
             
             // First check if preview.png exists
             const imgTestPng = new Image();
-            imgTestPng.onload = function() {
-                // If PNG exists, update immediately as it's faster to load
+            imgTestPng.onload = function() {                // If PNG exists, update immediately as it's faster to load
                 const imgElement = portfolioItem.querySelector('.portfolio-img img');
                 if (imgElement) {
                     imgElement.src = customPreviewPngUrl;
                 }
                 // Also update the project details for the modal
-                if (projectDetails[index + 1]) {
-                    projectDetails[index + 1].image = customPreviewPngUrl;
+                if (details[index + 1]) {
+                    details[index + 1].image = customPreviewPngUrl;
                 }
                 
                 // Then try to load the GIF in the background
@@ -716,8 +729,8 @@ async function fetchGitHubProjects() {
                         imgElement.src = customPreviewGifUrl;
                     }
                     // Update project details to use GIF for modal
-                    if (projectDetails[index + 1]) {
-                        projectDetails[index + 1].image = customPreviewGifUrl;
+                    if (details[index + 1]) {
+                        details[index + 1].image = customPreviewGifUrl;
                     }
                 };
                 // Set the source to test if GIF exists
@@ -729,10 +742,9 @@ async function fetchGitHubProjects() {
             // Prepare date string
             const createdDate = new Date(repo.created_at);
             const dateString = createdDate.getFullYear().toString();
-            
-            // Store project details for modal
+              // Store project details for modal
             const projectId = index + 1;
-            projectDetails[projectId] = {
+            details[projectId] = {
                 title: repo.name,
                 category: language,
                 client: 'Open Source',
@@ -742,8 +754,7 @@ async function fetchGitHubProjects() {
                 image: imageUrl,
                 url: repo.html_url
             };
-            
-            // Create HTML for the portfolio item
+              // Create HTML for the portfolio item
             portfolioItem.innerHTML = `
                 <div class="portfolio-img">
                     <img src="${imageUrl}" alt="${repo.name}">
@@ -758,8 +769,36 @@ async function fetchGitHubProjects() {
                 </div>
             `;
             
-            projectsContainer.appendChild(portfolioItem);
-        });
+            // Add to the DOM
+            container.appendChild(portfolioItem);
+            
+            // Apply card effect to this specific item
+            setTimeout(() => {
+                // Mouse move effect for 3D rotation
+                portfolioItem.addEventListener('mousemove', (e) => {
+                    const cardRect = portfolioItem.getBoundingClientRect();
+                    const cardCenterX = cardRect.left + cardRect.width / 2;
+                    const cardCenterY = cardRect.top + cardRect.height / 2;
+                    const mouseX = e.clientX - cardCenterX;
+                    const mouseY = e.clientY - cardCenterY;
+                    
+                    // Calculate rotation based on mouse position
+                    const rotateY = (mouseX / (cardRect.width / 2)) * 15; // Max 15 degrees
+                    const rotateX = -((mouseY / (cardRect.height / 2)) * 15); // Max 15 degrees
+                    
+                    // Apply the transform
+                    requestAnimationFrame(() => {
+                        portfolioItem.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                    });
+                });
+                
+                // Reset on mouse leave
+                portfolioItem.addEventListener('mouseleave', () => {
+                    requestAnimationFrame(() => {
+                        portfolioItem.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
+                    });                });
+            }, 100);
+        }
         
         // Update filter buttons based on available languages
         if (portfolioFilter) {
