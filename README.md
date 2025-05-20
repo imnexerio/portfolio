@@ -41,15 +41,16 @@ The deployment workflow will:
 
 ### GitHub Integration
 
-Edit the `js/github-config.js` file to set your GitHub username and optional access token:
+Edit the `js/github-config.js` file to set your GitHub username:
 
 ```javascript
 // Private GitHub credentials
 const _username = 'your-github-username';
-const _token = 'your-github-token'; // Optional but recommended for higher API limits
+// Leave token empty - use GitHub Actions workflow for secure deployment
+const _token = ''; // Token should be set as PAT_GITHUB in GitHub repository secrets
 ```
 
-> **Note**: If you include a GitHub token in your code, make sure the repository is private or use environment variables for deployment.
+> **Security Best Practice**: Never include your GitHub token directly in code. Use the GitHub Actions workflow to securely use your token from repository secrets.
 
 ### Social Links
 

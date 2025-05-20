@@ -86,13 +86,17 @@ function showGeneratorForm() {
                     <div class="form-group">
                         <label for="generator-github-username">GitHub Username <span class="form-field-required">*</span></label>
                         <input type="text" id="generator-github-username" placeholder="e.g. octocat" required>
-                        <div class="error-message" id="github-username-error">Please enter a valid GitHub username</div>
-                        <div class="input-help">Your GitHub profile will be used to populate projects, stats, and personal information</div>
+                        <div class="error-message" id="github-username-error">Please enter a valid GitHub username</div>                        <div class="input-help">Your GitHub profile will be used to populate projects, stats, and personal information</div>
                     </div>
-                      <div class="form-group">
-                        <label for="generator-github-token">GitHub Token <span class="form-field-optional">(optional)</span></label>
-                        <input type="password" id="generator-github-token" placeholder="ghp_xxxxxxxxxxxx">
-                        <div class="input-help">A token allows more GitHub API requests. <a href="https://github.com/settings/tokens" target="_blank">Create one here</a> with "public_repo" scope. For enhanced security, use GitHub Actions for deployment and add your token as a repository secret named <code>PAT_GITHUB</code>.</div>
+                      <div class="form-info github-token-info">
+                        <p><strong>About GitHub Authentication</strong></p>
+                        <p>For secure GitHub integration, this portfolio includes a GitHub Actions workflow for deployment.</p>
+                        <p><strong>How to set up your token:</strong></p>
+                        <ol>
+                            <li>Create a token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></li>
+                            <li>Add this token as a repository secret named <code>PAT_GITHUB</code> in your repository settings</li>
+                            <li>The included GitHub Actions workflow will use this secret for secure deployment</li>
+                        </ol>
                     </div>
                       <div class="form-group">
                         <label for="generator-linkedin">LinkedIn URL <span class="form-field-optional">(optional)</span></label>
@@ -186,13 +190,26 @@ function showGeneratorForm() {
     generateButton.addEventListener('click', validateAndGenerate);
       // Add CSS for new elements
     const style = document.createElement('style');
-    style.textContent = `
-        .form-info {
+    style.textContent = `        .form-info {
             background-color: rgba(var(--primary-color-rgb), 0.1);
             border-left: 3px solid var(--primary-color);
             padding: 15px;
             margin-top: 20px;
             border-radius: 4px;
+        }
+        
+        .github-token-info {
+            background-color: rgba(var(--secondary-color-rgb, 0, 120, 215), 0.1);
+            border-left: 3px solid var(--secondary-color, #0078d7);
+        }
+        
+        .github-token-info ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .github-token-info li {
+            margin-bottom: 5px;
         }
         
         .form-info p {
@@ -270,10 +287,11 @@ function validateAndGenerate() {
 
 function generateWebsite() {
     console.log("generateWebsite called"); // Debug log
-      try {
+    try {
         // Get form values
         const githubUsername = document.getElementById('generator-github-username').value.trim();
-        const githubToken = document.getElementById('generator-github-token')?.value.trim() || '';
+        // No longer using form input for token - always generate config with empty token
+        const githubToken = '';
         const linkedin = document.getElementById('generator-linkedin')?.value.trim() || '';
         const twitter = document.getElementById('generator-twitter')?.value.trim() || '';
         const instagram = document.getElementById('generator-instagram')?.value.trim() || '';
@@ -363,8 +381,7 @@ function generateWebsite() {
 }
 
 // Generate GitHub configuration file
-function generateGithubConfigFile(config) {
-    return `/**
+function generateGithubConfigFile(config) {    return `/**
  * GitHub Configuration Manager
  * 
  * Central configuration for all GitHub-related functionality across the portfolio.
@@ -682,14 +699,18 @@ function completeGeneration(config, zipBlob) {
         const successMessage = document.querySelector('.success-message');
         if (successMessage) {
             const updateNote = document.createElement('div');
-            updateNote.className = 'update-details';                updateNote.innerHTML = `
-                <p><small>Files updated:</small></p>
+            updateNote.className = 'update-details';                updateNote.innerHTML = `                <p><small>Files updated:</small></p>
                 <ul>
                     <li><small>GitHub Configuration (username: ${config.github.username})</small></li>
                     <li><small>Social Media Links</small></li>
                     <li><small>GitHub Actions workflow for secure deployment</small></li>
                 </ul>
-                <p><small><strong>Secure Deployment Tip:</strong> For better security, set up your GitHub token as a repository secret named <code>PAT_GITHUB</code> in your GitHub repository settings instead of including it in the code.</small></p>
+                <p><small><strong>Next Steps:</strong></small></p>
+                <ol>
+                    <li><small>Create a GitHub token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></small></li>
+                    <li><small>Add your token as a repository secret named <code>PAT_GITHUB</code> in your repository settings</small></li>
+                    <li><small>Set GitHub Pages source to "GitHub Actions" in repository settings</small></li>
+                </ol>
             `;
             
             // Insert after the first paragraph
