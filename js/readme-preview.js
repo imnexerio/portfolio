@@ -77,19 +77,8 @@ function initReadmeHybridBehavior() {
                 isPreviewOpen = true;
                 modalPreview.currentItem = item;
                 
-                // Show the preview
+                // Show the preview in click mode
                 showPreview(item, modalPreview, true);
-                
-                // Add close button
-                const closeBtn = document.createElement('div');
-                closeBtn.className = 'preview-close-btn';
-                closeBtn.innerHTML = '&times;';
-                closeBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    isPreviewOpen = false;
-                    hidePreview(modalPreview);
-                });
-                modalPreview.appendChild(closeBtn);
             }
         });
     });
