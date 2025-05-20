@@ -82,9 +82,9 @@
 ## 🖥️ Demo
 
 <div align="center">
-  <img src="https://user-images.githubusercontent.com/1303154/88677602-1635ba80-d120-11ea-84d8-d263ba5fc3c0.gif" alt="Portfolio Demo" width="70%">
+  <img src="https://raw.githubusercontent.com/imnexerio/portfolio/main/preview.gif" alt="Portfolio Demo" width="70%">
   <br><br>
-  <a href="https://your-portfolio-url.com" target="_blank">
+  <a href="https://imnexerio.github.io/portfolio/" target="_blank">
     <img src="https://img.shields.io/badge/View_Live_Demo-5C5C5C?style=for-the-badge&logo=github&logoColor=white" alt="View Live Demo">
   </a>
 </div>
@@ -253,7 +253,6 @@ This project is licensed under the [GNU Affero General Public License v3.0](LICE
 ---
 
 <div align="center">
-  <sub>Built with ❤️ by [Your Name](https://github.com/your-username)</sub>
+  <sub>Built with ❤️ by [IMNEXERIO](https://github.com/imnexerio)</sub>
   <br><br>
-  <img src="https://visitor-badge.laobi.icu/badge?page_id=your-username.portfolio" alt="visitors">
 </div>
