@@ -289,7 +289,11 @@ function generateWebsite() {
     console.log("generateWebsite called"); // Debug log
     try {
         // Get form values
-        const githubUsername = document.getElementById('generator-github-username').value.trim();
+        const githubUsername = document.getElementById('generator-github-username')?.value.trim();
+        if (!githubUsername) {
+            throw new Error('GitHub username is required');
+        }
+        
         // No longer using form input for token - always generate config with empty token
         const githubToken = '';
         const linkedin = document.getElementById('generator-linkedin')?.value.trim() || '';
@@ -315,16 +319,29 @@ function generateWebsite() {
         const loadingIndicator = document.querySelector('.loading-indicator');
         const generatorProgress = document.querySelector('.generator-progress');
         
-        if (formContent) formContent.style.display = 'none';
-        if (formButtons) formButtons.style.display = 'none';
-        if (loadingIndicator) loadingIndicator.classList.add('active');
-        if (generatorProgress) generatorProgress.classList.add('active');
-          // Update progress
+        if (!formContent || !formButtons || !loadingIndicator || !generatorProgress) {
+            throw new Error('Required form elements not found');
+        }
+        
+        formContent.style.display = 'none';
+        formButtons.style.display = 'none';
+        loadingIndicator.classList.add('active');
+        generatorProgress.classList.add('active');
+        
+        // Update progress
         updateProgress(10, 'Preparing to update GitHub and social links...');
         updateProgress(20, 'Checking internet connection...');
         
-        // Check connectivity to GitHub first
-        fetch('https://raw.githubusercontent.com/imnexerio/portfolio/main/README.md')
+        // Set a timeout to handle connectivity issues
+        const timeoutPromise = new Promise((_, reject) => {
+            setTimeout(() => reject(new Error('Connection timeout. Please check your internet connection.')), 10000);
+        });
+        
+        // Check connectivity to GitHub first with timeout
+        Promise.race([
+            fetch('https://raw.githubusercontent.com/imnexerio/portfolio/main/README.md'),
+            timeoutPromise
+        ])
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Cannot connect to GitHub. Please check your internet connection.');
@@ -342,6 +359,9 @@ function generateWebsite() {
                         linkedin: validateUrl(linkedin) || '',
                         twitter: validateUrl(twitter) || '',
                         instagram: validateUrl(instagram) || ''
+                    },
+                    personal: {
+                        name: githubUsername // Fallback to username if we don't have a name
                     }
                 };
                 
@@ -356,7 +376,6 @@ function generateWebsite() {
                 
                 // Make sure JSZip is available
                 if (typeof JSZip === 'undefined') {
-                    console.error("JSZip library not found");
                     throw new Error("Required JSZip library not found. Please check your internet connection and try again.");
                 }
                 
@@ -371,8 +390,8 @@ function generateWebsite() {
                     });
             })
             .catch(error => {
-                console.error('Connectivity check failed:', error);
-                showGenerationError('Cannot connect to GitHub. Please check your internet connection and try again.');
+                console.error('Connectivity or generation error:', error);
+                showGenerationError('Error during website generation: ' + error.message);
             });
     } catch (error) {
         console.error('Error in generateWebsite:', error);
@@ -551,40 +570,62 @@ function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
         }
         
         const zip = new JSZip();
-          // Get all the files we need to include
+        
+        // Get all the files we need to include
         collectWebsiteFiles()
             .then(files => {
                 updateProgress(70, 'Updating configuration files...');
                 
-                // Add all files to the ZIP with GitHub config and social links updates
-                files.forEach(file => {
-                    let content = file.content;
-                    
-                    // Only modify the GitHub config and social links files
-                    if (file.path === 'js/github-config.js') {
-                        // Replace with our generated config
-                        content = githubConfigJS;
-                    } else if (file.path === 'js/social-links.js') {
-                        // Replace with our generated social links
-                        content = socialLinksJS;
-                    }
-                    
-                    // Add the file to the ZIP without other modifications
-                    zip.file(file.path, content);
-                });
-                
-                updateProgress(90, 'Creating download package...');
-                
-                // Generate the ZIP file
-                zip.generateAsync({ type: 'blob' })
-                    .then(blob => {
-                        resolve(blob);
-                    })
-                    .catch(err => {
-                        reject(err);
+                try {
+                    // Add all files to the ZIP with GitHub config and social links updates
+                    files.forEach(file => {
+                        // Track any binary files to handle differently
+                        const isBinary = file.content instanceof Blob;
+                        
+                        let content = file.content;
+                        
+                        // Only modify the text files, not binary files
+                        if (!isBinary) {
+                            // Only modify the GitHub config and social links files
+                            if (file.path === 'js/github-config.js') {
+                                // Replace with our generated config
+                                content = githubConfigJS;
+                            } else if (file.path === 'js/social-links.js') {
+                                // Replace with our generated social links
+                                content = socialLinksJS;
+                            }
+                        }
+                        
+                        // Add the file to the ZIP (binary or text)
+                        zip.file(file.path, content);
                     });
+                    
+                    updateProgress(90, 'Creating download package...');
+                    
+                    // Generate the ZIP file with compression
+                    const zipOptions = {
+                        type: 'blob',
+                        compression: 'DEFLATE',
+                        compressionOptions: {
+                            level: 6 // Balanced between speed and compression ratio
+                        }
+                    };
+                    
+                    zip.generateAsync(zipOptions)
+                        .then(blob => {
+                            resolve(blob);
+                        })
+                        .catch(err => {
+                            console.error('ZIP generation failed:', err);
+                            reject(err);
+                        });
+                } catch (error) {
+                    console.error('Error processing files for ZIP:', error);
+                    reject(error);
+                }
             })
             .catch(err => {
+                console.error('Failed to collect website files:', err);
                 reject(err);
             });
     });
@@ -606,7 +647,8 @@ function collectWebsiteFiles() {
                 path: 'js/social-links.js',
                 content: '' // This will be replaced with our generated content
             },
-            {                path: 'README.md',
+            {                
+                path: 'README.md',
                 content: `# Personal Portfolio Website\n\nThis portfolio website was generated from the template by Santosh Prajapati.\n\n## Setup\n\n1. Edit the js/github-config.js file with your GitHub credentials if needed\n2. Host on any web server or GitHub Pages\n\n## GitHub Actions Deployment\n\nFor secure deployment with GitHub Actions:\n1. Add your GitHub token as a repository secret named \`PAT_GITHUB\`\n2. Use the included workflow file in \`.github/workflows/deploy.yml\`\n3. Set GitHub Pages source to "GitHub Actions" in repository settings\n\n## Features\n\n- Responsive design that works on all devices\n- Dynamic GitHub project loading\n- GitHub statistics visualization\n- Light/dark theme switcher\n- Custom color picker\n\n## Credits\n\nOriginal template by [Santosh Prajapati](https://github.com/imnexerio)`
             }
         ];
@@ -633,78 +675,92 @@ function collectWebsiteFiles() {
             '.github/workflows/deploy.yml'
         ];
         
-        // Create promises to fetch each file from GitHub
-        const fetchPromises = [];
+        // Create a map to identify binary files
+        const binaryExtensions = ['.gif', '.png', '.jpg', '.jpeg', '.ico', '.pdf', '.woff', '.woff2', '.eot', '.ttf', '.otf'];
+        const isBinaryFile = (file) => binaryExtensions.some(ext => file.toLowerCase().endsWith(ext));
         
-        // Fetch files from GitHub repository
-        filesToFetch.forEach(file => {
-            const fileUrl = repoBaseUrl + file;
-            fetchPromises.push(
-                fetch(fileUrl)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`Failed to fetch ${file} from GitHub`);
-                        }
-                        return response.text();
-                    })
-                    .then(content => {
-                        files.push({
-                            path: file,
-                            content: content
-                        });
-                    })                    .catch(error => {
-                        console.warn(`Could not fetch ${file} from GitHub:`, error);
-                        // Create a placeholder file with a comment
-                        if (file.endsWith('.js')) {
-                            files.push({
-                                path: file,
-                                content: `// JS file placeholder: ${file}\n\n// This file couldn't be automatically included`
-                            });
-                        } else if (file.endsWith('.css')) {
-                            files.push({
-                                path: file,
-                                content: `/* CSS file placeholder: ${file} */\n\n/* This file couldn't be automatically included */`
-                            });
-                        } else if (file.endsWith('.gif') || file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg')) {
-                            // For binary files, we'll try to fetch them as binary
-                            fetch(fileUrl)
-                                .then(response => {
-                                    if (!response.ok) throw new Error(`Failed to fetch binary ${file}`);
-                                    return response.blob();
-                                })
-                                .then(blob => {
-                                    files.push({
-                                        path: file,
-                                        content: blob
-                                    });
-                                })
-                                .catch(binaryError => {
-                                    console.warn(`Could not fetch binary file ${file}:`, binaryError);
-                                });
-                        } else {
-                            files.push({
-                                path: file,
-                                content: `<!-- Could not fetch ${file} from GitHub -->`
-                            });
-                        }
-                    })
-            );
-        });
-          // Wait for all files to be fetched
-        Promise.allSettled(fetchPromises)
-            .then(results => {
-                // Count successful fetches
-                const successCount = results.filter(result => result.status === 'fulfilled').length;
-                console.log(`Successfully fetched ${successCount} out of ${filesToFetch.length} files`);
-                
-                // Update progress with success rate
-                updateProgress(75, `Successfully collected ${successCount} out of ${filesToFetch.length} files...`);
-                
-                resolve(files);
-            })
+        // Fetch handlers with optimized error handling
+        const fetchTextFile = async (fileUrl, filePath) => {
+            try {
+                const response = await fetch(fileUrl);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch ${filePath} (${response.status})`);
+                }
+                return {
+                    path: filePath,
+                    content: await response.text()
+                };
+            } catch (error) {
+                console.warn(`Could not fetch ${filePath}:`, error);
+                // Create placeholder based on file extension
+                if (filePath.endsWith('.js')) {
+                    return {
+                        path: filePath,
+                        content: `// JS file placeholder: ${filePath}\n\n// This file couldn't be automatically included`
+                    };
+                } else if (filePath.endsWith('.css')) {
+                    return {
+                        path: filePath,
+                        content: `/* CSS file placeholder: ${filePath} */\n\n/* This file couldn't be automatically included */`
+                    };
+                } else {
+                    return {
+                        path: filePath,
+                        content: `<!-- Could not fetch ${filePath} from GitHub -->`
+                    };
+                }
+            }
+        };
+        
+        const fetchBinaryFile = async (fileUrl, filePath) => {
+            try {
+                const response = await fetch(fileUrl);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch binary ${filePath} (${response.status})`);
+                }
+                return {
+                    path: filePath,
+                    content: await response.blob()
+                };
+            } catch (error) {
+                console.warn(`Could not fetch binary file ${filePath}:`, error);
+                // Return null for binary files that couldn't be fetched
+                return null;
+            }
+        };
+        
+        // Process files with Promise.all for better performance
+        const fetchAllFiles = async () => {
+            const fetchPromises = filesToFetch.map(file => {
+                const fileUrl = repoBaseUrl + file;
+                return isBinaryFile(file) 
+                    ? fetchBinaryFile(fileUrl, file)
+                    : fetchTextFile(fileUrl, file);
+            });
+            
+            const results = await Promise.allSettled(fetchPromises);
+            
+            // Filter out null results and add successful fetches to files array
+            const fetchedFiles = results
+                .filter(result => result.status === 'fulfilled' && result.value !== null)
+                .map(result => result.value);
+            
+            files.push(...fetchedFiles);
+            
+            const successCount = fetchedFiles.length;
+            console.log(`Successfully fetched ${successCount} out of ${filesToFetch.length} files`);
+            updateProgress(75, `Successfully collected ${successCount} out of ${filesToFetch.length} files...`);
+            
+            return files;
+        };
+        
+        // Execute fetching with proper error handling
+        fetchAllFiles()
+            .then(resolve)
             .catch(error => {
                 console.error('Error collecting files from GitHub:', error);
-                reject(error);
+                // Still resolve with partial files rather than rejecting
+                resolve(files);
             });
     });
 }
@@ -714,21 +770,62 @@ function completeGeneration(config, zipBlob) {
     // Update progress and show success message
     updateProgress(100, 'Website updated successfully!');
     
+    // Store the URL object for later cleanup
+    let objectUrl = null;
+    
     // Hide loading indicator and show success message
     setTimeout(() => {
-        document.querySelector('.loading-indicator').classList.remove('active');
-        document.querySelector('.success-message').classList.add('active');
-          // Create download link for the ZIP file
+        // Check if we can find the necessary elements before proceeding
+        const loadingIndicator = document.querySelector('.loading-indicator');
+        const successMessage = document.querySelector('.success-message');
         const downloadLink = document.getElementById('download-website');
-        const url = URL.createObjectURL(zipBlob);
-        downloadLink.href = url;
-        downloadLink.download = `${config.github.username}-portfolio-updated.zip`;
+        
+        if (!loadingIndicator || !successMessage || !downloadLink) {
+            console.error('Required DOM elements not found for completion');
+            showGenerationError('Required DOM elements not found. Please refresh and try again.');
+            return;
+        }
+        
+        // Hide loading and show success
+        loadingIndicator.classList.remove('active');
+        successMessage.classList.add('active');
+        
+        // Create download link for the ZIP file
+        try {
+            objectUrl = URL.createObjectURL(zipBlob);
+            downloadLink.href = objectUrl;
+            downloadLink.download = `${config.github.username}-portfolio-updated.zip`;
+            
+            // Clean up the URL object when the page unloads or when download is clicked
+            downloadLink.addEventListener('click', () => {
+                // Give the browser some time to start the download before revoking
+                setTimeout(() => {
+                    if (objectUrl) {
+                        URL.revokeObjectURL(objectUrl);
+                        objectUrl = null;
+                    }
+                }, 5000);
+            });
+            
+            // Also clean up on page unload
+            window.addEventListener('unload', () => {
+                if (objectUrl) {
+                    URL.revokeObjectURL(objectUrl);
+                    objectUrl = null;
+                }
+            });
+        } catch (error) {
+            console.error('Error creating object URL:', error);
+            showGenerationError('Failed to create download link. Please try again.');
+            return;
+        }
         
         // Add a small note about what was updated
-        const successMessage = document.querySelector('.success-message');
         if (successMessage) {
             const updateNote = document.createElement('div');
-            updateNote.className = 'update-details';            updateNote.innerHTML = `                <p><small>Files updated:</small></p>
+            updateNote.className = 'update-details';
+            updateNote.innerHTML = `
+                <p><small>Files updated:</small></p>
                 <ul>
                     <li><small>GitHub Configuration (username: ${config.github.username})</small></li>
                     <li><small>Social Media Links</small></li>
@@ -758,12 +855,64 @@ function completeGeneration(config, zipBlob) {
 
 function showGenerationError(message) {
     // Update UI to show error
-    document.querySelector('.loading-indicator').classList.remove('active');
-    document.querySelector('.form-content').style.display = 'block';
-    document.querySelector('.form-buttons').style.display = 'flex';
+    const loadingIndicator = document.querySelector('.loading-indicator');
+    const formContent = document.querySelector('.form-content');
+    const formButtons = document.querySelector('.form-buttons');
     
-    // Show error message
-    alert(`Error generating website: ${message}`);
+    // Safely reset UI elements if they exist
+    if (loadingIndicator) loadingIndicator.classList.remove('active');
+    if (formContent) formContent.style.display = 'block';
+    if (formButtons) formButtons.style.display = 'flex';
+    
+    // Create a more user-friendly error notification
+    // First, check if we already have an error message element
+    let errorElement = document.querySelector('.generator-error-message');
+    
+    if (!errorElement) {
+        // Create a new error element
+        errorElement = document.createElement('div');
+        errorElement.className = 'generator-error-message';
+        
+        // Add some styling
+        errorElement.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
+        errorElement.style.border = '1px solid #ff0000';
+        errorElement.style.borderRadius = '4px';
+        errorElement.style.padding = '15px';
+        errorElement.style.margin = '15px 0';
+        errorElement.style.color = '#ff0000';
+        
+        // Insert at the top of the form content
+        if (formContent) {
+            formContent.insertBefore(errorElement, formContent.firstChild);
+        } else {
+            // If formContent doesn't exist, try to find the generator form
+            const generatorForm = document.querySelector('.generator-form');
+            if (generatorForm) {
+                generatorForm.insertBefore(errorElement, generatorForm.firstChild);
+            } else {
+                // As a fallback, just show an alert
+                alert(`Error generating website: ${message}`);
+                return;
+            }
+        }
+    }
+    
+    // Set the error message
+    errorElement.innerHTML = `
+        <strong>Error generating website:</strong>
+        <p>${message}</p>
+        <p>Please try again or check your internet connection.</p>
+    `;
+    
+    // Automatically remove the error after 10 seconds
+    setTimeout(() => {
+        if (errorElement && errorElement.parentNode) {
+            errorElement.parentNode.removeChild(errorElement);
+        }
+    }, 10000);
+    
+    // Log the error to console for debugging
+    console.error('Website generation error:', message);
 }
 
 /**
