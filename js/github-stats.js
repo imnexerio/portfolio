@@ -684,32 +684,47 @@ async function fetchGitHubProjects() {
             portfolioItem.setAttribute('data-category', language.toLowerCase());            // Set initial styles for proper rendering
             portfolioItem.style.opacity = '1';
             portfolioItem.style.transform = 'scale(1)';
-            
-            // First try to use a custom preview.png from the repository's main branch
-            // Then fallback to GitHub OpenGraph image if not found
-            const customPreviewUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/preview.png`;
+              // Try to use custom preview images from the repository's main branch
+            // First try PNG (faster loading) then switch to GIF (for animation)
+            const customPreviewPngUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/preview.png`;
+            const customPreviewGifUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/preview.gif`;
             const githubOgPreviewUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
             const fallbackImageUrl = `https://github.com/identicons/${repo.name}.png`;
             
-            // Use the custom preview image with fallback logic
-            // We'll set it to the GitHub OpenGraph image first, then check if the custom preview exists
+            // Use the GitHub OpenGraph image as initial fallback
             let imageUrl = githubOgPreviewUrl;
             
-            // Create an image element to test if the custom preview exists
-            const imgTest = new Image();
-            imgTest.onload = function() {
-                // If the custom preview image loads successfully, update the project image
+            // First check if preview.png exists
+            const imgTestPng = new Image();
+            imgTestPng.onload = function() {
+                // If PNG exists, update immediately as it's faster to load
                 const imgElement = portfolioItem.querySelector('.portfolio-img img');
                 if (imgElement) {
-                    imgElement.src = customPreviewUrl;
+                    imgElement.src = customPreviewPngUrl;
                 }
-                // Also update the image URL in the project details for the modal
+                // Also update the project details for the modal
                 if (projectDetails[index + 1]) {
-                    projectDetails[index + 1].image = customPreviewUrl;
+                    projectDetails[index + 1].image = customPreviewPngUrl;
                 }
+                
+                // Then try to load the GIF in the background
+                const imgTestGif = new Image();
+                imgTestGif.onload = function() {
+                    // When GIF is loaded, switch to it for animation
+                    const imgElement = portfolioItem.querySelector('.portfolio-img img');
+                    if (imgElement) {
+                        imgElement.src = customPreviewGifUrl;
+                    }
+                    // Update project details to use GIF for modal
+                    if (projectDetails[index + 1]) {
+                        projectDetails[index + 1].image = customPreviewGifUrl;
+                    }
+                };
+                // Set the source to test if GIF exists
+                imgTestGif.src = customPreviewGifUrl;
             };
-            // Set the source to test if image exists
-            imgTest.src = customPreviewUrl;
+            // Set the source to test if PNG exists
+            imgTestPng.src = customPreviewPngUrl;
             
             // Prepare date string
             const createdDate = new Date(repo.created_at);
