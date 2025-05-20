@@ -45,12 +45,52 @@ function initReadmeHoverBehavior() {
                             const enlargedHeight = rect.height * scaleFactor;
                             
                             // Calculate position to keep it centered (accounting for the size increase)
-                            const topOffset = rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2);
-                            const leftOffset = rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2);
+                            let topOffset = rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2);
+                            let leftOffset = rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2);
+                            
+                            // Check if the preview would go off-screen and adjust if needed
+                            const viewportWidth = window.innerWidth;
+                            const viewportHeight = window.innerHeight;
+                            
+                            // Check right edge
+                            if (leftOffset + enlargedWidth > viewportWidth - 20) {
+                                // Shift left to keep it on screen with 20px margin
+                                leftOffset = viewportWidth - enlargedWidth - 20;
+                            }
+                            
+                            // Check left edge
+                            if (leftOffset < 20) {
+                                // Shift right to keep it on screen with 20px margin
+                                leftOffset = 20;
+                            }
+                            
+                            // Check bottom edge
+                            if (topOffset + enlargedHeight > window.scrollY + viewportHeight - 20) {
+                                // Shift up to keep it on screen with 20px margin
+                                topOffset = window.scrollY + viewportHeight - enlargedHeight - 20;
+                            }
+                            
+                            // Check top edge
+                            if (topOffset < window.scrollY + 20) {
+                                // Shift down to keep it on screen with 20px margin
+                                topOffset = window.scrollY + 20;
+                            }
                             
                             // Create and style an absolutely positioned container that overlays the portfolio item
                             modalPreview.style.position = 'absolute';
                             modalPreview.style.zIndex = '1000';
+                            
+                            // Add a class for repositioning transitions if position was adjusted
+                            const wasRepositioned = 
+                                leftOffset !== (rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2)) ||
+                                topOffset !== (rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2));
+                                
+                            if (wasRepositioned) {
+                                modalPreview.classList.add('repositioned');
+                            } else {
+                                modalPreview.classList.remove('repositioned');
+                            }
+                            
                             modalPreview.style.top = `${topOffset}px`;
                             modalPreview.style.left = `${leftOffset}px`;
                             modalPreview.style.width = `${enlargedWidth}px`;
@@ -188,12 +228,20 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Add the necessary styles
-document.addEventListener('DOMContentLoaded', () => {    const style = document.createElement('style');
-    style.textContent = `        .portfolio-overlay-preview {
+document.addEventListener('DOMContentLoaded', () => {
+    const style = document.createElement('style');
+    style.textContent = `
+        .portfolio-overlay-preview {
             display: none;
             box-sizing: border-box;
             transform-origin: center center;
             will-change: transform, opacity;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            pointer-events: auto;
+        }
+        
+        .portfolio-overlay-preview.repositioned {
+            transition: opacity 0.3s ease, transform 0.3s ease, top 0.2s ease, left 0.2s ease;
         }
         
         .portfolio-overlay-preview .readme-container {

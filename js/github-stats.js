@@ -1113,7 +1113,9 @@ async function fetchRepoReadme(username, repoName, displayElement) {
     displayElement.innerHTML = '<div class="readme-loading"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>';
     
     try {
-        let readmeData = null;        // Check if we have a prefetched README promise for this repo
+        let readmeData = null;
+        
+        // Check if we have a prefetched README promise for this repo
         const portfolioItems = document.querySelectorAll(`.portfolio-details[data-repo="${repoName}"]`);
         let prefetchedData = null;
         
@@ -1134,7 +1136,8 @@ async function fetchRepoReadme(username, repoName, displayElement) {
         // If we have prefetched data, use it; otherwise, fetch it now
         if (prefetchedData) {
             console.log(`Using prefetched README for ${repoName}`);
-            readmeData = prefetchedData;        } else {
+            readmeData = prefetchedData;
+        } else {
             // Fetch the README file with authentication headers
             const headers = GitHubConfig.getAuthHeaders();
             const readmeResponse = await fetch(`https://api.github.com/repos/${username}/${repoName}/readme`, 
@@ -1154,7 +1157,8 @@ async function fetchRepoReadme(username, repoName, displayElement) {
         }
         
         // If we have README data, decode and display it
-        if (readmeData) {            // Decode content from base64
+        if (readmeData) {
+            // Decode content from base64
             const content = atob(readmeData.content);
             
             // Format the last updated date if available
@@ -1167,7 +1171,8 @@ async function fetchRepoReadme(username, repoName, displayElement) {
                     </div>
                 `;
             }
-              // Clean up and format the content
+            
+            // Clean up and format the content
             let formattedContent = cleanMarkdown(content);
             
             // Basic safety check - if suspicious content is detected, use text-only version
@@ -1178,49 +1183,57 @@ async function fetchRepoReadme(username, repoName, displayElement) {
                 formattedContent = content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
                 formattedContent = '<pre style="white-space: pre-wrap;">' + formattedContent + '</pre>';
             }
-              // Update the display element with the README content
+            
+            // Check if this is in a preview or full modal by checking class names
+            const isPreview = displayElement.id === 'preview-readme-container' || 
+                             displayElement.classList.contains('readme-container');
+            
+            // Update the display element with the README content
             displayElement.innerHTML = `
                 <div class="readme-content">
                     <h3>README ${lastUpdatedText}</h3>
                     <div class="markdown-body">${formattedContent}</div>
+                    ${isPreview ? '' : `
                     <div class="readme-expand-container">
                         <button class="readme-expand-btn">Show More</button>
-                    </div>
+                    </div>`}
                 </div>
             `;
             
-            // Add event listener for the show more button
-            const readmeContent = displayElement.querySelector('.markdown-body');
-            const expandBtn = displayElement.querySelector('.readme-expand-btn');
-            const expandContainer = displayElement.querySelector('.readme-expand-container');
-            
-            if (readmeContent && expandBtn) {
-                // Check if the content is overflowing
-                setTimeout(() => {
-                    if (readmeContent.scrollHeight > readmeContent.clientHeight) {
-                        // Content is overflowing, show the expand button
-                        expandContainer.style.display = 'flex';
-                        
-                        // Add click handler
-                        expandBtn.addEventListener('click', () => {
-                            if (readmeContent.classList.contains('expanded')) {
-                                // Collapse
-                                readmeContent.classList.remove('expanded');
-                                expandBtn.textContent = 'Show More';
-                                
-                                // Scroll back to the top of the README
-                                readmeContent.scrollTop = 0;
-                            } else {
-                                // Expand
-                                readmeContent.classList.add('expanded');
-                                expandBtn.textContent = 'Show Less';
-                            }
-                        });
-                    } else {
-                        // Content fits, hide the button
-                        expandContainer.style.display = 'none';
-                    }
-                }, 100);
+            // Add event listener for the show more button (only for full modal, not preview)
+            if (!isPreview) {
+                const readmeContent = displayElement.querySelector('.markdown-body');
+                const expandBtn = displayElement.querySelector('.readme-expand-btn');
+                const expandContainer = displayElement.querySelector('.readme-expand-container');
+                
+                if (readmeContent && expandBtn) {
+                    // Check if the content is overflowing
+                    setTimeout(() => {
+                        if (readmeContent.scrollHeight > readmeContent.clientHeight) {
+                            // Content is overflowing, show the expand button
+                            expandContainer.style.display = 'flex';
+                            
+                            // Add click handler
+                            expandBtn.addEventListener('click', () => {
+                                if (readmeContent.classList.contains('expanded')) {
+                                    // Collapse
+                                    readmeContent.classList.remove('expanded');
+                                    expandBtn.textContent = 'Show More';
+                                    
+                                    // Scroll back to the top of the README
+                                    readmeContent.scrollTop = 0;
+                                } else {
+                                    // Expand
+                                    readmeContent.classList.add('expanded');
+                                    expandBtn.textContent = 'Show Less';
+                                }
+                            });
+                        } else {
+                            // Content fits, hide the button
+                            expandContainer.style.display = 'none';
+                        }
+                    }, 100);
+                }
             }
         } else {
             displayElement.innerHTML = '<div class="readme-not-found">No README available for this repository.</div>';
