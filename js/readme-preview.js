@@ -1,5 +1,5 @@
 // Function to implement portfolio preview on hover and click
-function initReadmeHoverBehavior() {
+function initReadmeHybridBehavior() {
     // Get all portfolio items that might have README content
     const portfolioItems = document.querySelectorAll('.portfolio-item');
     const modal = document.querySelector('.portfolio-modal');
@@ -14,6 +14,7 @@ function initReadmeHoverBehavior() {
     let hoverTimer;
     let leaveTimer;
     let isPreviewOpen = false;
+    let isHoverMode = false;
     
     // Add event listeners to all portfolio items
     portfolioItems.forEach(item => {
@@ -22,24 +23,26 @@ function initReadmeHoverBehavior() {
             // Clear any existing timers
             clearTimeout(leaveTimer);
             
-            // Set timer to show preview
-            hoverTimer = setTimeout(() => {
-                // Don't show hover preview if already in click-preview mode
-                if (!isPreviewOpen) {
+            // Don't show hover preview if already in click mode
+            if (!isPreviewOpen) {
+                // Set timer to show preview
+                hoverTimer = setTimeout(() => {
+                    isHoverMode = true;
                     showPreview(item, modalPreview);
-                }
-            }, 400); // Delay for hover preview to avoid flickering
+                }, 400); // Delay for hover preview to avoid flickering
+            }
         });
         
-        // On leave, hide preview after short delay
+        // On leave, hide preview after short delay but only if in hover mode
         item.addEventListener('mouseleave', () => {
             clearTimeout(hoverTimer);
             
             // Only hide if not in click-preview mode
-            if (!isPreviewOpen) {
+            if (!isPreviewOpen && isHoverMode) {
                 leaveTimer = setTimeout(() => {
-                    if (modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') {
+                    if ((modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') && isHoverMode) {
                         hidePreview(modalPreview);
+                        isHoverMode = false;
                     }
                 }, 300);
             }
@@ -59,19 +62,25 @@ function initReadmeHoverBehavior() {
                 return;
             }
             
+            // Clear any hover timers
+            clearTimeout(hoverTimer);
+            clearTimeout(leaveTimer);
+            isHoverMode = false;
+            
             // Toggle between open/closed states
-            if (isPreviewOpen) {
-                // If already open, close it
+            if (isPreviewOpen && modalPreview.currentItem === item) {
+                // If already open and same item, close it
                 isPreviewOpen = false;
                 hidePreview(modalPreview);
             } else {
-                // Otherwise, open it and set flag
+                // If different item or not open, open it and set flag
                 isPreviewOpen = true;
+                modalPreview.currentItem = item;
                 
-                // Apply full-screen styling
+                // Show the preview
                 showPreview(item, modalPreview, true);
                 
-                // Add close button for clicked preview
+                // Add close button
                 const closeBtn = document.createElement('div');
                 closeBtn.className = 'preview-close-btn';
                 closeBtn.innerHTML = '&times;';
@@ -81,29 +90,24 @@ function initReadmeHoverBehavior() {
                     hidePreview(modalPreview);
                 });
                 modalPreview.appendChild(closeBtn);
-                
-                // Replace click hint with close hint
-                const clickHint = modalPreview.querySelector('.preview-click-hint');
-                if (clickHint) {
-                    clickHint.textContent = 'Click anywhere or press ESC to close';
-                }
             }
         });
     });
     
     // Keep preview visible when hovering over it in hover mode
     modalPreview.addEventListener('mouseenter', () => {
-        if (!isPreviewOpen) {
+        if (isHoverMode && !isPreviewOpen) {
             clearTimeout(leaveTimer);
         }
     });
     
     // Hide preview when mouse leaves the preview in hover mode
     modalPreview.addEventListener('mouseleave', () => {
-        if (!isPreviewOpen) {
+        if (isHoverMode && !isPreviewOpen) {
             leaveTimer = setTimeout(() => {
-                if (modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') {
+                if ((modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') && isHoverMode) {
                     hidePreview(modalPreview);
+                    isHoverMode = false;
                 }
             }, 300);
         }
@@ -122,8 +126,9 @@ function initReadmeHoverBehavior() {
     
     // Add ESC key support to close preview in click mode
     document.addEventListener('keydown', (e) => {
-        if (isPreviewOpen && e.key === 'Escape') {
+        if ((isPreviewOpen || isHoverMode) && e.key === 'Escape') {
             isPreviewOpen = false;
+            isHoverMode = false;
             hidePreview(modalPreview);
         }
     });
@@ -143,7 +148,7 @@ function initReadmeHoverBehavior() {
         
         if (!project) return;
         
-        // Always use the hover-style preview positioning
+        // Set preview positioning
         const rect = item.getBoundingClientRect();
         const scaleFactor = 1.3;
         const enlargedWidth = rect.width * scaleFactor;
@@ -215,7 +220,7 @@ function initReadmeHoverBehavior() {
         previewEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
         
         // Create content for the preview
-        let hintText = isClickMode ? 'Click anywhere or press ESC to close' : 'Click anywhere to see full view';
+        let hintText = isClickMode ? 'Click anywhere or press ESC to close' : 'Click to see full view';
         
         previewEl.innerHTML = `
             <div class="modal-project preview-project">
@@ -234,7 +239,7 @@ function initReadmeHoverBehavior() {
             <div class="preview-click-hint">${hintText}</div>
         `;
         
-        // If in click mode, add a close button
+        // Only add close button in click mode (not hover mode)
         if (isClickMode) {
             const closeBtn = document.createElement('div');
             closeBtn.className = 'preview-close-btn';
@@ -279,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check if the global portfolioConfig exists and respects its settings
     const shouldUsePreview = 
         typeof window.portfolioConfig !== 'undefined' 
-            ? !window.portfolioConfig.useModalPopup && window.portfolioConfig.useHoverPreview
+            ? !window.portfolioConfig.useModalPopup && (window.portfolioConfig.useClickPreview || window.portfolioConfig.useHoverPreview)
             : true; // Default to true if config isn't available
     
     if (!shouldUsePreview) return;
@@ -290,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
             clearInterval(checkPortfolioLoaded);
             
             // Now initialize our custom preview behavior
-            setTimeout(initReadmeHoverBehavior, 500);
+            setTimeout(initReadmeHybridBehavior, 500);
         }
     }, 500);
 });
@@ -399,8 +404,26 @@ document.addEventListener('DOMContentLoaded', () => {
             backdrop-filter: blur(3px);
         }
         
-        .preview-backdrop {
-            display: none; /* Hide backdrop as it's no longer needed */
+        .preview-close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            z-index: 10;
+        }
+        
+        .preview-close-btn:hover {
+            background-color: rgba(255, 255, 255, 0.4);
         }
         
         /* Responsive adjustments for the preview */

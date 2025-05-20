@@ -5,8 +5,9 @@
 
 // Configuration object for portfolio behavior
 const portfolioConfig = {
-    useModalPopup: false, // Set to false to use hover/click preview instead of modal popup
-    useHoverPreview: true // Set to true to enable hover preview
+    useModalPopup: false, // Set to false to use preview instead of modal popup
+    useClickPreview: true, // Set to true to enable click preview
+    useHoverPreview: true  // Set to true to enable hover preview
 };
 
 // Make configuration globally available
