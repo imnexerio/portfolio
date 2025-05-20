@@ -686,8 +686,8 @@ async function fetchGitHubProjects() {
             portfolioItem.style.transform = 'scale(1)';
               // Try to use custom preview images from the repository's main branch
             // First try PNG (faster loading) then switch to GIF (for animation)
-            const customPreviewPngUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/preview.png`;
-            const customPreviewGifUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/preview.gif`;
+            const customPreviewPngUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/public-portfolio/preview.png`;
+            const customPreviewGifUrl = `https://raw.githubusercontent.com/${username}/${repo.name}/main/public-portfolio/preview.gif`;
             const githubOgPreviewUrl = `https://opengraph.githubassets.com/1/${username}/${repo.name}`;
             const fallbackImageUrl = `https://github.com/identicons/${repo.name}.png`;
             
