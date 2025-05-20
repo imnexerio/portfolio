@@ -93,7 +93,7 @@
 
 <ol>
   <li>Clone this repository</li>
-  <pre><code>git clone https://github.com/your-username/portfolio.git</code></pre>
+  <pre><code>git clone https://github.com/imnexerio/portfolio.git</code></pre>
   
   <li>Open <code>js/github-config.js</code> and update your GitHub username</li>
   
