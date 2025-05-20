@@ -143,90 +143,62 @@ function initReadmeHoverBehavior() {
         
         if (!project) return;
         
-        // Position and size the preview differently based on mode
-        if (isClickMode) {
-            // For click mode: center in screen and make it larger
-            previewEl.style.position = 'fixed';
-            previewEl.style.zIndex = '1100';
-            previewEl.style.top = '50%';
-            previewEl.style.left = '50%';
-            previewEl.style.width = '80%';
-            previewEl.style.maxWidth = '900px';
-            previewEl.style.height = '80vh';
-            previewEl.style.transform = 'translate(-50%, -50%) scale(0.95)';
-            
-            // Add a backdrop when in click mode
-            document.body.style.overflow = 'hidden'; // Prevent scrolling
-            
-            // Add backdrop if it doesn't exist
-            let backdrop = document.querySelector('.preview-backdrop');
-            if (!backdrop) {
-                backdrop = document.createElement('div');
-                backdrop.className = 'preview-backdrop';
-                document.body.appendChild(backdrop);
-            }
-            backdrop.style.display = 'block';
-            setTimeout(() => {
-                backdrop.style.opacity = '1';
-            }, 10);
-        } else {
-            // For hover mode: position relative to the item
-            const rect = item.getBoundingClientRect();
-            const scaleFactor = 1.3;
-            const enlargedWidth = rect.width * scaleFactor;
-            const enlargedHeight = rect.height * scaleFactor;
-            
-            // Calculate centered position
-            let topOffset = rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2);
-            let leftOffset = rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2);
-            
-            // Check boundaries
-            const viewportWidth = window.innerWidth;
-            const viewportHeight = window.innerHeight;
-            
-            // Check right edge
-            if (leftOffset + enlargedWidth > viewportWidth - 20) {
-                leftOffset = viewportWidth - enlargedWidth - 20;
-            }
-            
-            // Check left edge
-            if (leftOffset < 20) {
-                leftOffset = 20;
-            }
-            
-            // Check bottom edge
-            if (topOffset + enlargedHeight > window.scrollY + viewportHeight - 20) {
-                topOffset = window.scrollY + viewportHeight - enlargedHeight - 20;
-            }
-            
-            // Check top edge
-            if (topOffset < window.scrollY + 20) {
-                topOffset = window.scrollY + 20;
-            }
-            
-            // Apply the positioning
-            previewEl.style.position = 'absolute';
-            previewEl.style.zIndex = '1000';
-            
-            // Add a class for repositioning transitions if position was adjusted
-            const wasRepositioned = 
-                leftOffset !== (rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2)) ||
-                topOffset !== (rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2));
-                
-            if (wasRepositioned) {
-                previewEl.classList.add('repositioned');
-            } else {
-                previewEl.classList.remove('repositioned');
-            }
-            
-            previewEl.style.top = `${topOffset}px`;
-            previewEl.style.left = `${leftOffset}px`;
-            previewEl.style.width = `${enlargedWidth}px`;
-            previewEl.style.height = `${enlargedHeight}px`;
-            previewEl.style.transform = 'scale(0.95)';
+        // Always use the hover-style preview positioning
+        const rect = item.getBoundingClientRect();
+        const scaleFactor = 1.3;
+        const enlargedWidth = rect.width * scaleFactor;
+        const enlargedHeight = rect.height * scaleFactor;
+        
+        // Calculate centered position
+        let topOffset = rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2);
+        let leftOffset = rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2);
+        
+        // Check boundaries
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+        
+        // Check right edge
+        if (leftOffset + enlargedWidth > viewportWidth - 20) {
+            leftOffset = viewportWidth - enlargedWidth - 20;
         }
         
-        // Common styles for both modes
+        // Check left edge
+        if (leftOffset < 20) {
+            leftOffset = 20;
+        }
+        
+        // Check bottom edge
+        if (topOffset + enlargedHeight > window.scrollY + viewportHeight - 20) {
+            topOffset = window.scrollY + viewportHeight - enlargedHeight - 20;
+        }
+        
+        // Check top edge
+        if (topOffset < window.scrollY + 20) {
+            topOffset = window.scrollY + 20;
+        }
+        
+        // Apply the positioning
+        previewEl.style.position = 'absolute';
+        previewEl.style.zIndex = '1000';
+        
+        // Add a class for repositioning transitions if position was adjusted
+        const wasRepositioned = 
+            leftOffset !== (rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2)) ||
+            topOffset !== (rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2));
+            
+        if (wasRepositioned) {
+            previewEl.classList.add('repositioned');
+        } else {
+            previewEl.classList.remove('repositioned');
+        }
+        
+        previewEl.style.top = `${topOffset}px`;
+        previewEl.style.left = `${leftOffset}px`;
+        previewEl.style.width = `${enlargedWidth}px`;
+        previewEl.style.height = `${enlargedHeight}px`;
+        previewEl.style.transform = 'scale(0.95)';
+        
+        // Common styles
         previewEl.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
         previewEl.style.backdropFilter = 'blur(5px)';
         previewEl.style.borderRadius = '10px';
@@ -262,15 +234,24 @@ function initReadmeHoverBehavior() {
             <div class="preview-click-hint">${hintText}</div>
         `;
         
+        // If in click mode, add a close button
+        if (isClickMode) {
+            const closeBtn = document.createElement('div');
+            closeBtn.className = 'preview-close-btn';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isPreviewOpen = false;
+                hidePreview(previewEl);
+            });
+            previewEl.appendChild(closeBtn);
+        }
+        
         // Show the preview with animation
         previewEl.style.display = 'flex';
         setTimeout(() => {
             previewEl.style.opacity = '1';
-            if (isClickMode) {
-                previewEl.style.transform = 'translate(-50%, -50%) scale(1)';
-            } else {
-                previewEl.style.transform = 'scale(1)';
-            }
+            previewEl.style.transform = 'scale(1)';
             
             // Allow scrolling once visible
             previewEl.style.overflow = 'auto';
@@ -280,23 +261,7 @@ function initReadmeHoverBehavior() {
     // Helper function to hide preview
     function hidePreview(previewEl) {
         previewEl.style.opacity = '0';
-        if (previewEl.style.position === 'fixed') {
-            previewEl.style.transform = 'translate(-50%, -50%) scale(0.95)';
-            
-            // Also fade out the backdrop
-            const backdrop = document.querySelector('.preview-backdrop');
-            if (backdrop) {
-                backdrop.style.opacity = '0';
-                setTimeout(() => {
-                    backdrop.style.display = 'none';
-                }, 300);
-            }
-            
-            // Re-enable scrolling
-            document.body.style.overflow = 'auto';
-        } else {
-            previewEl.style.transform = 'scale(0.95)';
-        }
+        previewEl.style.transform = 'scale(0.95)';
         
         setTimeout(() => {
             previewEl.style.display = 'none';
@@ -435,51 +400,21 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         
         .preview-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 1050;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            display: none; /* Hide backdrop as it's no longer needed */
         }
         
-        .preview-close-btn {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            width: 30px;
-            height: 30px;
-            background-color: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            z-index: 1;
-        }
-        
-        .preview-close-btn:hover {
-            background-color: var(--primary-color, #3498db);
-            transform: rotate(90deg);
-        }
-        
-        /* Responsive adjustments for the preview in clicked state */
+        /* Responsive adjustments for the preview */
         @media (max-width: 768px) {
-            .portfolio-overlay-preview[style*="position: fixed"] {
-                width: 95% !important;
-                height: 85vh !important;
+            .portfolio-overlay-preview {
+                /* Override any fixed positioning with absolute for consistent behavior */
+                position: absolute !important;
+                /* Scale down slightly on mobile */
+                width: calc(100% - 40px) !important;
+                max-width: 400px !important;
             }
             
             .portfolio-overlay-preview .preview-image {
-                height: 140px;
+                height: 120px;
             }
         }
     `;
