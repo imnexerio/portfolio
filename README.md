@@ -127,6 +127,28 @@ The portfolio is fully responsive and optimized for:
 - Tablets
 - Mobile devices
 
+## 🧪 Local Development with Environment Variables
+
+For local testing with GitHub authentication:
+
+1. Edit the `js/env-loader.js` file and replace `'your_github_token_here'` with your actual GitHub token:
+   ```javascript
+   // Set your GitHub token for local testing
+   window.env.PAT_GITHUB = 'your_actual_token_here';
+   ```
+
+2. Start your local development server (e.g., Live Server in VS Code or Python's built-in server)
+   ```bash
+   # Using Python's built-in server
+   python -m http.server 8000
+   ```
+
+3. Open your browser to the local development URL (e.g., `http://localhost:8000` or `http://127.0.0.1:5500`)
+
+The environment variable loader will detect you're in a local environment and use the token from the env-loader.js file. This file is added to .gitignore, so you won't accidentally commit your token to the repository.
+
+> **Note**: Always ensure `js/env-loader.js` remains in your `.gitignore` file to prevent committing your token.
+
 ## 📄 License
 
 This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.

@@ -8,8 +8,11 @@
 // Create a namespace for GitHub configuration
 window.GitHubConfig = (function() {    // Private GitHub credentials
     const _username = 'imnexerio';
-    // Get token from environment variable or leave empty for public access
-    const _token = ''; // Token should be set as PAT_GITHUB in GitHub repository secrets
+    
+    // Try to get token from environment variables for local development
+    // 1. Check window.env (from .env file loader for local dev)
+    // 2. Empty string for production (should use PAT_GITHUB in GitHub Actions)
+    const _token = (window.env && window.env.PAT_GITHUB) || '';
     
     // Configuration options
     const _config = {
