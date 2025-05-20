@@ -1,4 +1,4 @@
-// Function to implement hover-to-open and mouseleave-to-close for README modals
+// Function to implement click-to-open for portfolio modals with simplified preview on hover
 function initReadmeHoverBehavior() {
     // Get all portfolio items that might have README content
     const portfolioItems = document.querySelectorAll('.portfolio-item');
@@ -7,7 +7,7 @@ function initReadmeHoverBehavior() {
     
     if (!portfolioItems.length || !modal || !modalContent) return;
     
-    // When using the actual modal preview on hover, we don't need a separate preview element
+    // Create the preview element that will show the same content as the main modal
     const modalPreview = document.createElement('div');
     modalPreview.className = 'portfolio-overlay-preview';
     document.body.appendChild(modalPreview);
@@ -17,7 +17,7 @@ function initReadmeHoverBehavior() {
     
     // Add event listeners to all portfolio items
     portfolioItems.forEach(item => {
-        // On hover, show README preview after short delay
+        // On hover, show preview after short delay
         item.addEventListener('mouseenter', () => {
             // Clear any existing timers
             clearTimeout(leaveTimer);
@@ -39,7 +39,7 @@ function initReadmeHoverBehavior() {
                         if (project) {
                             // Position the preview exactly over the portfolio item but make it larger
                             const rect = item.getBoundingClientRect();
-                              // Calculate dimensions for the enlarged preview (30% larger than the original item)
+                            // Calculate dimensions for the enlarged preview (30% larger than the original item)
                             const scaleFactor = 1.3; // Make the preview 30% larger
                             const enlargedWidth = rect.width * scaleFactor;
                             const enlargedHeight = rect.height * scaleFactor;
@@ -97,51 +97,46 @@ function initReadmeHoverBehavior() {
                             modalPreview.style.height = `${enlargedHeight}px`;
                             modalPreview.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
                             modalPreview.style.backdropFilter = 'blur(5px)';
-                            modalPreview.style.borderRadius = '10px'; // Slightly larger border radius
-                            modalPreview.style.overflow = 'hidden'; // Hide scrollbars initially
+                            modalPreview.style.borderRadius = '10px';
+                            modalPreview.style.overflow = 'hidden';
                             modalPreview.style.display = 'flex';
                             modalPreview.style.flexDirection = 'column';
                             modalPreview.style.alignItems = 'center';
                             modalPreview.style.justifyContent = 'flex-start';
                             modalPreview.style.color = '#fff';
-                            modalPreview.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.5)'; // Enhanced shadow
-                            modalPreview.style.padding = '20px'; // Larger padding for the bigger container
+                            modalPreview.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.5)';
+                            modalPreview.style.padding = '20px';
                             modalPreview.style.opacity = '0';
                             modalPreview.style.cursor = 'pointer';
-                            modalPreview.style.transform = 'scale(0.95)'; // Start slightly smaller for growth animation
+                            modalPreview.style.transform = 'scale(0.95)';
                             modalPreview.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
                             
-                            // Create content for the preview
+                            // Create content for the preview - use the same content structure as the main modal
+                            // but only include image, description, and "View Project on GitHub" button
                             modalPreview.innerHTML = `
-                                <h3>${project.title}</h3>
-                                <div id="preview-readme-container" class="readme-container">
-                                    <div class="readme-loading"><i class="fas fa-spinner fa-spin"></i> Loading README...</div>
-                                </div>
-                                <div class="preview-action-button">
-                                    <a href="#" class="view-details-btn">View Full Details</a>
+                                <div class="modal-project preview-project">
+                                    <div class="modal-image preview-image">
+                                        <img src="${project.image}" alt="${project.title}">
+                                    </div>
+                                    <div class="modal-details preview-details">
+                                        <h2>${project.title}</h2>
+                                        <p class="project-category">${project.category}</p>
+                                        <div class="project-description">
+                                            <p>${project.description}</p>
+                                        </div>
+                                        <a href="${project.url}" class="btn primary-btn" target="_blank">View Project on GitHub</a>
+                                    </div>
                                 </div>
                                 <div class="preview-click-hint">Click anywhere to see full details</div>
                             `;
                             
-                            // Add click event to the view details button
-                            const viewDetailsBtn = modalPreview.querySelector('.view-details-btn');
-                            if (viewDetailsBtn) {
-                                viewDetailsBtn.addEventListener('click', (e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    modalPreview.style.display = 'none';
-                                    detailsBtn.click();
-                                });
-                            }
-                            
                             // Make the entire preview clickable to open the full modal
                             modalPreview.addEventListener('click', (e) => {
-                                // Don't trigger if clicking on links or buttons or scrolling
+                                // Don't trigger if clicking on links or buttons
                                 if (e.target.tagName.toLowerCase() === 'a' || 
                                     e.target.tagName.toLowerCase() === 'button' ||
                                     e.target.closest('a') || 
-                                    e.target.closest('button') ||
-                                    e.target.closest('.readme-container')) {
+                                    e.target.closest('button')) {
                                     return;
                                 }
                                 
@@ -158,30 +153,13 @@ function initReadmeHoverBehavior() {
                                 // Allow scrolling once visible
                                 modalPreview.style.overflow = 'auto';
                             }, 10);
-                            
-                            // Fetch README only when needed
-                            const readmeContainer = modalPreview.querySelector('#preview-readme-container');
-                            if (readmeContainer) {
-                                const username = project.url.split('/')[3]; // GitHub username from URL
-                                
-                                // Store the repo name for easier access
-                                readmeContainer.setAttribute('data-repo', repoName);
-                                
-                                // Check if we already have prefetched README data
-                                if (item.repoData && item.repoData.readmePromise) {
-                                    // Use the same fetchRepoReadme function to ensure consistent display
-                                    fetchRepoReadme(username, repoName, readmeContainer);
-                                } else {
-                                    fetchRepoReadme(username, repoName, readmeContainer);
-                                }
-                            }
                         }
                     }
                 }
             }, 400); // Delay for hover preview to avoid flickering
         });
         
-        // On leave, hide README preview after short delay
+        // On leave, hide preview after short delay
         item.addEventListener('mouseleave', () => {
             clearTimeout(hoverTimer);
             
@@ -228,8 +206,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Add the necessary styles
-document.addEventListener('DOMContentLoaded', () => {
-    const style = document.createElement('style');
+document.addEventListener('DOMContentLoaded', () => {    const style = document.createElement('style');
     style.textContent = `
         .portfolio-overlay-preview {
             display: none;
@@ -244,43 +221,57 @@ document.addEventListener('DOMContentLoaded', () => {
             transition: opacity 0.3s ease, transform 0.3s ease, top 0.2s ease, left 0.2s ease;
         }
         
-        .portfolio-overlay-preview .readme-container {
-            max-height: 65%;
-            overflow-y: auto;
+        .portfolio-overlay-preview .preview-project {
+            display: flex;
+            flex-direction: column;
             width: 100%;
-            margin: 15px 0;
-            padding: 15px;
-            background-color: rgba(30, 30, 30, 0.5);
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-          
-        .portfolio-overlay-preview .readme-content {
-            overflow: hidden;
-            position: relative;
-            max-height: 65%;
-            width: 100%;
-        }
-          .portfolio-overlay-preview .markdown-body {
-            font-size: 0.85rem;
-            line-height: 1.5;
-            color: #f0f0f0;
-            max-height: 160px;  /* Increased height for larger preview */
-            overflow-y: auto;
-            padding-right: 12px;
+            height: 100%;
         }
         
-        .portfolio-overlay-preview .markdown-body.expanded {
-            max-height: 70%;
-        }        .portfolio-overlay-preview h3 {
+        .portfolio-overlay-preview .preview-image {
+            width: 100%;
+            height: 160px;
+            overflow: hidden;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .portfolio-overlay-preview .preview-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .portfolio-overlay-preview .preview-details {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+        
+        .portfolio-overlay-preview .preview-details h2 {
             margin-top: 0;
-            margin-bottom: 12px;
+            margin-bottom: 5px;
             color: var(--primary-color, #3498db);
             font-size: 1.2rem;
             text-align: center;
         }
         
-        .portfolio-overlay-preview .view-details-btn {
+        .portfolio-overlay-preview .project-category {
+            color: #ccc;
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .portfolio-overlay-preview .project-description {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .portfolio-overlay-preview .btn {
             display: inline-block;
             background-color: var(--primary-color, #3498db);
             color: #fff;
@@ -290,47 +281,17 @@ document.addEventListener('DOMContentLoaded', () => {
             font-weight: 500;
             font-size: 0.95rem;
             transition: all 0.3s ease;
-            margin-top: 12px;
+            text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
-          .portfolio-overlay-preview .view-details-btn:hover {
+        
+        .portfolio-overlay-preview .btn:hover {
             background-color: var(--primary-hover, #2980b9);
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
         }
         
-        .portfolio-overlay-preview .readme-meta {
-            text-align: right;
-            margin-top: 5px;
-            font-size: 0.75rem;
-        }
-        
-        .portfolio-overlay-preview .readme-meta a {
-            color: var(--primary-color, #3498db);
-            text-decoration: none;
-        }
-        
-        .portfolio-overlay-preview .readme-expand-container {
-            text-align: center;
-            margin-top: 10px;
-            display: none;
-        }
-        
-        .portfolio-overlay-preview .readme-expand-btn {
-            background-color: transparent;
-            border: 1px solid var(--primary-color, #3498db);
-            color: var(--primary-color, #3498db);
-            padding: 5px 15px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.8rem;
-            transition: all 0.2s ease;
-        }
-        
-        .portfolio-overlay-preview .readme-expand-btn:hover {
-            background-color: var(--primary-color, #3498db);
-            color: #fff;
-        }        .portfolio-overlay-preview .preview-click-hint {
+        .portfolio-overlay-preview .preview-click-hint {
             position: absolute;
             bottom: 15px;
             left: 0;
@@ -345,19 +306,6 @@ document.addEventListener('DOMContentLoaded', () => {
             width: fit-content;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             backdrop-filter: blur(3px);
-        }
-        
-        .readme-loading {
-            text-align: center;
-            padding: 25px;
-            color: #ccc;
-        }
-        
-        .readme-not-found, .readme-error {
-            text-align: center;
-            padding: 20px;
-            color: #ccc;
-            font-style: italic;
         }
     `;
     document.head.appendChild(style);
