@@ -10,7 +10,7 @@ window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = 'imnexerio';
     // replace your token here or leave it empty to use public access or use github environment variables
-    const _token = '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';
+    const _token = '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';
     
     // Configuration options
     const _config = {
