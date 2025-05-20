@@ -22,22 +22,22 @@ document.addEventListener('DOMContentLoaded', function() {
         if (loadingIndicator) loadingIndicator.classList.remove('active');
         if (successMessage) successMessage.classList.remove('active');
     }
-    
-    // Check if JSZip is available and load it if not
+      // Check if JSZip is available and load it if not
     if (typeof JSZip === 'undefined') {
         console.log("Loading JSZip library");
         const jsZipScript = document.createElement('script');
         jsZipScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
         jsZipScript.onload = function() {
-            console.log("JSZip library loaded");
+            console.log("JSZip library loaded successfully");
             initWebsiteGenerator();
         };
-        jsZipScript.onerror = function() {
-            console.error("Failed to load JSZip library");
-            initWebsiteGenerator();
+        jsZipScript.onerror = function(error) {
+            console.error("Failed to load JSZip library:", error);
+            alert("Failed to load required libraries. Please check your internet connection and try again.");
         };
         document.head.appendChild(jsZipScript);
     } else {
+        console.log("JSZip library already loaded");
         initWebsiteGenerator();
     }
 });
@@ -593,7 +593,7 @@ function createWebsiteZip(config, githubConfigJS, socialLinksJS) {
 // Collect all website files
 function collectWebsiteFiles() {
     return new Promise((resolve, reject) => {
-        updateProgress(65, 'Collecting website files from repository...');
+        updateProgress(65, 'Collecting all website files from repository...');
         
         // Use the GitHub repository as the source of files instead of the current document
         const repoBaseUrl = 'https://raw.githubusercontent.com/imnexerio/portfolio/main/';
@@ -610,18 +610,26 @@ function collectWebsiteFiles() {
                 content: `# Personal Portfolio Website\n\nThis portfolio website was generated from the template by Santosh Prajapati.\n\n## Setup\n\n1. Edit the js/github-config.js file with your GitHub credentials if needed\n2. Host on any web server or GitHub Pages\n\n## GitHub Actions Deployment\n\nFor secure deployment with GitHub Actions:\n1. Add your GitHub token as a repository secret named \`PAT_GITHUB\`\n2. Use the included workflow file in \`.github/workflows/deploy.yml\`\n3. Set GitHub Pages source to "GitHub Actions" in repository settings\n\n## Features\n\n- Responsive design that works on all devices\n- Dynamic GitHub project loading\n- GitHub statistics visualization\n- Light/dark theme switcher\n- Custom color picker\n\n## Credits\n\nOriginal template by [Santosh Prajapati](https://github.com/imnexerio)`
             }
         ];
-          // Files to fetch from the repository
+        // Files to fetch from the repository - comprehensive list
         const filesToFetch = [
             'index.html',
+            'LICENSE',
             'css/modern-styles.css',
             'css/advanced-animations.css',
             'css/wow-effects.css',
             'css/consolidated-responsive.css',
             'css/github-stats.css',
+            'css/github-readme.css',
             'css/website-generator.css',
             'js/github-stats.js',
             'js/optimized-main.js',
             'js/website-generator.js',
+            'js/modal-override.js',
+            'js/readme-preview.js',
+            'js/env-loader.js',
+            'js/social-links.js',
+            'public-portfolio/preview.gif',
+            'public-portfolio/preview.png',
             '.github/workflows/deploy.yml'
         ];
         
@@ -644,8 +652,7 @@ function collectWebsiteFiles() {
                             path: file,
                             content: content
                         });
-                    })
-                    .catch(error => {
+                    })                    .catch(error => {
                         console.warn(`Could not fetch ${file} from GitHub:`, error);
                         // Create a placeholder file with a comment
                         if (file.endsWith('.js')) {
@@ -658,6 +665,22 @@ function collectWebsiteFiles() {
                                 path: file,
                                 content: `/* CSS file placeholder: ${file} */\n\n/* This file couldn't be automatically included */`
                             });
+                        } else if (file.endsWith('.gif') || file.endsWith('.png') || file.endsWith('.jpg') || file.endsWith('.jpeg')) {
+                            // For binary files, we'll try to fetch them as binary
+                            fetch(fileUrl)
+                                .then(response => {
+                                    if (!response.ok) throw new Error(`Failed to fetch binary ${file}`);
+                                    return response.blob();
+                                })
+                                .then(blob => {
+                                    files.push({
+                                        path: file,
+                                        content: blob
+                                    });
+                                })
+                                .catch(binaryError => {
+                                    console.warn(`Could not fetch binary file ${file}:`, binaryError);
+                                });
                         } else {
                             files.push({
                                 path: file,
@@ -667,10 +690,16 @@ function collectWebsiteFiles() {
                     })
             );
         });
-        
-        // Wait for all files to be fetched
+          // Wait for all files to be fetched
         Promise.allSettled(fetchPromises)
-            .then(() => {
+            .then(results => {
+                // Count successful fetches
+                const successCount = results.filter(result => result.status === 'fulfilled').length;
+                console.log(`Successfully fetched ${successCount} out of ${filesToFetch.length} files`);
+                
+                // Update progress with success rate
+                updateProgress(75, `Successfully collected ${successCount} out of ${filesToFetch.length} files...`);
+                
                 resolve(files);
             })
             .catch(error => {
@@ -699,10 +728,13 @@ function completeGeneration(config, zipBlob) {
         const successMessage = document.querySelector('.success-message');
         if (successMessage) {
             const updateNote = document.createElement('div');
-            updateNote.className = 'update-details';                updateNote.innerHTML = `                <p><small>Files updated:</small></p>
+            updateNote.className = 'update-details';            updateNote.innerHTML = `                <p><small>Files updated:</small></p>
                 <ul>
                     <li><small>GitHub Configuration (username: ${config.github.username})</small></li>
                     <li><small>Social Media Links</small></li>
+                    <li><small>All CSS and JavaScript files</small></li>
+                    <li><small>README.md and LICENSE files</small></li>
+                    <li><small>Portfolio preview images</small></li>
                     <li><small>GitHub Actions workflow for secure deployment</small></li>
                 </ul>
                 <p><small><strong>Next Steps:</strong></small></p>
