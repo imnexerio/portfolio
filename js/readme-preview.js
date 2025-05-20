@@ -20,16 +20,14 @@ function initReadmeHybridBehavior() {
     portfolioItems.forEach(item => {
         // On hover, show preview after short delay
         item.addEventListener('mouseenter', () => {
-            // Clear any existing timers
             clearTimeout(leaveTimer);
             
             // Don't show hover preview if already in click mode
             if (!isPreviewOpen) {
-                // Set timer to show preview
                 hoverTimer = setTimeout(() => {
                     isHoverMode = true;
                     showPreview(item, modalPreview);
-                }, 400); // Delay for hover preview to avoid flickering
+                }, 400);
             }
         });
         
@@ -37,10 +35,9 @@ function initReadmeHybridBehavior() {
         item.addEventListener('mouseleave', () => {
             clearTimeout(hoverTimer);
             
-            // Only hide if not in click-preview mode
             if (!isPreviewOpen && isHoverMode) {
                 leaveTimer = setTimeout(() => {
-                    if (isPreviewVisible(modalPreview) && isHoverMode) {
+                    if (modalPreview.style.display !== 'none' && isHoverMode) {
                         hidePreview(modalPreview);
                         isHoverMode = false;
                     }
@@ -54,30 +51,22 @@ function initReadmeHybridBehavior() {
             e.preventDefault();
             e.stopPropagation();
             
-            // Prevent duplicate processing if clicking a button
-            if (e.target.tagName.toLowerCase() === 'a' || 
-                e.target.tagName.toLowerCase() === 'button' ||
-                e.target.closest('a') || 
-                e.target.closest('button')) {
-                return;
-            }
+            // Skip if clicking on interactive elements
+            const interactive = e.target.closest('a, button');
+            if (interactive) return;
             
             // Clear any hover timers
             clearTimeout(hoverTimer);
             clearTimeout(leaveTimer);
             isHoverMode = false;
             
-            // Toggle between open/closed states
+            // Toggle preview state
             if (isPreviewOpen && modalPreview.currentItem === item) {
-                // If already open and same item, close it
                 isPreviewOpen = false;
                 hidePreview(modalPreview);
             } else {
-                // If different item or not open, open it and set flag
                 isPreviewOpen = true;
                 modalPreview.currentItem = item;
-                
-                // Show the preview in click mode
                 showPreview(item, modalPreview, true);
             }
         });
@@ -94,7 +83,7 @@ function initReadmeHybridBehavior() {
     modalPreview.addEventListener('mouseleave', () => {
         if (isHoverMode && !isPreviewOpen) {
             leaveTimer = setTimeout(() => {
-                if (isPreviewVisible(modalPreview) && isHoverMode) {
+                if (modalPreview.style.display !== 'none' && isHoverMode) {
                     hidePreview(modalPreview);
                     isHoverMode = false;
                 }
@@ -104,53 +93,54 @@ function initReadmeHybridBehavior() {
     
     // Close preview when clicking outside in click mode
     document.body.addEventListener('click', (e) => {
-        if (isPreviewOpen && 
-            e.target !== modalPreview && 
-            !modalPreview.contains(e.target) &&
-            !e.target.closest('.portfolio-item')) {
+        const clickedOutside = isPreviewOpen && 
+                              e.target !== modalPreview && 
+                              !modalPreview.contains(e.target) &&
+                              !e.target.closest('.portfolio-item');
+                              
+        if (clickedOutside) {
             isPreviewOpen = false;
             hidePreview(modalPreview);
         }
     });
     
-    // Helper function to check if preview is visible
-    function isPreviewVisible(previewEl) {
-        return previewEl.style.display === 'flex' || previewEl.style.display === 'block';
-    }
-    
     // Helper function to show preview
     function showPreview(item, previewEl, isClickMode = false) {
         const detailsBtn = item.querySelector('.portfolio-details');
-        
         if (!detailsBtn) return;
         
         const projectId = detailsBtn.getAttribute('data-id');
-        
         if (!projectId || !window.projectDetailsData) return;
         
         const project = window.projectDetailsData[projectId];
-        
         if (!project) return;
         
-        // Set preview positioning
+        // Calculate dimensions and positioning
         const rect = item.getBoundingClientRect();
         const scaleFactor = 1.3;
         const enlargedWidth = rect.width * scaleFactor;
         const enlargedHeight = rect.height * scaleFactor;
         
-        // Calculate centered position
+        // Calculate initial centered position
         let topOffset = rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2);
         let leftOffset = rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2);
         
-        // Check boundaries
+        // Check boundaries and adjust if needed
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
+        const padding = 20; // Padding from viewport edges
         
-        // Check edges and adjust if needed
-        if (leftOffset + enlargedWidth > viewportWidth - 20) leftOffset = viewportWidth - enlargedWidth - 20;
-        if (leftOffset < 20) leftOffset = 20;
-        if (topOffset + enlargedHeight > window.scrollY + viewportHeight - 20) topOffset = window.scrollY + viewportHeight - enlargedHeight - 20;
-        if (topOffset < window.scrollY + 20) topOffset = window.scrollY + 20;
+        // Adjust for viewport edges
+        if (leftOffset + enlargedWidth > viewportWidth - padding) leftOffset = viewportWidth - enlargedWidth - padding;
+        if (leftOffset < padding) leftOffset = padding;
+        if (topOffset + enlargedHeight > window.scrollY + viewportHeight - padding) 
+            topOffset = window.scrollY + viewportHeight - enlargedHeight - padding;
+        if (topOffset < window.scrollY + padding) topOffset = window.scrollY + padding;
+        
+        // Detect if repositioned from ideal center
+        const idealLeft = rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2);
+        const idealTop = rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2);
+        const wasRepositioned = leftOffset !== idealLeft || topOffset !== idealTop;
         
         // Apply the positioning
         previewEl.style.position = 'absolute';
@@ -161,11 +151,6 @@ function initReadmeHybridBehavior() {
         previewEl.style.height = `${enlargedHeight}px`;
         previewEl.style.transform = 'scale(0.95)';
         
-        // Detect if position was adjusted from ideal centered position
-        const wasRepositioned = 
-            leftOffset !== (rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2)) ||
-            topOffset !== (rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2));
-            
         // Add transition class if repositioned
         previewEl.classList.toggle('repositioned', wasRepositioned);
         
@@ -175,7 +160,7 @@ function initReadmeHybridBehavior() {
         // Create content for the preview
         previewEl.innerHTML = createPreviewContent(project);
         
-        // Add close button for both hover and click modes
+        // Add close button
         const closeBtn = document.createElement('div');
         closeBtn.className = 'preview-close-btn';
         closeBtn.innerHTML = '&times;';
@@ -240,11 +225,6 @@ function initReadmeHybridBehavior() {
         
         setTimeout(() => {
             previewEl.style.display = 'none';
-            // Remove the close button if it exists
-            const closeBtn = previewEl.querySelector('.preview-close-btn');
-            if (closeBtn) {
-                previewEl.removeChild(closeBtn);
-            }
         }, 300);
     }
 }
@@ -259,16 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     if (!shouldUsePreview) return;
     
-    // Wait for GitHub projects to load before initializing preview behavior
-    const checkPortfolioLoaded = setInterval(() => {
-        if (document.querySelectorAll('.portfolio-item').length > 0) {
-            clearInterval(checkPortfolioLoaded);
-            // Initialize our custom preview behavior
-            setTimeout(initReadmeHybridBehavior, 500);
-        }
-    }, 500);
-    
-    // Add the necessary styles
+    // Add the necessary styles immediately
     const style = document.createElement('style');
     style.textContent = `
         .portfolio-overlay-preview {
@@ -353,7 +324,8 @@ document.addEventListener('DOMContentLoaded', () => {
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
         }
-          .preview-close-btn {
+        
+        .preview-close-btn {
             position: absolute;
             top: 10px;
             right: 10px;
@@ -391,4 +363,13 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     `;
     document.head.appendChild(style);
+    
+    // Wait for GitHub projects to load before initializing preview behavior
+    const checkPortfolioLoaded = setInterval(() => {
+        if (document.querySelectorAll('.portfolio-item').length > 0) {
+            clearInterval(checkPortfolioLoaded);
+            // Initialize our custom preview behavior
+            initReadmeHybridBehavior();
+        }
+    }, 500);
 });
