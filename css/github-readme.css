@@ -32,7 +32,7 @@
 }
 
 .readme-content {
-    max-height: 400px;
+    max-height: 350px;
     overflow: hidden;
     padding-right: 15px;
     position: relative;
@@ -41,13 +41,13 @@
 .markdown-body {
     font-size: 0.95rem;
     line-height: 1.6;
-    max-height: 300px;
+    max-height: 250px; /* Reduced height for better small screen experience */
     overflow-y: auto;
     transition: max-height 0.3s ease;
 }
 
 .markdown-body.expanded {
-    max-height: 800px;
+    max-height: 600px; /* Also reduced when expanded */
 }
 
 .readme-expand-container {
@@ -129,6 +129,39 @@
 .markdown-body {
     font-size: 0.95rem;
     line-height: 1.6;
+}
+
+/* Media queries for responsive README display */
+@media (max-width: 768px) {
+    .readme-content {
+        max-height: 300px;
+    }
+    
+    .markdown-body {
+        max-height: 180px;
+    }
+    
+    .markdown-body.expanded {
+        max-height: 450px;
+    }
+    
+    .readme-content h3 {
+        font-size: 1.2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .readme-content {
+        max-height: 270px;
+    }
+    
+    .markdown-body {
+        max-height: 150px;
+    }
+    
+    .markdown-body.expanded {
+        max-height: 350px;
+    }
 }
 
 .markdown-body h1, 

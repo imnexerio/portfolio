@@ -680,8 +680,7 @@ async function fetchGitHubProjects() {
             throw new Error('No GitHub repositories found.');        }
         
         // Helper function to process a single repository
-        function processRepositoryItem(repo, index, container, details, langs, user) {
-            // Skip forked repositories if needed
+        function processRepositoryItem(repo, index, container, details, langs, user) {            // Skip forked repositories if needed
             if (repo.fork) return;
               // Determine the main language for filtering
             const language = repo.language || 'Other';
@@ -689,14 +688,22 @@ async function fetchGitHubProjects() {
             
             // Set delay class for animation (max delay-5)
             const delay = Math.min(index + 1, 5);
+              
+            // Prepare project ID and date string
+            const projectId = index + 1;
+            const createdDate = new Date(repo.created_at);
+            const dateString = createdDate.getFullYear().toString();
             
             // Create the portfolio item HTML
             const portfolioItem = document.createElement('div');
             portfolioItem.className = `portfolio-item card-3d scroll-scale delay-${delay}`;
             portfolioItem.setAttribute('data-category', language.toLowerCase());
+            portfolioItem.setAttribute('data-id', projectId);
+            portfolioItem.setAttribute('data-repo', repo.name);
             // Set initial styles for proper rendering
             portfolioItem.style.opacity = '1';
             portfolioItem.style.transform = 'scale(1)';
+            portfolioItem.style.cursor = 'pointer'; // Add pointer cursor to indicate item is clickable
             
             // Try to use custom preview images from the repository's main branch
             // First try PNG (faster loading) then switch to GIF (for animation)
@@ -735,15 +742,10 @@ async function fetchGitHubProjects() {
                 };
                 // Set the source to test if GIF exists
                 imgTestGif.src = customPreviewGifUrl;
-            };
-            // Set the source to test if PNG exists
+            };            // Set the source to test if PNG exists
             imgTestPng.src = customPreviewPngUrl;
             
-            // Prepare date string
-            const createdDate = new Date(repo.created_at);
-            const dateString = createdDate.getFullYear().toString();
-              // Store project details for modal
-            const projectId = index + 1;
+            // Store project details for modal
             details[projectId] = {
                 title: repo.name,
                 category: language,
@@ -753,7 +755,7 @@ async function fetchGitHubProjects() {
                 technologies: [language],
                 image: imageUrl,
                 url: repo.html_url
-            };            // Create HTML for the portfolio item
+            };// Create HTML for the portfolio item
             portfolioItem.innerHTML = `
                 <div class="portfolio-img">
                     <img src="${imageUrl}" alt="${repo.name}">
@@ -768,8 +770,7 @@ async function fetchGitHubProjects() {
                 </div>
             `;
               // Add to the DOM
-            container.appendChild(portfolioItem);
-              // Set up hover functionality to prefetch README when user hovers over the item
+            container.appendChild(portfolioItem);            // Set up hover functionality to prefetch README when user hovers over the item
             portfolioItem.addEventListener('mouseenter', () => {
                 // Set a data attribute to track if we've already started fetching the README
                 if (!portfolioItem.dataset.readmeFetching) {
@@ -778,7 +779,8 @@ async function fetchGitHubProjects() {
                     // Small delay to avoid unnecessary fetches if user is just moving the mouse across items
                     portfolioItem.readmeTimer = setTimeout(() => {
                         const repoName = repo.name;
-                        // Store the repo object in the DOM element for later access                        portfolioItem.repoData = portfolioItem.repoData || {};
+                        // Store the repo object in the DOM element for later access
+                        portfolioItem.repoData = portfolioItem.repoData || {};
                         
                         // Begin fetching the README but don't display it yet
                         // This preload will make it faster when the modal is actually opened
@@ -796,6 +798,9 @@ async function fetchGitHubProjects() {
                                 console.warn(`Error pre-fetching README for ${repoName}:`, error);
                                 return null;
                             });
+                            
+                        // Optional: Show README in a hover tooltip - can be enabled if preferred
+                        // For now, we'll just preload for faster modal display
                     }, 300); // 300ms delay before starting to fetch
                 }
             });
@@ -828,10 +833,24 @@ async function fetchGitHubProjects() {
                 });
                 
                 // Reset on mouse leave
-                portfolioItem.addEventListener('mouseleave', () => {
-                    requestAnimationFrame(() => {
+                portfolioItem.addEventListener('mouseleave', () => {                    requestAnimationFrame(() => {
                         portfolioItem.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-                    });                });
+                    });
+                });
+                
+                // Make the entire portfolio item clickable to open modal
+                portfolioItem.addEventListener('click', (e) => {
+                    // Don't open modal if clicking on a link
+                    if (e.target.closest('.portfolio-links a')) {
+                        return;
+                    }
+                      // Find the details button inside this item and simulate a click
+                    const detailsBtn = portfolioItem.querySelector('.portfolio-details');
+                    if (detailsBtn) {
+                        e.preventDefault();
+                        detailsBtn.click();
+                    }
+                });
             }, 100);
         }
         
