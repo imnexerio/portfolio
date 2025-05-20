@@ -113,15 +113,6 @@ function initReadmeHybridBehavior() {
         }
     });
     
-    // Add ESC key support to close preview in click mode
-    document.addEventListener('keydown', (e) => {
-        if ((isPreviewOpen || isHoverMode) && e.key === 'Escape') {
-            isPreviewOpen = false;
-            isHoverMode = false;
-            hidePreview(modalPreview);
-        }
-    });
-    
     // Helper function to check if preview is visible
     function isPreviewVisible(previewEl) {
         return previewEl.style.display === 'flex' || previewEl.style.display === 'block';
@@ -134,7 +125,6 @@ function initReadmeHybridBehavior() {
         if (!detailsBtn) return;
         
         const projectId = detailsBtn.getAttribute('data-id');
-        const repoName = detailsBtn.getAttribute('data-repo');
         
         if (!projectId || !window.projectDetailsData) return;
         
@@ -156,56 +146,46 @@ function initReadmeHybridBehavior() {
         const viewportWidth = window.innerWidth;
         const viewportHeight = window.innerHeight;
         
-        // Check right edge
-        if (leftOffset + enlargedWidth > viewportWidth - 20) {
-            leftOffset = viewportWidth - enlargedWidth - 20;
-        }
-        
-        // Check left edge
-        if (leftOffset < 20) {
-            leftOffset = 20;
-        }
-        
-        // Check bottom edge
-        if (topOffset + enlargedHeight > window.scrollY + viewportHeight - 20) {
-            topOffset = window.scrollY + viewportHeight - enlargedHeight - 20;
-        }
-        
-        // Check top edge
-        if (topOffset < window.scrollY + 20) {
-            topOffset = window.scrollY + 20;
-        }
+        // Check edges and adjust if needed
+        if (leftOffset + enlargedWidth > viewportWidth - 20) leftOffset = viewportWidth - enlargedWidth - 20;
+        if (leftOffset < 20) leftOffset = 20;
+        if (topOffset + enlargedHeight > window.scrollY + viewportHeight - 20) topOffset = window.scrollY + viewportHeight - enlargedHeight - 20;
+        if (topOffset < window.scrollY + 20) topOffset = window.scrollY + 20;
         
         // Apply the positioning
         previewEl.style.position = 'absolute';
         previewEl.style.zIndex = '1000';
-        
-        // Add a class for repositioning transitions if position was adjusted
-        const wasRepositioned = 
-            leftOffset !== (rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2)) ||
-            topOffset !== (rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2));
-            
-        if (wasRepositioned) {
-            previewEl.classList.add('repositioned');
-        } else {
-            previewEl.classList.remove('repositioned');
-        }
-        
         previewEl.style.top = `${topOffset}px`;
         previewEl.style.left = `${leftOffset}px`;
         previewEl.style.width = `${enlargedWidth}px`;
         previewEl.style.height = `${enlargedHeight}px`;
         previewEl.style.transform = 'scale(0.95)';
         
+        // Detect if position was adjusted from ideal centered position
+        const wasRepositioned = 
+            leftOffset !== (rect.left + window.scrollX - ((enlargedWidth - rect.width) / 2)) ||
+            topOffset !== (rect.top + window.scrollY - ((enlargedHeight - rect.height) / 2));
+            
+        // Add transition class if repositioned
+        previewEl.classList.toggle('repositioned', wasRepositioned);
+        
         // Apply common styles
         setPreviewStyles(previewEl);
         
         // Create content for the preview
-        previewEl.innerHTML = createPreviewContent(project, isClickMode);
+        previewEl.innerHTML = createPreviewContent(project);
         
-        // Only add close button in click mode (not hover mode)
+        // Add close button if in click mode
         if (isClickMode) {
-            addCloseButton(previewEl);
+            const closeBtn = document.createElement('div');
+            closeBtn.className = 'preview-close-btn';
+            closeBtn.innerHTML = '&times;';
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                isPreviewOpen = false;
+                hidePreview(previewEl);
+            });
+            previewEl.appendChild(closeBtn);
         }
         
         // Show the preview with animation
@@ -213,8 +193,6 @@ function initReadmeHybridBehavior() {
         setTimeout(() => {
             previewEl.style.opacity = '1';
             previewEl.style.transform = 'scale(1)';
-            
-            // Allow scrolling once visible
             previewEl.style.overflow = 'auto';
         }, 10);
     }
@@ -238,7 +216,7 @@ function initReadmeHybridBehavior() {
     }
     
     // Create the HTML content for the preview
-    function createPreviewContent(project, isClickMode) {
+    function createPreviewContent(project) {
         return `
             <div class="modal-project preview-project">
                 <div class="modal-image preview-image">
@@ -254,19 +232,6 @@ function initReadmeHybridBehavior() {
                 </div>
             </div>
         `;
-    }
-    
-    // Add close button to preview
-    function addCloseButton(previewEl) {
-        const closeBtn = document.createElement('div');
-        closeBtn.className = 'preview-close-btn';
-        closeBtn.innerHTML = '&times;';
-        closeBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            isPreviewOpen = false;
-            hidePreview(previewEl);
-        });
-        previewEl.appendChild(closeBtn);
     }
     
     // Helper function to hide preview
@@ -287,7 +252,7 @@ function initReadmeHybridBehavior() {
 
 // Call this function after portfolio items are loaded
 document.addEventListener('DOMContentLoaded', () => {
-    // Check if the global portfolioConfig exists and respects its settings
+    // Check if the global portfolioConfig exists and use its settings
     const shouldUsePreview = 
         typeof window.portfolioConfig !== 'undefined' 
             ? !window.portfolioConfig.useModalPopup && (window.portfolioConfig.useClickPreview || window.portfolioConfig.useHoverPreview)
@@ -299,15 +264,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const checkPortfolioLoaded = setInterval(() => {
         if (document.querySelectorAll('.portfolio-item').length > 0) {
             clearInterval(checkPortfolioLoaded);
-            
-            // Now initialize our custom preview behavior
+            // Initialize our custom preview behavior
             setTimeout(initReadmeHybridBehavior, 500);
         }
     }, 500);
-});
-
-// Add the necessary styles
-document.addEventListener('DOMContentLoaded', () => {
+    
+    // Add the necessary styles
     const style = document.createElement('style');
     style.textContent = `
         .portfolio-overlay-preview {
@@ -393,23 +355,6 @@ document.addEventListener('DOMContentLoaded', () => {
             box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
         }
         
-        .portfolio-overlay-preview .preview-click-hint {
-            position: absolute;
-            bottom: 15px;
-            left: 0;
-            right: 0;
-            text-align: center;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.8);
-            padding: 6px 12px;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 20px;
-            margin: 0 auto;
-            width: fit-content;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(3px);
-        }
-        
         .preview-close-btn {
             position: absolute;
             top: 10px;
@@ -435,9 +380,7 @@ document.addEventListener('DOMContentLoaded', () => {
         /* Responsive adjustments for the preview */
         @media (max-width: 768px) {
             .portfolio-overlay-preview {
-                /* Override any fixed positioning with absolute for consistent behavior */
                 position: absolute !important;
-                /* Scale down slightly on mobile */
                 width: calc(100% - 40px) !important;
                 max-width: 400px !important;
             }
