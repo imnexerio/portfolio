@@ -3,6 +3,44 @@
  * Adds advanced animations and optimizes for performance
  */
 
+// Utility functions for performance optimization
+const utils = {
+    // Throttle function to limit execution frequency
+    throttle: function(func, limit) {
+        let lastFunc;
+        let lastRan;
+        return function() {
+            const context = this;
+            const args = arguments;
+            if (!lastRan) {
+                func.apply(context, args);
+                lastRan = Date.now();
+            } else {
+                clearTimeout(lastFunc);
+                lastFunc = setTimeout(function() {
+                    if ((Date.now() - lastRan) >= limit) {
+                        func.apply(context, args);
+                        lastRan = Date.now();
+                    }
+                }, limit - (Date.now() - lastRan));
+            }
+        };
+    },
+    
+    // Debounce function to delay execution until after events complete
+    debounce: function(func, wait) {
+        let timeout;
+        return function() {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+                func.apply(context, args);
+            }, wait);
+        };
+    }
+};
+
 // Configuration object for portfolio behavior
 const portfolioConfig = {
     useModalPopup: false, // Set to false to use preview instead of modal popup
@@ -26,8 +64,8 @@ document.addEventListener('DOMContentLoaded', function() {
     initAdvancedScrollAnimations();
     initSkillsAnimation();
     initPortfolioFilter();
-    initPortfolioModal();
-    initContactForm();    initBackToTop();
+    initContactForm();
+    initBackToTop();
     initScrollProgress();
     initCreatorTypingEffect();  // Initialize the creator button typing effect
     init3DCardEffect();
@@ -38,7 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initMouseTrailer();
     initParticleEffect();
     
-    // Initialize the portfolio modal only if it's enabled in the configuration
+    // Initialize the portfolio modal with project data
     initPortfolioModal(window.projectDetailsData);
 });
 
@@ -554,21 +592,8 @@ function initPortfolioFilter() {
     const filterButtons = document.querySelectorAll('.filter-btn');
     const portfolioItems = document.querySelectorAll('.portfolio-item');
     
-    // Debounce function to improve performance
-    function debounce(func, wait) {
-        let timeout;
-        return function() {
-            const context = this;
-            const args = arguments;
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-                func.apply(context, args);
-            }, wait);
-        };
-    }
-
     filterButtons.forEach(button => {
-        button.addEventListener('click', debounce(function() {
+        button.addEventListener('click', utils.debounce(function() {
             // Remove active class from all buttons
             filterButtons.forEach(btn => btn.classList.remove('active'));
             
@@ -830,22 +855,8 @@ function initBackToTop() {
     const backToTopButton = document.querySelector('.back-to-top');
     
     if (backToTopButton) {
-        // Throttle function to improve performance
-        function throttle(func, limit) {
-            let inThrottle;
-            return function() {
-                const args = arguments;
-                const context = this;
-                if (!inThrottle) {
-                    func.apply(context, args);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
-                }
-            };
-        }
-        
         // Show/hide button based on scroll position
-        window.addEventListener('scroll', throttle(() => {
+        window.addEventListener('scroll', utils.throttle(() => {
             if (window.scrollY > 300) {
                 backToTopButton.classList.add('active');
             } else {
@@ -871,29 +882,7 @@ function initScrollProgress() {
     const progressBar = document.querySelector('.scroll-progress');
     
     if (progressBar) {
-        // Throttle function to improve performance
-        function throttle(func, limit) {
-            let lastFunc;
-            let lastRan;
-            return function() {
-                const context = this;
-                const args = arguments;
-                if (!lastRan) {
-                    func.apply(context, args);
-                    lastRan = Date.now();
-                } else {
-                    clearTimeout(lastFunc);
-                    lastFunc = setTimeout(function() {
-                        if ((Date.now() - lastRan) >= limit) {
-                            func.apply(context, args);
-                            lastRan = Date.now();
-                        }
-                    }, limit - (Date.now() - lastRan));
-                }
-            };
-        }
-        
-        window.addEventListener('scroll', throttle(() => {
+        window.addEventListener('scroll', utils.throttle(() => {
             const totalHeight = document.body.scrollHeight - window.innerHeight;
             const progress = (window.pageYOffset / totalHeight) * 100;
             
@@ -911,30 +900,8 @@ function initScrollProgress() {
 function init3DCardEffect() {
     const cards = document.querySelectorAll('.card-3d');
     
-    // Throttle function to improve performance
-    function throttle(func, limit) {
-        let lastFunc;
-        let lastRan;
-        return function() {
-            const context = this;
-            const args = arguments;
-            if (!lastRan) {
-                func.apply(context, args);
-                lastRan = Date.now();
-            } else {
-                clearTimeout(lastFunc);
-                lastFunc = setTimeout(function() {
-                    if ((Date.now() - lastRan) >= limit) {
-                        func.apply(context, args);
-                        lastRan = Date.now();
-                    }
-                }, limit - (Date.now() - lastRan));
-            }
-        };
-    }
-    
     cards.forEach(card => {
-        card.addEventListener('mousemove', throttle((e) => {
+        card.addEventListener('mousemove', utils.throttle((e) => {
             const cardRect = card.getBoundingClientRect();
             const cardCenterX = cardRect.left + cardRect.width / 2;
             const cardCenterY = cardRect.top + cardRect.height / 2;
@@ -966,30 +933,8 @@ function init3DCardEffect() {
 function initMagneticElements() {
     const magneticElements = document.querySelectorAll('.magnetic');
     
-    // Throttle function to improve performance
-    function throttle(func, limit) {
-        let lastFunc;
-        let lastRan;
-        return function() {
-            const context = this;
-            const args = arguments;
-            if (!lastRan) {
-                func.apply(context, args);
-                lastRan = Date.now();
-            } else {
-                clearTimeout(lastFunc);
-                lastFunc = setTimeout(function() {
-                    if ((Date.now() - lastRan) >= limit) {
-                        func.apply(context, args);
-                        lastRan = Date.now();
-                    }
-                }, limit - (Date.now() - lastRan));
-            }
-        };
-    }
-    
     magneticElements.forEach(element => {
-        element.addEventListener('mousemove', throttle((e) => {
+        element.addEventListener('mousemove', utils.throttle((e) => {
             const elementRect = element.getBoundingClientRect();
             const elementCenterX = elementRect.left + elementRect.width / 2;
             const elementCenterY = elementRect.top + elementRect.height / 2;
@@ -1021,29 +966,7 @@ function initMagneticElements() {
 function initParallaxEffect() {
     const parallaxSections = document.querySelectorAll('.parallax-section');
     
-    // Throttle function to improve performance
-    function throttle(func, limit) {
-        let lastFunc;
-        let lastRan;
-        return function() {
-            const context = this;
-            const args = arguments;
-            if (!lastRan) {
-                func.apply(context, args);
-                lastRan = Date.now();
-            } else {
-                clearTimeout(lastFunc);
-                lastFunc = setTimeout(function() {
-                    if ((Date.now() - lastRan) >= limit) {
-                        func.apply(context, args);
-                        lastRan = Date.now();
-                    }
-                }, limit - (Date.now() - lastRan));
-            }
-        };
-    }
-    
-    window.addEventListener('scroll', throttle(() => {
+    window.addEventListener('scroll', utils.throttle(() => {
         parallaxSections.forEach(section => {
             const distance = window.scrollY;
             const parallaxBg = section.querySelector('.parallax-bg');
@@ -1159,30 +1082,8 @@ function initMouseTrailer() {
     mouseTrailer.className = 'mouse-trailer';
     document.body.appendChild(mouseTrailer);
     
-    // Throttle function to improve performance
-    function throttle(func, limit) {
-        let lastFunc;
-        let lastRan;
-        return function() {
-            const context = this;
-            const args = arguments;
-            if (!lastRan) {
-                func.apply(context, args);
-                lastRan = Date.now();
-            } else {
-                clearTimeout(lastFunc);
-                lastFunc = setTimeout(function() {
-                    if ((Date.now() - lastRan) >= limit) {
-                        func.apply(context, args);
-                        lastRan = Date.now();
-                    }
-                }, limit - (Date.now() - lastRan));
-            }
-        };
-    }
-    
     // Update mouse trailer position
-    document.addEventListener('mousemove', throttle((e) => {
+    document.addEventListener('mousemove', utils.throttle((e) => {
         // Use requestAnimationFrame for smoother animation
         requestAnimationFrame(() => {
             mouseTrailer.style.left = `${e.clientX}px`;
