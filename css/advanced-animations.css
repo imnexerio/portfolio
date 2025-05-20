@@ -327,16 +327,16 @@
 }
 
 /* Scroll Progress Indicator */
-/*.scroll-progress {*/
-/*  position: fixed;*/
-/*  top: 0;*/
-/*  left: 0;*/
-/*  width: 0;*/
-/*  height: 4px;*/
-/*  background: var(--gradient-primary);*/
-/*  z-index: 9999;*/
-/*  transition: width 0.1s linear;*/
-/*}*/
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 4px;
+  background: var(--gradient-primary);
+  z-index: 9999;
+  transition: width 0.1s linear;
+}
 
 /* Bio Loading Animation */
 .bio-loading {

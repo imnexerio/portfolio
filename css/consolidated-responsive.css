@@ -269,9 +269,9 @@
     }
     
     /* Scroll progress indicator */
-    /*.scroll-progress {*/
-    /*    height: 3px;*/
-    /*}*/
+    .scroll-progress {
+        height: 3px;
+    }
     
     /* Section padding */
     section {
