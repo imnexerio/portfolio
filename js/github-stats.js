@@ -781,17 +781,21 @@ async function fetchGitHubProjects() {
                         const repoName = repo.name;
                         // Store the repo object in the DOM element for later access
                         portfolioItem.repoData = portfolioItem.repoData || {};
-                        
-                        // Begin fetching the README but don't display it yet
+                          // Begin fetching the README but don't display it yet
                         // This preload will make it faster when the modal is actually opened
                         console.log(`Pre-fetching README for ${repoName}`);
-                        portfolioItem.repoData.readmePromise = fetch(`https://api.github.com/repos/${user}/${repoName}/readme`)
+                        
+                        // Get authentication headers for GitHub API
+                        const headers = GitHubConfig.getAuthHeaders();
+                        
+                        portfolioItem.repoData.readmePromise = fetch(`https://api.github.com/repos/${user}/${repoName}/readme`,
+                            headers.Authorization ? { headers } : {})
                             .then(response => {
                                 if (response.ok) {
                                     console.log(`Successfully pre-fetched README for ${repoName}`);
                                     return response.json();
                                 }
-                                console.warn(`No README found for ${repoName}`);
+                                console.warn(`No README found for ${repoName} (status: ${response.status})`);
                                 return null; // README not found or other error
                             })
                             .catch(error => {
@@ -1130,16 +1134,21 @@ async function fetchRepoReadme(username, repoName, displayElement) {
         // If we have prefetched data, use it; otherwise, fetch it now
         if (prefetchedData) {
             console.log(`Using prefetched README for ${repoName}`);
-            readmeData = prefetchedData;
-        } else {
-            // Fetch the README file
-            const readmeResponse = await fetch(`https://api.github.com/repos/${username}/${repoName}/readme`);
+            readmeData = prefetchedData;        } else {
+            // Fetch the README file with authentication headers
+            const headers = GitHubConfig.getAuthHeaders();
+            const readmeResponse = await fetch(`https://api.github.com/repos/${username}/${repoName}/readme`, 
+                headers.Authorization ? { headers } : {});
             
             if (readmeResponse.ok) {
                 readmeData = await readmeResponse.json();
             } else {
-                // README not found
-                displayElement.innerHTML = '<div class="readme-not-found">No README available for this repository.</div>';
+                // README not found or access denied
+                const errorMessage = readmeResponse.status === 403 
+                    ? '<div class="readme-error">Access to this README is restricted. This may be due to API rate limits or repository permissions.</div>'
+                    : '<div class="readme-not-found">No README available for this repository.</div>';
+                displayElement.innerHTML = errorMessage;
+                console.warn(`Error fetching README for ${username}/${repoName}: Status ${readmeResponse.status}`);
                 return;
             }
         }
