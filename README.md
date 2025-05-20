@@ -49,29 +49,29 @@
         <sub>Auto-fetch repositories, contributions & stats</sub>
       </td>
       <td align="center" width="33%">
-        <img src="https://github.githubassets.com/images/modules/site/home/responsive-browser.svg" width="50px"><br>
+        <img src="https://github.githubassets.com/images/modules/profile/achievements/starstruck-default.png" width="50px"><br>
         <b>Responsive Design</b><br>
         <sub>Works perfectly on all devices</sub>
       </td>
       <td align="center" width="33%">
-        <img src="https://github.githubassets.com/images/modules/site/home/globe.svg" width="50px"><br>
+        <img src="https://github.githubassets.com/images/modules/profile/achievements/pair-extraordinaire-default.png" width="50px"><br>
         <b>Light/Dark Mode</b><br>
         <sub>Toggle between light and dark themes</sub>
       </td>
     </tr>
     <tr>
       <td align="center">
-        <img src="https://github.githubassets.com/images/modules/site/home/community-discussions.svg" width="50px"><br>
+        <img src="https://github.githubassets.com/images/modules/profile/achievements/galaxy-brain-default.png" width="50px"><br>
         <b>Custom Themes</b><br>
         <sub>Multiple color themes available</sub>
       </td>
       <td align="center">
-        <img src="https://github.githubassets.com/images/modules/site/home/community-discussions.svg" width="50px"><br>
+        <img src="https://github.githubassets.com/images/modules/profile/achievements/yolo-default.png" width="50px"><br>
         <b>Modern Effects</b><br>
         <sub>Parallax scrolling & 3D effects</sub>
       </td>
       <td align="center">
-        <img src="https://github.githubassets.com/images/modules/site/home/pr-merge.svg" width="50px"><br>
+        <img src="https://github.githubassets.com/images/modules/profile/achievements/public-sponsor-default.png" width="50px"><br>
         <b>Self-Deployable</b><br>
         <sub>Generate customized versions</sub>
       </td>
