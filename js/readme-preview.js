@@ -175,18 +175,17 @@ function initReadmeHybridBehavior() {
         // Create content for the preview
         previewEl.innerHTML = createPreviewContent(project);
         
-        // Add close button if in click mode
-        if (isClickMode) {
-            const closeBtn = document.createElement('div');
-            closeBtn.className = 'preview-close-btn';
-            closeBtn.innerHTML = '&times;';
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                isPreviewOpen = false;
-                hidePreview(previewEl);
-            });
-            previewEl.appendChild(closeBtn);
-        }
+        // Add close button for both hover and click modes
+        const closeBtn = document.createElement('div');
+        closeBtn.className = 'preview-close-btn';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isPreviewOpen = false;
+            isHoverMode = false;
+            hidePreview(previewEl);
+        });
+        previewEl.appendChild(closeBtn);
         
         // Show the preview with animation
         previewEl.style.display = 'flex';
@@ -354,27 +353,28 @@ document.addEventListener('DOMContentLoaded', () => {
             transform: translateY(-3px);
             box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
         }
-        
-        .preview-close-btn {
+          .preview-close-btn {
             position: absolute;
             top: 10px;
             right: 10px;
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.2);
+            background-color: var(--primary-color, #3498db);
             color: #fff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 20px;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: all 0.2s ease;
             z-index: 10;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         .preview-close-btn:hover {
-            background-color: rgba(255, 255, 255, 0.4);
+            background-color: var(--primary-hover, #2980b9);
+            transform: scale(1.1);
         }
         
         /* Responsive adjustments for the preview */
