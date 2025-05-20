@@ -15,6 +15,43 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* CSS arrow indicators for positioning */
+.readme-preview::before,
+.readme-preview::after {
+    content: '';
+    position: absolute;
+    left: var(--arrow-offset, 20px);
+    height: 0;
+    width: 0;
+    border: solid transparent;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+    transform: translateX(-50%);
+}
+
+/* Arrow pointing down (when preview is above the item) */
+.readme-preview::before {
+    bottom: -10px;
+    border-width: 10px;
+    border-top-color: var(--card-bg, #1e1e1e);
+}
+
+/* Arrow pointing up (when preview is below the item) */
+.readme-preview::after {
+    top: -10px;
+    border-width: 10px;
+    border-bottom-color: var(--card-bg, #1e1e1e);
+}
+
+.readme-preview.position-top::before {
+    opacity: 1;
+}
+
+.readme-preview.position-bottom::after {
+    opacity: 1;
+}
+
 .readme-preview.active {
     max-height: 350px;
     opacity: 1;

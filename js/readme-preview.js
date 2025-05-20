@@ -42,12 +42,36 @@ function initReadmeHoverBehavior() {
                     const repoName = item.getAttribute('data-repo');
                     const userId = GitHubConfig.getUsername();
                     
-                    if (!repoName || !userId) return;
-                    
-                    // Position the preview near the portfolio item
+                    if (!repoName || !userId) return;                    // Position the preview relative to the portfolio item
                     const rect = item.getBoundingClientRect();
-                    readmePreview.style.top = `${rect.bottom + window.scrollY + 10}px`;
-                    readmePreview.style.left = `${rect.left + window.scrollX}px`;
+                    const previewHeight = 350; // Maximum height of the preview as defined in CSS
+                    
+                    // Check if there's enough space above the item
+                    const spaceAbove = rect.top;
+                    
+                    // Remove positioning classes
+                    readmePreview.classList.remove('position-top', 'position-bottom');
+                    
+                    // Calculate horizontal positioning for the arrow
+                    const itemCenter = rect.left + (rect.width / 2);
+                    const arrowOffset = itemCenter - rect.left;
+                    
+                    // Adjust CSS arrow position to align with the center of the item
+                    readmePreview.style.setProperty('--arrow-offset', `${arrowOffset}px`);
+                    
+                    if (spaceAbove >= previewHeight + 20) {
+                        // Position above the item if there's enough space
+                        readmePreview.style.top = `${rect.top + window.scrollY - previewHeight - 10}px`;
+                        readmePreview.classList.add('position-top');
+                    } else {
+                        // Fall back to positioning below the item
+                        readmePreview.style.top = `${rect.bottom + window.scrollY + 10}px`;
+                        readmePreview.classList.add('position-bottom');
+                    }
+                    
+                    // Center the preview horizontally under the portfolio item
+                    const leftPosition = rect.left + window.scrollX + (rect.width / 2) - (Math.min(350, Math.max(300, rect.width)) / 2);
+                    readmePreview.style.left = `${Math.max(10, leftPosition)}px`;
                     readmePreview.style.maxWidth = `${Math.max(300, rect.width)}px`;
                     
                     // Show loading state
