@@ -3,7 +3,7 @@ name: Build and Deploy Portfolio
 on:
   push:
     branches:
-      - main  # Deploy when changes are pushed to main branch
+      - main  # Deploy when changes are pushed to main branch(change according to your branch)
   workflow_dispatch:  # Allow manual trigger
 
 permissions:
