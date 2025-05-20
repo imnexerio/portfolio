@@ -18,7 +18,7 @@ function setupLocalEnv() {
         
         // Set your GitHub token for local testing
         // IMPORTANT: Don't commit this value to git!
-        window.env.PAT_GITHUB = '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';
+        window.env.PAT_GITHUB = 'your API token here';
         
         // Log loaded environment variables (without showing the actual token value)
         Object.keys(window.env).forEach(key => {

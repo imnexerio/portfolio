@@ -1,26 +1,106 @@
-# Modern GitHub Portfolio Website
+# 🌟 Modern GitHub Portfolio Website
 
-![GitHub Portfolio](https://img.shields.io/badge/Portfolio-GitHub-blue)
-![Version](https://img.shields.io/badge/Version-1.0-green)
-![License](https://img.shields.io/badge/License-AGPL--3.0-yellow)
+<div align="center">
+  
+![GitHub Portfolio](https://img.shields.io/badge/Portfolio-GitHub-blue?style=for-the-badge&logo=github)
+![Version](https://img.shields.io/badge/Version-1.0-green?style=for-the-badge)
+![License](https://img.shields.io/badge/License-AGPL--3.0-yellow?style=for-the-badge)
+![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/javascript-%23323330.svg?style=for-the-badge&logo=javascript&logoColor=%23F7DF1E)
 
-A modern, responsive portfolio website that dynamically displays your GitHub projects and statistics. This portfolio is designed to showcase your skills, projects, and professional information in an elegant and interactive way.
+<br>
+
+<img src="https://raw.githubusercontent.com/gist/theAdityaNVS/f5b585d1082da2dffffea32434f37956/raw/7f9552d0a179b4f98779ca5a7f9a11fe1e1ca632/GitHub-logo.gif" width="200px">
+
+**A modern, responsive portfolio website that dynamically displays your GitHub projects and statistics**
+
+</div>
+
+> 💡 This portfolio is designed to showcase your skills, projects, and professional information in an elegant and interactive way.
+
+---
+
+## 📋 Table of Contents
+
+- [✨ Features](#-features)
+- [🖥️ Demo](#️-demo)
+- [🚀 Quick Start](#-quick-start)
+- [🔄 GitHub Actions Deployment](#-github-actions-deployment-recommended)
+- [🛠️ Configuration](#️-configuration)
+- [📋 Project Structure](#-project-structure)
+- [🎨 Customization](#-customization)
+- [🔧 Website Generator](#-website-generator)
+- [📱 Responsive Design](#-responsive-design)
+- [🧪 Local Development](#-local-development-with-environment-variables)
+- [📄 License](#-license)
+- [🙏 Acknowledgements](#-acknowledgements)
+
+---
 
 ## ✨ Features
 
-- **GitHub Integration**: Automatically fetches and displays your repositories, contributions, and statistics
-- **Responsive Design**: Fully responsive layout that works across all devices
-- **Light/Dark Mode**: Toggle between light and dark themes
-- **Custom Themes**: Choose from multiple color themes or create your own
-- **Modern Effects**: Includes parallax scrolling, animations, and 3D effects
-- **Self-Deployable**: Generate and download a custom version of the portfolio with your information
+<div align="center">
+  <table>
+    <tr>
+      <td align="center" width="33%">
+        <img src="https://github.githubassets.com/images/modules/profile/achievements/pull-shark-default.png" width="50px"><br>
+        <b>GitHub Integration</b><br>
+        <sub>Auto-fetch repositories, contributions & stats</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://github.githubassets.com/images/modules/site/home/responsive-browser.svg" width="50px"><br>
+        <b>Responsive Design</b><br>
+        <sub>Works perfectly on all devices</sub>
+      </td>
+      <td align="center" width="33%">
+        <img src="https://github.githubassets.com/images/modules/site/home/globe.svg" width="50px"><br>
+        <b>Light/Dark Mode</b><br>
+        <sub>Toggle between light and dark themes</sub>
+      </td>
+    </tr>
+    <tr>
+      <td align="center">
+        <img src="https://github.githubassets.com/images/modules/site/home/community-discussions.svg" width="50px"><br>
+        <b>Custom Themes</b><br>
+        <sub>Multiple color themes available</sub>
+      </td>
+      <td align="center">
+        <img src="https://github.githubassets.com/images/modules/site/home/community-discussions.svg" width="50px"><br>
+        <b>Modern Effects</b><br>
+        <sub>Parallax scrolling & 3D effects</sub>
+      </td>
+      <td align="center">
+        <img src="https://github.githubassets.com/images/modules/site/home/pr-merge.svg" width="50px"><br>
+        <b>Self-Deployable</b><br>
+        <sub>Generate customized versions</sub>
+      </td>
+    </tr>
+  </table>
+</div>
+
+## 🖥️ Demo
+
+<div align="center">
+  <img src="https://user-images.githubusercontent.com/1303154/88677602-1635ba80-d120-11ea-84d8-d263ba5fc3c0.gif" alt="Portfolio Demo" width="70%">
+  <br><br>
+  <a href="https://your-portfolio-url.com" target="_blank">
+    <img src="https://img.shields.io/badge/View_Live_Demo-5C5C5C?style=for-the-badge&logo=github&logoColor=white" alt="View Live Demo">
+  </a>
+</div>
 
 ## 🚀 Quick Start
 
-1. Clone this repository
-2. Open `js/github-config.js` and update your GitHub username
-3. Customize your personal information in the profile sections
-4. Deploy to your preferred hosting service (GitHub Pages, Netlify, Vercel, etc.)
+<ol>
+  <li>Clone this repository</li>
+  <pre><code>git clone https://github.com/your-username/portfolio.git</code></pre>
+  
+  <li>Open <code>js/github-config.js</code> and update your GitHub username</li>
+  
+  <li>Customize your personal information in the profile sections</li>
+  
+  <li>Deploy to your preferred hosting service (GitHub Pages, Netlify, Vercel, etc.)</li>
+</ol>
 
 ## 🔄 GitHub Actions Deployment (Recommended)
 
@@ -66,6 +146,9 @@ const socialLinks = [
 
 ## 📋 Project Structure
 
+<details>
+<summary>Click to expand file structure</summary>
+
 ```
 portfolio/
 ├── index.html            # Main HTML file
@@ -84,6 +167,7 @@ portfolio/
 │   └── website-generator.js    # Portfolio generator
 └── LICENSE               # AGPL License file
 ```
+</details>
 
 ## 🎨 Customization
 
@@ -151,10 +235,25 @@ The environment variable loader will detect you're in a local environment and us
 
 ## 📄 License
 
-This project is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) - see the [LICENSE](LICENSE) file for details.
+<div align="center">
+  
+This project is licensed under the [GNU Affero General Public License v3.0](LICENSE) (AGPL-3.0)
+
+<img src="https://upload.wikimedia.org/wikipedia/commons/0/06/AGPLv3_Logo.svg" width="120px">
+</div>
 
 ## 🙏 Acknowledgements
 
-- [Font Awesome](https://fontawesome.com/) for icons
-- [Google Fonts](https://fonts.google.com/) for typography
-- [GitHub API](https://docs.github.com/en/rest) for project data
+<div align="center">
+  <a href="https://fontawesome.com/"><img src="https://img.shields.io/badge/Font_Awesome-339AF0?style=for-the-badge&logo=fontawesome&logoColor=white"></a>
+  <a href="https://fonts.google.com/"><img src="https://img.shields.io/badge/Google_Fonts-4285F4?style=for-the-badge&logo=google&logoColor=white"></a>
+  <a href="https://docs.github.com/en/rest"><img src="https://img.shields.io/badge/GitHub_API-181717?style=for-the-badge&logo=github&logoColor=white"></a>
+</div>
+
+---
+
+<div align="center">
+  <sub>Built with ❤️ by [Your Name](https://github.com/your-username)</sub>
+  <br><br>
+  <img src="https://visitor-badge.laobi.icu/badge?page_id=your-username.portfolio" alt="visitors">
+</div>
