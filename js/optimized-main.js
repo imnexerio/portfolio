@@ -117,6 +117,21 @@ function adjustColorBrightness(hex, percent) {
 }
 
 /**
+ * Helper function to update theme icon visibility
+ */
+function updateThemeIcons(sunIcon, moonIcon, theme) {
+    if (!sunIcon || !moonIcon) return;
+    
+    if (theme === 'dark') {
+        sunIcon.style.display = 'none';
+        moonIcon.style.display = 'inline-block';
+    } else {
+        sunIcon.style.display = 'inline-block';
+        moonIcon.style.display = 'none';
+    }
+}
+
+/**
  * Theme Switcher
  */
 function initThemeSwitcher() {
@@ -139,15 +154,7 @@ function initThemeSwitcher() {
             toggleButton.setAttribute('data-theme', savedTheme);
             
             // Update icon visibility
-            if (sunIcon && moonIcon) {
-                if (savedTheme === 'dark') {
-                    sunIcon.style.display = 'none';
-                    moonIcon.style.display = 'inline-block';
-                } else {
-                    sunIcon.style.display = 'inline-block';
-                    moonIcon.style.display = 'none';
-                }
-            }
+            updateThemeIcons(sunIcon, moonIcon, savedTheme);
         }
     }
     
@@ -156,25 +163,14 @@ function initThemeSwitcher() {
         toggleButton.addEventListener('click', () => {
             const currentTheme = toggleButton.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-            
-            // Toggle the icon display
-            if (sunIcon && moonIcon) {
-                if (newTheme === 'dark') {
-                    sunIcon.style.display = 'none';
-                    moonIcon.style.display = 'inline-block';
-                } else {
-                    sunIcon.style.display = 'inline-block';
-                    moonIcon.style.display = 'none';
-                }
-            }
+              // Toggle the icon display
+            updateThemeIcons(sunIcon, moonIcon, newTheme);
             
             // Update button attribute
             toggleButton.setAttribute('data-theme', newTheme);
             
-            // Remove active class from all buttons
+            // Update button states - the toggle button should be active
             themeButtons.forEach(btn => btn.classList.remove('active'));
-            
-            // Add active class to toggle button
             toggleButton.classList.add('active');
             
             // Set theme
@@ -213,8 +209,7 @@ function initThemeSwitcher() {
             }
         }
     }
-    
-    // Apply saved custom color if available
+      // Apply saved custom color if available
     const savedCustomColor = localStorage.getItem('customThemeColor');
     if (savedCustomColor) {
         applyCustomColor(savedCustomColor);
@@ -223,17 +218,8 @@ function initThemeSwitcher() {
         }
     }
     
-    // Add active class to current theme button
-    themeButtons.forEach(btn => {
-        btn.classList.remove('active');
-        
-        // Add active class to the appropriate button based on current theme
-        if (toggleButton && savedTheme === toggleButton.getAttribute('data-theme')) {
-            toggleButton.classList.add('active');
-        } else if (purpleButton) {
-            purpleButton.classList.add('active');
-        }
-    });
+    // Update theme button states using the helper function
+    updateThemeButtonStates(savedTheme, purpleButton, toggleButton);
     
     // Handle color option clicks
     colorOptions.forEach(option => {
@@ -271,84 +257,71 @@ function initThemeSwitcher() {
 }
 
 /**
+ * Helper function to update theme button states
+ */
+function updateThemeButtonStates(savedTheme, purpleButton, toggleButton) {
+    // Update active button
+    const themeButtons = document.querySelectorAll('.theme-btn');
+    themeButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // Determine which button should be active
+    if (toggleButton && savedTheme === toggleButton.getAttribute('data-theme')) {
+        toggleButton.classList.add('active');
+    } else if (purpleButton) {
+        purpleButton.classList.add('active');
+    }
+}
+
+/**
  * Force Random Theme on Every Refresh
  */
 function forceRandomThemeOnRefresh() {
     // Get user's theme preference (light/dark mode)
-    const savedTheme = localStorage.getItem('theme');
-    const isDarkMode = savedTheme === 'dark';
+    const savedTheme = localStorage.getItem('theme') || 'light';
     
     // We need to wait for the DOM to be ready to get the color options
     const colorOptions = document.querySelectorAll('.color-option');
-    if(colorOptions.length === 0) {
-        // If color options aren't available yet, set a fallback random color
-        const fallbackColors = ['#9d4edd', '#ff6b6b', '#4cc9f0', '#f72585', '#4361ee', '#fb8500', '#43aa8b', '#f94144'];
-        const randomColor = fallbackColors[Math.floor(Math.random() * fallbackColors.length)];
-        
-        // Apply the random color
-        applyCustomColor(randomColor);
-        
-        // Save the custom color
-        localStorage.setItem('customThemeColor', randomColor);
-        
-        // Set theme to custom with the random color but preserve light/dark preference
-        document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light');
-        
-        return;
+    const fallbackColors = ['#9d4edd', '#ff6b6b', '#4cc9f0', '#f72585', '#4361ee', '#fb8500', '#43aa8b', '#f94144'];
+    
+    // Choose colors based on availability
+    let randomColor;
+    if (colorOptions.length > 0) {
+        const availableColors = Array.from(colorOptions).map(option => option.getAttribute('data-color'));
+        randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
+    } else {
+        randomColor = fallbackColors[Math.floor(Math.random() * fallbackColors.length)];
     }
     
-    // Get all available colors from the color options
-    const availableColors = Array.from(colorOptions).map(option => option.getAttribute('data-color'));
-    
-    // Pick a random color from available colors
-    const randomColor = availableColors[Math.floor(Math.random() * availableColors.length)];
-    
-    // Apply the random color
+    // Apply and save the random color
     applyCustomColor(randomColor);
+    localStorage.setItem('customThemeColor', randomColor);
     
-    // Update the custom color picker value
+    // Update the custom color picker value if it exists
     const customColorPicker = document.getElementById('custom-color-picker');
     if (customColorPicker) {
         customColorPicker.value = randomColor;
     }
     
-    // Save the custom color
-    localStorage.setItem('customThemeColor', randomColor);
-    
-    // Preserve light/dark theme preference but apply custom color
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', savedTheme);
-    } else {
-        // Default to light if no preference
-        document.documentElement.setAttribute('data-theme', 'light');
+    // Set theme attribute and save preference if needed
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    if (!localStorage.getItem('theme')) {
         localStorage.setItem('theme', 'light');
     }
     
-    // Update active button
-    const themeButtons = document.querySelectorAll('.theme-btn');
-    themeButtons.forEach(btn => btn.classList.remove('active'));
+    // Update theme button states and icons
     const purpleButton = document.querySelector('.theme-btn.purple');
-    if (purpleButton) {
-        purpleButton.classList.add('active');
-    }
+    const toggleButton = document.querySelector('.theme-btn.toggle-theme');
+    
+    updateThemeButtonStates(savedTheme, purpleButton, toggleButton);
     
     // Update toggle button icon if it exists
-    const toggleButton = document.querySelector('.theme-btn.toggle-theme');
     if (toggleButton) {
         const sunIcon = toggleButton.querySelector('.fa-sun');
         const moonIcon = toggleButton.querySelector('.fa-moon');
         
         if (sunIcon && moonIcon) {
-            if (savedTheme === 'dark') {
-                sunIcon.style.display = 'none';
-                moonIcon.style.display = 'inline-block';
-                toggleButton.setAttribute('data-theme', 'dark');
-                toggleButton.classList.add('active');
-            } else {
-                sunIcon.style.display = 'inline-block';
-                moonIcon.style.display = 'none';
-                toggleButton.setAttribute('data-theme', 'light');
-            }
+            updateThemeIcons(sunIcon, moonIcon, savedTheme);
+            toggleButton.setAttribute('data-theme', savedTheme);
         }
     }
 }
@@ -470,8 +443,16 @@ function initCreatorTypingEffect() {
     setTimeout(type, 1000);
 }
 
-// Initialize the creator button typing effect
-initCreatorTypingEffect();
+
+function createAnimationObserver(callback, options = {}) {
+    const defaultOptions = {
+        root: null,
+        rootMargin: '0px',
+        threshold: 0.1
+    };
+    
+    return new IntersectionObserver(callback, {...defaultOptions, ...options});
+}
 
 /**
  * Advanced Scroll Animations with Intersection Observer for performance
@@ -480,14 +461,8 @@ function initAdvancedScrollAnimations() {
     // Select all elements with animation classes
     const animatedElements = document.querySelectorAll('.fade-in, .slide-in-left, .slide-in-right, .scale-in, .scroll-reveal, .scroll-scale, .scroll-rotate, .stagger-item, .split-text, .wow-title, .wow-subtitle, .wow-button');
     
-    // Use Intersection Observer for better performance
-    const observerOptions = {
-        root: null,
-        rootMargin: '0px',
-        threshold: 0.1
-    };
-    
-    const observer = new IntersectionObserver((entries, observer) => {
+    // Create observer with callback
+    const observer = createAnimationObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
@@ -496,7 +471,7 @@ function initAdvancedScrollAnimations() {
                 observer.unobserve(entry.target);
             }
         });
-    }, observerOptions);
+    });
     
     // Observe each element
     animatedElements.forEach(element => {
@@ -509,7 +484,7 @@ function initAdvancedScrollAnimations() {
     staggerContainers.forEach(container => {
         const staggerItems = container.querySelectorAll('.stagger-item');
         
-        const staggerObserver = new IntersectionObserver((entries, observer) => {
+        const staggerObserver = createAnimationObserver((entries, observer) => {
             if (entries[0].isIntersecting) {
                 staggerItems.forEach((item, index) => {
                     setTimeout(() => {
@@ -520,7 +495,7 @@ function initAdvancedScrollAnimations() {
                 // Unobserve after animation is triggered
                 observer.unobserve(container);
             }
-        }, observerOptions);
+        });
         
         staggerObserver.observe(container);
     });
@@ -538,7 +513,7 @@ function initSkillsAnimation() {
     });
 
     // Use Intersection Observer for better performance
-    const observer = new IntersectionObserver((entries, observer) => {
+    const observer = createAnimationObserver((entries, observer) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const level = entry.target;
@@ -553,8 +528,6 @@ function initSkillsAnimation() {
                 observer.unobserve(level);
             }
         });
-    }, {
-        threshold: 0.1
     });
     
     // Observe each skill level
@@ -565,18 +538,14 @@ function initSkillsAnimation() {
     // Re-initialize scroll animations for newly added skill items
     const newScrollElements = document.querySelectorAll('.skill-item.scroll-scale:not(.active)');
     if (newScrollElements.length > 0) {
-        // Use the same observer options as in initAdvancedScrollAnimations
-        const scrollObserver = new IntersectionObserver((entries, observer) => {
+        // Create a new observer for the new elements
+        const scrollObserver = createAnimationObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
                     observer.unobserve(entry.target);
                 }
             });
-        }, {
-            root: null,
-            rootMargin: '0px',
-            threshold: 0.1
         });
         
         newScrollElements.forEach(element => {
@@ -1110,43 +1079,47 @@ function initMouseTrailer() {
 }
 
 /**
- * Particle Effect
+ * Particle Effect - Optimized to generate particles once and reuse them
  */
 function initParticleEffect() {
     const wowSection = document.querySelector('.wow-section');
     
-    if (wowSection) {
-        // Create particles container
-        const particlesContainer = document.createElement('div');
-        particlesContainer.className = 'particles';
+    if (!wowSection) return;
+    
+    // Create particles container
+    const particlesContainer = document.createElement('div');
+    particlesContainer.className = 'particles';
+    
+    // Create particles
+    const particleCount = window.innerWidth < 768 ? 30 : 60; // Reduce particles on mobile
+    
+    // Create particles in a document fragment for better performance
+    const fragment = document.createDocumentFragment();
+    
+    for (let i = 0; i < particleCount; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
         
-        // Create particles
-        const particleCount = window.innerWidth < 768 ? 30 : 60; // Reduce particles on mobile
+        // Random position
+        particle.style.left = `${Math.random() * 100}%`;
+        particle.style.top = `${Math.random() * 100}%`;
         
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            
-            // Random position
-            particle.style.left = `${Math.random() * 100}%`;
-            particle.style.top = `${Math.random() * 100}%`;
-            
-            // Random size
-            const size = Math.random() * 4 + 2;
-            particle.style.width = `${size}px`;
-            particle.style.height = `${size}px`;
-            
-            // Random animation duration
-            particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
-            
-            // Random animation delay
-            particle.style.animationDelay = `${Math.random() * 5}s`;
-            
-            particlesContainer.appendChild(particle);
-        }
+        // Random size
+        const size = Math.random() * 4 + 2;
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
         
-        wowSection.appendChild(particlesContainer);
+        // Random animation duration
+        particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
+        
+        // Random animation delay
+        particle.style.animationDelay = `${Math.random() * 5}s`;
+        
+        fragment.appendChild(particle);
     }
+    
+    particlesContainer.appendChild(fragment);
+    wowSection.appendChild(particlesContainer);
 }
 
 // Add CSS for theme transition
