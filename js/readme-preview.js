@@ -40,7 +40,7 @@ function initReadmeHybridBehavior() {
             // Only hide if not in click-preview mode
             if (!isPreviewOpen && isHoverMode) {
                 leaveTimer = setTimeout(() => {
-                    if ((modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') && isHoverMode) {
+                    if (isPreviewVisible(modalPreview) && isHoverMode) {
                         hidePreview(modalPreview);
                         isHoverMode = false;
                     }
@@ -94,7 +94,7 @@ function initReadmeHybridBehavior() {
     modalPreview.addEventListener('mouseleave', () => {
         if (isHoverMode && !isPreviewOpen) {
             leaveTimer = setTimeout(() => {
-                if ((modalPreview.style.display === 'flex' || modalPreview.style.display === 'block') && isHoverMode) {
+                if (isPreviewVisible(modalPreview) && isHoverMode) {
                     hidePreview(modalPreview);
                     isHoverMode = false;
                 }
@@ -121,6 +121,11 @@ function initReadmeHybridBehavior() {
             hidePreview(modalPreview);
         }
     });
+    
+    // Helper function to check if preview is visible
+    function isPreviewVisible(previewEl) {
+        return previewEl.style.display === 'flex' || previewEl.style.display === 'block';
+    }
     
     // Helper function to show preview
     function showPreview(item, previewEl, isClickMode = false) {
@@ -192,7 +197,30 @@ function initReadmeHybridBehavior() {
         previewEl.style.height = `${enlargedHeight}px`;
         previewEl.style.transform = 'scale(0.95)';
         
-        // Common styles
+        // Apply common styles
+        setPreviewStyles(previewEl);
+        
+        // Create content for the preview
+        previewEl.innerHTML = createPreviewContent(project, isClickMode);
+        
+        // Only add close button in click mode (not hover mode)
+        if (isClickMode) {
+            addCloseButton(previewEl);
+        }
+        
+        // Show the preview with animation
+        previewEl.style.display = 'flex';
+        setTimeout(() => {
+            previewEl.style.opacity = '1';
+            previewEl.style.transform = 'scale(1)';
+            
+            // Allow scrolling once visible
+            previewEl.style.overflow = 'auto';
+        }, 10);
+    }
+    
+    // Apply styles to preview element
+    function setPreviewStyles(previewEl) {
         previewEl.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
         previewEl.style.backdropFilter = 'blur(5px)';
         previewEl.style.borderRadius = '10px';
@@ -207,11 +235,11 @@ function initReadmeHybridBehavior() {
         previewEl.style.opacity = '0';
         previewEl.style.cursor = 'pointer';
         previewEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-        
-        // Create content for the preview
-        let hintText = isClickMode ? 'Click anywhere or press ESC to close' : 'Click to see full view';
-        
-        previewEl.innerHTML = `
+    }
+    
+    // Create the HTML content for the preview
+    function createPreviewContent(project, isClickMode) {
+        return `
             <div class="modal-project preview-project">
                 <div class="modal-image preview-image">
                     <img src="${project.image}" alt="${project.title}">
@@ -225,31 +253,20 @@ function initReadmeHybridBehavior() {
                     <a href="${project.url}" class="btn primary-btn" target="_blank">View Project on GitHub</a>
                 </div>
             </div>
-            <div class="preview-click-hint">${hintText}</div>
         `;
-        
-        // Only add close button in click mode (not hover mode)
-        if (isClickMode) {
-            const closeBtn = document.createElement('div');
-            closeBtn.className = 'preview-close-btn';
-            closeBtn.innerHTML = '&times;';
-            closeBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                isPreviewOpen = false;
-                hidePreview(previewEl);
-            });
-            previewEl.appendChild(closeBtn);
-        }
-        
-        // Show the preview with animation
-        previewEl.style.display = 'flex';
-        setTimeout(() => {
-            previewEl.style.opacity = '1';
-            previewEl.style.transform = 'scale(1)';
-            
-            // Allow scrolling once visible
-            previewEl.style.overflow = 'auto';
-        }, 10);
+    }
+    
+    // Add close button to preview
+    function addCloseButton(previewEl) {
+        const closeBtn = document.createElement('div');
+        closeBtn.className = 'preview-close-btn';
+        closeBtn.innerHTML = '&times;';
+        closeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isPreviewOpen = false;
+            hidePreview(previewEl);
+        });
+        previewEl.appendChild(closeBtn);
     }
     
     // Helper function to hide preview
