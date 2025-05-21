@@ -24,9 +24,14 @@ jobs:
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
+
       - name: Create env.js file with environment variables
         run: |
           echo "window.env = { PAT_GITHUB: '${{ secrets.PAT_GITHUB }}', FORMSPREE_ID: '${{ secrets.FORMSPREE_ID }}' };" > env.js
+
+      - name: Create Google verification file
+        run: |
+          echo "google-site-verification: ${{ secrets.GOOGLE_VERIFICATION_CONTENT }}.html" > ${{ secrets.GOOGLE_VERIFICATION_CONTENT }}.html
           
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
