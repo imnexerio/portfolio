@@ -81,12 +81,13 @@ function showGeneratorForm() {
         <div class="generator-overlay">
             <div class="generator-form">
                 <button class="close-form">&times;</button>
-                <h2>Customize Your Portfolio</h2>
-                <p>Update your social links and GitHub information without recreating the entire website.</p>                <div class="form-content">
+                <h2>Your complete Portfolio just using GitHub ID</h2>
+                <div class="form-content">
                     <div class="form-group">
                         <label for="generator-github-username">GitHub Username <span class="form-field-required">*</span></label>
                         <input type="text" id="generator-github-username" placeholder="e.g. octocat" required>
-                        <div class="error-message" id="github-username-error">Please enter a valid GitHub username</div>                        <div class="input-help">Your GitHub profile will be used to populate projects, stats, and personal information</div>
+                        <div class="error-message" id="github-username-error">Please enter a valid GitHub username</div>
+                        <div class="input-help">Your GitHub profile will be used to populate your portfolio</div>
                     </div>
                     
                     <div class="form-group">
@@ -106,39 +107,6 @@ function showGeneratorForm() {
                         <input type="text" id="generator-instagram" placeholder="e.g. https://www.instagram.com/johndoe/">
                         <div class="input-help">Complete Instagram profile URL including https://</div>
                     </div>
-                    
-                    <div class="consolidated-info">
-                        <h3>Important Information</h3>
-                        
-                        <div class="info-section github-section">
-                            <h4>GitHub Authentication</h4>
-                            <p>For secure GitHub integration, this portfolio includes a GitHub Actions workflow for deployment.</p>
-                            <p><strong>How to set up your token:</strong></p>
-                            <ol>
-                                <li>Create a token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></li>
-                                <li>Add this token as a repository secret named <code>PAT_GITHUB</code> in your repository settings</li>
-                                <li>The included GitHub Actions workflow will use this secret for secure deployment</li>
-                            </ol>
-                        </div>
-                        
-                        <div class="info-section formspree-section">
-                            <h4>Contact Form Integration</h4>
-                            <p>Your portfolio includes a contact form powered by Formspree, a free form backend service.</p>
-                            <p><strong>How to set up Formspree:</strong></p>
-                            <ol>
-                                <li>Create a free account at <a href="https://formspree.io" target="_blank">Formspree.io</a></li>
-                                <li>Create a new form and get your form ID (looks like <code>xrgjayzb</code>)</li>
-                                <li>Replace the form action URL in the contact section with your Formspree endpoint: <code>https://formspree.io/f/YOUR_FORM_ID</code></li>
-                            </ol>
-                        </div>
-                        
-                        <div class="info-section deployment-section">
-                            <h4>What happens next?</h4>
-                            <p>Clicking "Update My Portfolio" will update the social links and GitHub information in the website.</p>
-                            <p>You'll receive a ZIP file that you can upload to any web hosting service or GitHub Pages.</p>
-                            <p><strong>Secure Deployment:</strong> The generated package includes a GitHub Actions workflow (<code>.github/workflows/deploy.yml</code>) for secure deployment.</p>
-                        </div>
-                    </div>
                 </div><div class="loading-indicator">
                     <p>Updating your portfolio website...</p>
                     <div class="generator-progress">
@@ -149,20 +117,35 @@ function showGeneratorForm() {
                     </div>
                 </div>                <div class="success-message">
                     <h3>Success! 🎉</h3>
-                    <p>Your portfolio website has been updated.</p>
-                    <p>Download the ZIP file and upload it to your existing web hosting service!</p>
-                    <div class="hosting-tips">                        <h4>How to update your website:</h4>
+                    <p>Your portfolio website has been created.</p>
+
+                    <div class="setup-instructions">
+                        <h4>Important Setup Steps:</h4>
+                        <ol>
+                            <li><strong>GitHub Authentication:</strong>
+                                <ul>
+                                    <li>Create a token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></li>
+                                    <li>Add the token as a repository secret named <code>PAT_GITHUB</code></li>
+                                </ul>
+                            </li>
+                            <li><strong>Formspree Contact Form:</strong>
+                                <ul>
+                                    <li>Create an account at <a href="https://formspree.io" target="_blank">Formspree.io</a></li>
+                                    <li>Get your form ID and update the form action URL</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="hosting-tips">
+                        <h4>Deploy Your Website:</h4>
                         <ol>
                             <li><strong>GitHub Pages with Actions (Recommended):</strong> 
                               <ul>
-                                <li>Add your GitHub token as a repository secret named <code>PAT_GITHUB</code></li>
-                                <li>Include the <code>.github/workflows/deploy.yml</code> file</li>
                                 <li>Set GitHub Pages source to "GitHub Actions" in repository settings</li>
                               </ul>
                             </li>
-                            <li><strong>GitHub Pages (Manual):</strong> Replace the files in your repository</li>
-                            <li><strong>Netlify:</strong> Drag and drop the ZIP folder to update your site</li>
-                            <li><strong>Vercel:</strong> Push updated files to your GitHub repo</li>
+                            <li><strong>Manual Options:</strong> GitHub Pages (manual), Netlify, or Vercel</li>
                         </ol>
                     </div>
                     <a href="#" id="download-website" class="download-button">
@@ -206,73 +189,42 @@ function showGeneratorForm() {
     // Generate website event
     generateButton.addEventListener('click', validateAndGenerate);      // Add CSS for new elements
     const style = document.createElement('style');
-    style.textContent = `        .consolidated-info {
+    style.textContent = `
+        /* Form field styling */
+        .form-field-required {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        /* Setup instructions and hosting tips */
+        .setup-instructions, .hosting-tips {
             background-color: rgba(var(--primary-color-rgb, 0, 120, 215), 0.05);
             border: 1px solid rgba(var(--primary-color-rgb, 0, 120, 215), 0.2);
             border-radius: 8px;
-            padding: 20px;
-            margin: 25px 0 15px 0;
+            padding: 15px;
+            margin: 15px 0;
+            text-align: left;
         }
         
-        .consolidated-info h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            text-align: center;
-            font-size: 1.2em;
-            color: var(--primary-color, #0078d7);
-        }
-        
-        .info-section {
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid rgba(var(--primary-color-rgb, 0, 120, 215), 0.1);
-        }
-        
-        .info-section:last-child {
-            margin-bottom: 0;
-            padding-bottom: 0;
-            border-bottom: none;
-        }
-        
-        .info-section h4 {
+        .setup-instructions h4, .hosting-tips h4 {
             margin-top: 0;
             margin-bottom: 10px;
             color: var(--secondary-color, #0078d7);
             font-size: 1.1em;
+            text-align: center;
         }
         
-        .github-section {
-            border-left: 3px solid var(--secondary-color, #0078d7);
-            padding-left: 15px;
-        }
-        
-        .formspree-section {
-            border-left: 3px solid var(--accent-color, #4CAF50);
-            padding-left: 15px;
-        }
-        
-        .deployment-section {
-            border-left: 3px solid var(--primary-color, #0078d7);
-            padding-left: 15px;
-        }
-        
-        .info-section ol {
+        .setup-instructions ol, .hosting-tips ol {
             margin: 10px 0;
             padding-left: 20px;
         }
         
-        .info-section li {
-            margin-bottom: 5px;
+        .setup-instructions li, .hosting-tips li {
+            margin-bottom: 8px;
         }
         
-        .info-section p {
-            margin: 5px 0;
-            text-align: left;
-        }
-        
-        .form-field-required {
-            color: var(--primary-color);
-            font-weight: bold;
+        .setup-instructions ul, .hosting-tips ul {
+            padding-left: 20px;
         }
         
         .update-details {
@@ -282,25 +234,13 @@ function showGeneratorForm() {
             margin: 10px 0;
             font-size: 0.9em;
         }
-          .update-details ul {
+        
+        .update-details ul {
             margin: 5px 0;
             padding-left: 20px;
         }
         
-        /* Styles for better information hierarchy and transitions */
-        .consolidated-info {
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .info-section {
-            transition: background-color 0.3s ease;
-        }
-        
-        .info-section:hover {
-            background-color: rgba(var(--primary-color-rgb, 0, 120, 215), 0.05);
-        }
-        
+        /* Error message */
         .generator-error-message {
             animation: fadeIn 0.5s ease;
         }
@@ -899,24 +839,7 @@ function completeGeneration(config, zipBlob) {
         if (successMessage) {
             const updateNote = document.createElement('div');
             updateNote.className = 'update-details';
-            updateNote.innerHTML = `
-                <p><small>Files updated:</small></p>
-                <ul>
-                    <li><small>GitHub Configuration (username: ${config.github.username})</small></li>
-                    <li><small>Social Media Links</small></li>
-                    <li><small>All CSS and JavaScript files</small></li>
-                    <li><small>README.md and LICENSE files</small></li>
-                    <li><small>Portfolio preview images</small></li>
-                    <li><small>GitHub Actions workflow for secure deployment</small></li>
-                </ul>                <p><small><strong>Next Steps:</strong></small></p>
-                <ol>
-                    <li><small>Create a GitHub token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></small></li>
-                    <li><small>Add your token as a repository secret named <code>PAT_GITHUB</code> in your repository settings</small></li>
-                    <li><small>Set GitHub Pages source to "GitHub Actions" in repository settings</small></li>
-                    <li><small>Set up Formspree for your contact form: create an account at <a href="https://formspree.io" target="_blank">Formspree.io</a> and update the form action URL</small></li>
-                </ol>
-            `;
-            
+                        
             // Insert after the first paragraph
             const firstP = successMessage.querySelector('p');
             if (firstP && firstP.nextSibling) {
