@@ -1219,11 +1219,17 @@ section:nth-child(even) {
 }
 
 /* Make sure the last-updated text is visible */
-.footer-bottom .last-updated {
+.footer-bottom .last-updated,
+.footer-bottom .version-info {
     margin-bottom: 0;
     font-size: 0.8rem;
     opacity: 0.8;
     color: var(--footer-text);
+}
+
+.footer-bottom .version-info {
+    font-weight: 500;
+    color: var(--accent-color);
 }
 
 /* Back to Top Button */
