@@ -3,7 +3,7 @@
 <div align="center">
   
 ![GitHub Portfolio](https://img.shields.io/badge/Portfolio-GitHub-blue?style=for-the-badge&logo=github)
-![Version](https://img.shields.io/badge/Version-1.0-green?style=for-the-badge)
+![Version](https://img.shields.io/badge/Version-1.1-green?style=for-the-badge)
 ![License](https://img.shields.io/badge/License-AGPL--3.0-yellow?style=for-the-badge)
 ![HTML5](https://img.shields.io/badge/html5-%23E34F26.svg?style=for-the-badge&logo=html5&logoColor=white)
 ![CSS3](https://img.shields.io/badge/css3-%231572B6.svg?style=for-the-badge&logo=css3&logoColor=white)
@@ -32,6 +32,8 @@
 - [🎨 Customization](#-customization)
 - [🔧 Website Generator](#-website-generator)
 - [📱 Responsive Design](#-responsive-design)
+- [📑 README Preview](#-readme-preview)
+- [🖼️ Modal Enhancements](#️-modal-enhancements)
 - [🧪 Local Development](#-local-development-with-environment-variables)
 - [📄 License](#-license)
 - [🙏 Acknowledgements](#-acknowledgements)
@@ -158,12 +160,16 @@ portfolio/
 │   ├── wow-effects.css          # Scroll effects
 │   ├── consolidated-responsive.css # Responsive design
 │   ├── github-stats.css         # GitHub statistics styling
+│   ├── github-readme.css        # GitHub README styling
 │   └── website-generator.css    # Generator styling
 ├── js/                   # JavaScript files
 │   ├── github-config.js        # GitHub configuration
 │   ├── github-stats.js         # GitHub data fetching and display
 │   ├── optimized-main.js       # Main functionality
 │   ├── social-links.js         # Social media links handler
+│   ├── readme-preview.js       # README rendering functionality
+│   ├── modal-override.js       # Enhanced modal functionality
+│   ├── env-loader.js           # Environment variables loader
 │   └── website-generator.js    # Portfolio generator
 └── LICENSE               # AGPL License file
 ```
@@ -210,6 +216,34 @@ The portfolio is fully responsive and optimized for:
 - Desktop screens
 - Tablets
 - Mobile devices
+
+## 📑 README Preview
+
+The new README preview feature allows for:
+
+- Live rendering of GitHub README files directly in project cards
+- Support for GitHub-flavored markdown syntax
+- Syntax highlighting for code blocks
+- Automatic rendering of tables, images, and other markdown elements
+- Custom styling that matches GitHub's appearance
+
+To use this feature:
+
+```javascript
+// The README content is automatically loaded from your GitHub repositories
+// No additional configuration required!
+```
+
+## 🖼️ Modal Enhancements
+
+The enhanced modal system provides:
+
+- Smooth open/close animations
+- Keyboard navigation (Escape to close, arrow keys for navigation)
+- Touch-friendly swipe gestures on mobile
+- Dynamic content loading
+- Responsive layout that works on all screen sizes
+- Advanced image gallery for project screenshots
 
 ## 🧪 Local Development with Environment Variables
 
