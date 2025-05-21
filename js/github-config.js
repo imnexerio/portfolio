@@ -13,9 +13,19 @@ window.GitHubConfig = (function() {    // Private GitHub credentials
     // 1. Check window.env (from .env file loader for local dev)
     // 2. Empty string for production (should use PAT_GITHUB in GitHub Actions)
     const _token = (window.env && window.env.PAT_GITHUB) || '';
+      // Get Formspree ID from environment variables (local development) or from HTML data attribute (production)
+    let _formspreeId = (window.env && window.env.FORMSPREE_ID) || '';
     
-    // Get Formspree ID from environment variables
-    const _formspreeId = (window.env && window.env.FORMSPREE_ID) || '';
+    // Attempt to get the Formspree ID from the form's data attribute when the page loads
+    // This is for the deployed version where environment variables might not be available
+    document.addEventListener('DOMContentLoaded', function() {
+        if (!_formspreeId) {
+            const contactForm = document.getElementById('contactForm');
+            if (contactForm && contactForm.dataset.formspreeId) {
+                _formspreeId = contactForm.dataset.formspreeId;
+            }
+        }
+    });
     
     // Configuration options
     const _config = {

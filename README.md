@@ -111,13 +111,38 @@ This portfolio includes a GitHub Actions workflow for automatic deployment to Gi
 1. Fork this repository
 2. Go to your repository's Settings > Secrets and variables > Actions
 3. Add a new repository secret named `PAT_GITHUB` with your GitHub token
-4. Go to Settings > Pages and set the source to "GitHub Actions"
-5. Any push to the main branch will automatically deploy your portfolio
+4. Add another secret named `FORMSPREE_ID` with your Formspree form ID (see Contact Form setup below)
+5. Go to Settings > Pages and set the source to "GitHub Actions"
+6. Any push to the main branch will automatically deploy your portfolio
 
 The deployment workflow will:
 - Build and deploy your site to GitHub Pages
-- Make your PAT_GITHUB token available during the build process
-- Keep your token secure by using GitHub's secret management
+- Make your PAT_GITHUB and FORMSPREE_ID tokens available during the build process
+- Keep your tokens secure by using GitHub's secret management
+
+## 📞 Contact Form Setup
+
+The contact form uses [Formspree](https://formspree.io) to handle form submissions:
+
+1. Sign up at [Formspree.io](https://formspree.io)
+2. Create a new form and get your form ID (it looks like `abcdefgh`)
+3. Set up the form ID in **one** of these ways:
+
+   **For GitHub Actions deployment:**
+   - Add a repository secret named `FORMSPREE_ID` with your form ID
+
+   **For manual deployment:**
+   - Open `index.html` and update the contact form with your Formspree ID:
+     ```html
+     <form id="contactForm" action="#" method="POST" data-formspree-id="YOUR-FORMSPREE-ID">
+     ```
+
+   **For local development:**
+   - Create a `.env` file in the root directory:
+     ```
+     PAT_GITHUB=your_github_personal_access_token
+     FORMSPREE_ID=your_formspree_id
+     ```
 
 ## 🛠️ Configuration
 

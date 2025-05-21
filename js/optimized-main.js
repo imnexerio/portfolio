@@ -767,8 +767,27 @@ function initContactForm() {
     const formStatus = document.getElementById('form-status');
     
     if (form) {
-        // Get Formspree ID from config
-        const formspreeId = window.GitHubConfig.getFormspreeId();
+        // Get Formspree ID from config with fallbacks
+        let formspreeId;
+        
+        try {
+            // First try from GitHubConfig
+            if (window.GitHubConfig && typeof window.GitHubConfig.getFormspreeId === 'function') {
+                formspreeId = window.GitHubConfig.getFormspreeId();
+            }
+            
+            // Try to get from the form's data attribute as fallback
+            if (!formspreeId && form.dataset.formspreeId) {
+                formspreeId = form.dataset.formspreeId;
+            }
+            
+            // Try to get from the form's action URL as last resort
+            if (!formspreeId && form.getAttribute('action') && form.getAttribute('action').includes('formspree.io/f/')) {
+                formspreeId = form.getAttribute('action').split('formspree.io/f/')[1];
+            }
+        } catch (error) {
+            console.error("Error retrieving Formspree ID:", error);
+        }
         
         // Set the form action URL using the Formspree ID
         if (formspreeId) {
@@ -792,9 +811,27 @@ function initContactForm() {
             // Double-check we're using the Formspree URL, not the page URL
             const formAction = form.getAttribute('action');
             if (!formAction || !formAction.includes('formspree.io')) {
-                const fallbackFormspreeId = window.GitHubConfig.getFormspreeId();
-                if (fallbackFormspreeId) {
-                    form.setAttribute('action', `https://formspree.io/f/${fallbackFormspreeId}`);
+                // Try all fallbacks again
+                let fallbackId;
+                
+                try {
+                    // Check data attribute on form
+                    if (form.dataset.formspreeId) {
+                        fallbackId = form.dataset.formspreeId;
+                    }
+                    // Check if there's a hidden input with the ID
+                    else {
+                        const hiddenInput = form.querySelector('input[name="_formspree_id"]');
+                        if (hiddenInput) {
+                            fallbackId = hiddenInput.value;
+                        }
+                    }
+                } catch (error) {
+                    console.error("Error during fallback:", error);
+                }
+                
+                if (fallbackId) {
+                    form.setAttribute('action', `https://formspree.io/f/${fallbackId}`);
                 } else {
                     formStatus.innerHTML = '<div class="error">Form configuration error: Formspree ID not found.</div>';
                     return;

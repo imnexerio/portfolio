@@ -1,1 +1,7 @@
 /.vscode
+/.env.js
+/env.js
+/.idea
+/.DS_Store
+node_modules/
+config.local.js
