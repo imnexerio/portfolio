@@ -772,7 +772,9 @@ function initContactForm() {
         
         // Set the form action URL using the Formspree ID
         if (formspreeId) {
-            form.action = `https://formspree.io/f/${formspreeId}`;
+            form.setAttribute('action', `https://formspree.io/f/${formspreeId}`);
+            // Explicitly set method to POST
+            form.setAttribute('method', 'POST');
         } else {
             console.warn('Formspree ID not found. Contact form may not work.');
         }
@@ -786,8 +788,21 @@ function initContactForm() {
             
             // Get the form data
             const formData = new FormData(form);
-              // Send the form data to Formspree
-            fetch(form.action, {
+            
+            // Double-check we're using the Formspree URL, not the page URL
+            const formAction = form.getAttribute('action');
+            if (!formAction || !formAction.includes('formspree.io')) {
+                const fallbackFormspreeId = window.GitHubConfig.getFormspreeId();
+                if (fallbackFormspreeId) {
+                    form.setAttribute('action', `https://formspree.io/f/${fallbackFormspreeId}`);
+                } else {
+                    formStatus.innerHTML = '<div class="error">Form configuration error: Formspree ID not found.</div>';
+                    return;
+                }
+            }
+            
+            // Send the form data to Formspree
+            fetch(form.getAttribute('action'), {
                 method: 'POST',
                 body: formData,
                 headers: {
