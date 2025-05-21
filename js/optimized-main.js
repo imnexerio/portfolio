@@ -370,7 +370,20 @@ function initTypingEffect() {
     const typedTextElement = document.querySelector('.typed-text');
     if (!typedTextElement) return;
 
-    const words = ['Mobile Developer', 'Kotlin Developer', 'Flutter Developer', 'Software Engineer', 'Open Source Contributor'];
+    // Default roles if GitHub data isn't available yet
+    let words = ['Software Developer', 'Full Stack Developer', 'Web Developer', 'Open Source Contributor'];
+    
+    // We'll expose this function globally so it can be called after GitHub data is loaded
+    window.updateTypedRoles = function(newRoles) {
+        if (Array.isArray(newRoles) && newRoles.length > 0) {
+            words = newRoles;
+            // Reset indexes to start with the new words
+            wordIndex = 0;
+            charIndex = 0;
+            isDeleting = false;
+        }
+    };
+    
     let wordIndex = 0;
     let charIndex = 0;
     let isDeleting = false;

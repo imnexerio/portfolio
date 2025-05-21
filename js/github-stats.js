@@ -12,6 +12,21 @@ async function initGitHubStats() {
     const username = GitHubConfig.getUsername();
     
     try {
+        // Set the last updated date/time
+        const lastUpdatedElement = document.getElementById('last-updated-date');
+        if (lastUpdatedElement) {
+            const now = new Date();
+            const options = { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: true 
+            };
+            lastUpdatedElement.textContent = now.toLocaleDateString(undefined, options);
+        }
+        
         // Get headers from config
         const headers = GitHubConfig.getAuthHeaders();
         if (headers.Authorization) {
@@ -99,8 +114,26 @@ function setGitHubProfileImage(avatarUrl) {
     // Find the profile image in the about section and replace its src
     const profileImage = document.getElementById('profile-image') || document.querySelector('.about-image img');
     if (profileImage) {
-        profileImage.src = avatarUrl;
-        console.log('GitHub Stats: Profile image updated with GitHub avatar');
+        // Show loading animation
+        profileImage.classList.add('loading-image');
+        
+        // Create a new image to preload
+        const tempImg = new Image();
+        tempImg.onload = function() {
+            // Once loaded, update the real image and remove loading class
+            profileImage.src = avatarUrl;
+            profileImage.classList.remove('loading-image');
+            console.log('GitHub Stats: Profile image updated with GitHub avatar');
+        };
+        
+        tempImg.onerror = function() {
+            console.warn('GitHub Stats: Failed to load profile image');
+            // Remove loading class even if there's an error
+            profileImage.classList.remove('loading-image');
+        };
+        
+        // Start loading
+        tempImg.src = avatarUrl;
     } else {
         console.warn('GitHub Stats: Profile image element not found');
     }
@@ -169,11 +202,55 @@ function setFaviconFromGitHub(avatarUrl) {
 // Function to update user information from GitHub profile
 function updateUserInfoFromGitHub(userData) {
     if (!userData) return;
-
-    // Update page title
+    
+    // Try to determine user's favorite color from profile info
+    let favoriteColor = null;
+    
+    // Check if user has any color-related information in bio
+    if (userData.bio) {
+        const colorRegex = /(favorite|favourite|preferred|love)\s+colors?:?\s*([a-zA-Z]+)/i;
+        const match = userData.bio.match(colorRegex);
+        if (match && match[2]) {
+            const colorName = match[2].toLowerCase();
+            const colorMap = {
+                'blue': '#4361ee',
+                'red': '#f94144',
+                'green': '#43aa8b',
+                'purple': '#9d4edd',
+                'pink': '#f72585',
+                'orange': '#fb8500',
+                'black': '#2d3436',
+                'cyan': '#4cc9f0',
+                'teal': '#2a9d8f',
+                'yellow': '#ffbe0b'
+            };
+            
+            if (colorName in colorMap) {
+                favoriteColor = colorMap[colorName];
+                console.log(`Detected favorite color from bio: ${colorName} -> ${favoriteColor}`);
+                
+                // Apply this color as a theme suggestion
+                if (window.applyCustomColor) {
+                    window.applyCustomColor(favoriteColor);
+                }
+            }
+        }
+    }
+    
+    // Update page title and meta description
     const pageTitle = document.querySelector('title');
     if (pageTitle && userData.name) {
         pageTitle.textContent = `${userData.name} - Portfolio`;
+    }
+    
+    // Update meta description with name and bio if available
+    const metaDescription = document.querySelector('meta[name="description"]');
+    if (metaDescription && userData.name) {
+        let description = `${userData.name}'s portfolio showcasing GitHub projects`;
+        if (userData.bio) {
+            description += ` - ${userData.bio}`;
+        }
+        metaDescription.setAttribute('content', description);
     }
 
     // Update hero section
@@ -189,11 +266,25 @@ function updateUserInfoFromGitHub(userData) {
             element.textContent = userData.name;
         }
     });
-    
-    // Update footer with current year
+      // Update footer with current year
     const currentYearElement = document.getElementById('current-year');
     if (currentYearElement) {
         currentYearElement.textContent = new Date().getFullYear();
+    }
+    
+    // Update logo initials based on name
+    const logoInitials = document.querySelector('.logo-initials');
+    if (logoInitials && userData.name) {
+        // Extract initials from name (first letters of first and last name)
+        const nameParts = userData.name.split(' ');
+        let initials = nameParts[0][0]; // First letter of first name
+        
+        // Add first letter of last name if available
+        if (nameParts.length > 1) {
+            initials += nameParts[nameParts.length - 1][0];
+        }
+        
+        logoInitials.textContent = initials.toUpperCase();
     }
 
     // Update about section
@@ -205,11 +296,24 @@ function updateUserInfoFromGitHub(userData) {
     const aboutGitHubUsername = document.querySelector('.info-item:nth-child(2) .info-value');
     if (aboutGitHubUsername) {
         aboutGitHubUsername.textContent = userData.login;
-    }
-
-    const aboutLocation = document.querySelector('.info-item:nth-child(3) .info-value');
+    }    const aboutLocation = document.querySelector('.info-item:nth-child(3) .info-value');
     if (aboutLocation && userData.location) {
         aboutLocation.textContent = userData.location;
+    }
+    
+    // Update availability status based on hireable flag
+    const availabilityStatus = document.querySelector('.availability-status');
+    if (availabilityStatus) {
+        if (userData.hireable === true) {
+            availabilityStatus.textContent = 'Available for hire';
+            availabilityStatus.classList.add('available');
+        } else if (userData.hireable === false) {
+            availabilityStatus.textContent = 'Not currently available';
+            availabilityStatus.classList.remove('available');
+        } else {
+            // If hireable is null or undefined, keep default text
+            availabilityStatus.textContent = 'Available for projects';
+        }
     }
     
     // Update contact section
@@ -229,11 +333,16 @@ function updateUserInfoFromGitHub(userData) {
         contactGitHub.textContent = `github.com/${userData.login}`;
         contactGitHub.href = `https://github.com/${userData.login}`;
     }
-    
-    // Update GitHub profile button link
+      // Update GitHub profile button link
     const githubProfileLink = document.querySelector('.github-profile-link');
     if (githubProfileLink && userData.login) {
         githubProfileLink.href = `https://github.com/${userData.login}`;
+    }
+    
+    // Update website creator button title
+    const websiteCreatorBtn = document.getElementById('website-creator-btn');
+    if (websiteCreatorBtn && userData.login) {
+        websiteCreatorBtn.title = `Create your own portfolio like ${userData.name || userData.login}'s`;
     }
     
     const contactRepoCount = document.querySelector('.repo-count-value');
@@ -370,6 +479,9 @@ async function extractAndDisplaySkills(repos, headers) {
             'Open Source Contribution': { score: repos.length, category: 'professional' }
         };
         
+        // For extracting developer roles based on languages and topics
+        const rolePriorities = {};
+        
         // Add a fallback for empty repositories
         let hasLanguages = false;
         
@@ -412,24 +524,116 @@ async function extractAndDisplaySkills(repos, headers) {
                 const percentage = bytes / totalBytes;
                 languageData[language].bytes += bytes;
                 languageData[language].score += percentage * repoWeight;
-                languageData[language].repos += 1;
-            }
+                languageData[language].repos += 1;            }
             
             // Update professional skills based on repository topics and languages
             if (repo.topics && repo.topics.length > 0) {
                 if (repo.topics.some(topic => ['android', 'ios', 'mobile', 'app'].includes(topic))) {
                     professionalSkills['Mobile Development'].score += repoWeight;
+                    rolePriorities['Mobile Developer'] = (rolePriorities['Mobile Developer'] || 0) + repoWeight;
+                    rolePriorities['App Developer'] = (rolePriorities['App Developer'] || 0) + repoWeight * 0.8;
                 }
                 
                 if (repo.topics.some(topic => ['flutter', 'react-native', 'xamarin', 'cross-platform'].includes(topic)) ||
                     Object.keys(languages).some(lang => ['Dart', 'JavaScript', 'TypeScript'].includes(lang))) {
                     professionalSkills['Cross-Platform Development'].score += repoWeight;
+                    rolePriorities['Cross-Platform Developer'] = (rolePriorities['Cross-Platform Developer'] || 0) + repoWeight;
                 }
                 
                 if (repo.topics.some(topic => ['algorithm', 'problem-solving', 'leetcode', 'competitive-programming'].includes(topic))) {
                     professionalSkills['Problem Solving'].score += repoWeight;
+                    rolePriorities['Algorithm Developer'] = (rolePriorities['Algorithm Developer'] || 0) + repoWeight;
+                }
+                
+                // Extract more developer roles based on topics
+                if (repo.topics.some(topic => ['web', 'frontend', 'website'].includes(topic))) {
+                    rolePriorities['Web Developer'] = (rolePriorities['Web Developer'] || 0) + repoWeight;
+                }
+                
+                if (repo.topics.some(topic => ['backend', 'api', 'server'].includes(topic))) {
+                    rolePriorities['Backend Developer'] = (rolePriorities['Backend Developer'] || 0) + repoWeight;
+                }
+                
+                if (repo.topics.some(topic => ['fullstack', 'full-stack'].includes(topic))) {
+                    rolePriorities['Full Stack Developer'] = (rolePriorities['Full Stack Developer'] || 0) + repoWeight * 1.2;
+                }
+                
+                if (repo.topics.some(topic => ['devops', 'cloud', 'aws', 'azure', 'docker', 'kubernetes'].includes(topic))) {
+                    rolePriorities['DevOps Engineer'] = (rolePriorities['DevOps Engineer'] || 0) + repoWeight;
+                }
+                
+                if (repo.topics.some(topic => ['ai', 'machine-learning', 'ml', 'deep-learning', 'data-science'].includes(topic))) {
+                    rolePriorities['AI Developer'] = (rolePriorities['AI Developer'] || 0) + repoWeight;
+                    rolePriorities['Machine Learning Engineer'] = (rolePriorities['Machine Learning Engineer'] || 0) + repoWeight;
                 }
             }
+            
+            // Extract roles based on dominant languages
+            for (const [language, bytes] of Object.entries(languages)) {
+                const percentage = bytes / totalBytes;
+                if (percentage > 0.5) { // If language makes up more than 50% of the repo
+                    switch(language) {
+                        case 'JavaScript':
+                            rolePriorities['JavaScript Developer'] = (rolePriorities['JavaScript Developer'] || 0) + repoWeight;
+                            rolePriorities['Front-end Developer'] = (rolePriorities['Front-end Developer'] || 0) + repoWeight * 0.7;
+                            break;
+                        case 'TypeScript':
+                            rolePriorities['TypeScript Developer'] = (rolePriorities['TypeScript Developer'] || 0) + repoWeight;
+                            rolePriorities['Front-end Developer'] = (rolePriorities['Front-end Developer'] || 0) + repoWeight * 0.7;
+                            break;
+                        case 'Python':
+                            rolePriorities['Python Developer'] = (rolePriorities['Python Developer'] || 0) + repoWeight;
+                            break;
+                        case 'Java':
+                            rolePriorities['Java Developer'] = (rolePriorities['Java Developer'] || 0) + repoWeight;
+                            break;
+                        case 'C#':
+                            rolePriorities['C# Developer'] = (rolePriorities['C# Developer'] || 0) + repoWeight;
+                            break;
+                        case 'PHP':
+                            rolePriorities['PHP Developer'] = (rolePriorities['PHP Developer'] || 0) + repoWeight;
+                            break;
+                        case 'Ruby':
+                            rolePriorities['Ruby Developer'] = (rolePriorities['Ruby Developer'] || 0) + repoWeight;
+                            break;
+                        case 'Go':
+                            rolePriorities['Go Developer'] = (rolePriorities['Go Developer'] || 0) + repoWeight;
+                            break;
+                        case 'Rust':
+                            rolePriorities['Rust Developer'] = (rolePriorities['Rust Developer'] || 0) + repoWeight;
+                            break;
+                        case 'Swift':
+                            rolePriorities['iOS Developer'] = (rolePriorities['iOS Developer'] || 0) + repoWeight;
+                            break;
+                        case 'Kotlin':
+                            rolePriorities['Android Developer'] = (rolePriorities['Android Developer'] || 0) + repoWeight;
+                            break;
+                        case 'Dart':
+                            rolePriorities['Flutter Developer'] = (rolePriorities['Flutter Developer'] || 0) + repoWeight;
+                            break;
+                    }
+                }
+            }
+        }
+        
+        // Always ensure "Software Engineer" and "Developer" are present
+        rolePriorities['Software Engineer'] = (rolePriorities['Software Engineer'] || 0) + repos.length * 0.5;
+        rolePriorities['Developer'] = (rolePriorities['Developer'] || 0) + repos.length * 0.3;
+        
+        // Create developer roles array based on priorities
+        const developerRoles = Object.entries(rolePriorities)
+            .sort((a, b) => b[1] - a[1]) // Sort by score, descending
+            .slice(0, 5) // Take top 5
+            .map(([role]) => role); // Extract just the role names
+        
+        // Add "Open Source Contributor" if user has repositories
+        if (repos.length > 0) {
+            developerRoles.push('Open Source Contributor');
+        }
+        
+        // Update the typing effect with these roles if available
+        if (developerRoles.length > 0 && window.updateTypedRoles) {
+            window.updateTypedRoles(developerRoles);
         }
           // If no languages were found, display an error message
         if (!hasLanguages || Object.keys(languageData).length === 0) {

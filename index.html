@@ -3,12 +3,13 @@
 <head>    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1">
     <title>GitHub Portfolio</title>
+    <meta name="description" content="Personal portfolio showcasing GitHub projects and skills">
     <!-- Favicon will be dynamically set from GitHub avatar -->
     <link rel="stylesheet" href="css/modern-styles.css">
     <link rel="stylesheet" href="css/advanced-animations.css">
-    <link rel="stylesheet" href="css/wow-effects.css">    <link rel="stylesheet" href="css/consolidated-responsive.css">    <link rel="stylesheet" href="css/github-stats.css">
-    <link rel="stylesheet" href="css/website-generator.css">
+    <link rel="stylesheet" href="css/wow-effects.css">    <link rel="stylesheet" href="css/consolidated-responsive.css">    <link rel="stylesheet" href="css/github-stats.css">    <link rel="stylesheet" href="css/website-generator.css">
     <link rel="stylesheet" href="css/github-readme.css">
+    <link rel="stylesheet" href="css/custom-indicators.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -42,11 +43,10 @@
         </div>
     </div>
 
-    <!-- Header Section -->
-    <header id="header">
+    <!-- Header Section -->    <header id="header">
         <div class="container">
             <div class="logo">
-                <a href="#hero" class="magnetic">SP</a>
+                <a href="#hero" class="magnetic logo-initials">SP</a>
             </div>
             <nav>
                 <ul class="nav-links">
@@ -108,10 +108,9 @@
                         <div class="info-item stagger-item">
                             <span class="info-title">Location:</span>
                             <span class="info-value">Location</span>
-                        </div>
-                        <div class="info-item stagger-item">
+                        </div>                        <div class="info-item stagger-item">
                             <span class="info-title">Availability:</span>
-                            <span class="info-value">Available for projects</span>
+                            <span class="info-value availability-status">Available for projects</span>
                         </div>                    </div>
                     <a href="https://github.com/" class="btn primary-btn magnetic github-profile-link" target="_blank">View GitHub Profile</a>
                     <div class="github-stats scroll-reveal slide-in-right delay-4">
@@ -278,9 +277,9 @@
                 <div class="footer-social social-icons scroll-reveal">
                     <!-- Social media links will be dynamically inserted here -->
                 </div>
-            </div>
-            <div class="footer-bottom">
+            </div>            <div class="footer-bottom">
                 <p class="scroll-reveal">&copy; <span id="current-year">2025</span> <span class="github-username">GitHub User</span>. All Rights Reserved.</p>
+                <p class="scroll-reveal last-updated">Data last updated: <span id="last-updated-date">Loading...</span></p>
             </div>
         </div>
     </footer>
@@ -313,9 +312,9 @@
           }
         })
     </script>
-          <!-- Website Creator Attribution -->
+      <!-- Website Creator Attribution -->
     <div class="website-creator">
-        <div class="website-creator-btn create" title="Create your own portfolio">
+        <div class="website-creator-btn create" id="website-creator-btn" title="Create your own portfolio">
             <i class="fas fa-code"></i>
             <div class="typed-container">
                 <span class="typed-message"></span>
