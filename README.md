@@ -251,13 +251,13 @@ This portfolio uses an environment variable loader system for secure local devel
 
 ### 🔐 Using env-loader.js
 
-The `env-loader.js` file provides a secure way to use GitHub authentication during local development without exposing your token in committed code:
+The `env-loader.js` file provides a secure way to use GitHub authentication and Formspree integration during local development without exposing your sensitive data in committed code:
 
 ```javascript
 // Environment Variable Loader for Local Development
 window.env = window.env || {};
 
-function setupLocalEnv() {
+function setupEnv() {
     // Only set environment variables in local development environments
     if (window.location.hostname === 'localhost' || 
         window.location.hostname === '127.0.0.1') {
@@ -267,18 +267,23 @@ function setupLocalEnv() {
         // Set your GitHub token for local testing
         window.env.PAT_GITHUB = 'your_github_token_here';
         
+        // Set your Formspree ID for local testing
+        window.env.FORMSPREE_ID = 'your_formspree_id_here';
+        
         Object.keys(window.env).forEach(key => {
             console.log(`Loaded env variable: ${key}`);
         });
     }
 }
 
-setupLocalEnv();
+setupEnv();
 ```
 
 ### 🚀 Setup Instructions
 
-1. Edit the `js/env-loader.js` file and replace `'your_github_token_here'` with your actual GitHub token
+1. Edit the `js/env-loader.js` file and:
+   - Replace `'your_github_token_here'` with your actual GitHub token
+   - Replace `'your_formspree_id_here'` with your Formspree form ID
    
 2. Start your local development server:
    ```bash
@@ -298,9 +303,43 @@ setupLocalEnv();
 - **Environment Detection**: Automatically detects local development environments (localhost/127.0.0.1)
 - **Console Logging**: Provides feedback when environment variables are successfully loaded
 - **Git Protection**: The file is included in `.gitignore` by default to prevent accidental token exposure
-- **Production Safety**: No effect in production environments, where GitHub Actions secrets are used instead
 
-> **⚠️ Security Warning**: Never commit your actual GitHub token. The `env-loader.js` file should always remain in your `.gitignore` file.
+### 📧 Setting Up Formspree for Contact Form
+
+The contact form uses [Formspree](https://formspree.io) to handle submissions without requiring backend code.
+
+1. **Create a Formspree Account**:
+   - Go to [Formspree.io](https://formspree.io)
+   - Sign up for an account (the free tier allows 50 submissions per month)
+
+2. **Create a New Form**:
+   - After logging in, click on "New Form"
+   - Give your form a name (e.g., "Portfolio Contact Form")
+   - Choose the email address where you want to receive form submissions
+
+3. **Get Your Form ID**:
+   - After creating the form, you'll see a form endpoint URL that looks like this:
+     `https://formspree.io/f/xxxxxxxx`
+   - The part after "/f/" is your form ID (xxxxxxxx)
+
+4. **Configure for Local Development**:
+   - Open `js/env-loader.js` in your portfolio
+   - Update the line `window.env.FORMSPREE_ID = 'your_formspree_id_here';`
+   - Replace 'your_formspree_id_here' with your actual Formspree ID
+
+5. **Configure for Production Deployment**:
+   - Go to your GitHub repository
+   - Navigate to Settings > Secrets and Variables > Actions
+   - Click on "New repository secret"
+   - Name: `FORMSPREE_ID`
+   - Value: Your Formspree form ID
+   - Click "Add secret"
+
+6. **Troubleshooting**:
+   - If the form isn't working, check that you've entered the correct form ID
+   - Ensure your Formspree account is active
+   - Check for JavaScript console errors
+   - For more help, visit [Formspree's documentation](https://formspree.io/docs/)
 
 ## 📄 License
 
