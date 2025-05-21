@@ -1215,7 +1215,15 @@ section:nth-child(even) {
 .footer-bottom p {
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;
+}
+
+/* Make sure the last-updated text is visible */
+.footer-bottom .last-updated {
     margin-bottom: 0;
+    font-size: 0.8rem;
+    opacity: 0.8;
+    color: var(--footer-text);
 }
 
 /* Back to Top Button */
@@ -1506,6 +1514,17 @@ section:nth-child(even) {
     z-index: 99;
     display: flex;
     align-items: center;
+}
+
+/* Ensure spacing for the footer bottom */
+@media screen and (max-width: 768px) {
+    .website-creator {
+        bottom: 100px;  /* More space on mobile */
+    }
+    
+    #footer {
+        padding-bottom: 50px;
+    }
 }
 
 .website-creator-btn {

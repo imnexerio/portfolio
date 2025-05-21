@@ -12,21 +12,6 @@ async function initGitHubStats() {
     const username = GitHubConfig.getUsername();
     
     try {
-        // Set the last updated date/time
-        const lastUpdatedElement = document.getElementById('last-updated-date');
-        if (lastUpdatedElement) {
-            const now = new Date();
-            const options = { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit',
-                hour12: true 
-            };
-            lastUpdatedElement.textContent = now.toLocaleDateString(undefined, options);
-        }
-        
         // Get headers from config
         const headers = GitHubConfig.getAuthHeaders();
         if (headers.Authorization) {
@@ -258,18 +243,45 @@ function updateUserInfoFromGitHub(userData) {
     if (heroName && userData.name) {
         heroName.textContent = userData.name;
     }
-    
-    // Update footer with GitHub username
+      // Update footer with GitHub username
     const footerUsernameElements = document.querySelectorAll('.github-username');
     footerUsernameElements.forEach(element => {
         if (element && userData.name) {
             element.textContent = userData.name;
         }
     });
-      // Update footer with current year
+    
+    // Update footer with current year and ensure it's visible
     const currentYearElement = document.getElementById('current-year');
     if (currentYearElement) {
         currentYearElement.textContent = new Date().getFullYear();
+        // Make sure the parent elements are visible
+        const footerBottom = document.querySelector('.footer-bottom');
+        if (footerBottom) {
+            footerBottom.style.display = 'block';
+        }
+    }
+    
+    // Ensure last updated element is visible and updated
+    const lastUpdatedElement = document.getElementById('last-updated-date');
+    if (lastUpdatedElement) {
+        const now = new Date();
+        const options = { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit',
+            hour12: true 
+        };
+        lastUpdatedElement.textContent = now.toLocaleDateString(undefined, options);
+        
+        // Ensure parent element is visible
+        const lastUpdated = document.querySelector('.last-updated');
+        if (lastUpdated) {
+            lastUpdated.style.visibility = 'visible';
+            lastUpdated.style.opacity = '1';
+        }
     }
     
     // Update logo initials based on name
