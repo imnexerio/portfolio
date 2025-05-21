@@ -181,6 +181,20 @@ function updateUserInfoFromGitHub(userData) {
     if (heroName && userData.name) {
         heroName.textContent = userData.name;
     }
+    
+    // Update footer with GitHub username
+    const footerUsernameElements = document.querySelectorAll('.github-username');
+    footerUsernameElements.forEach(element => {
+        if (element && userData.name) {
+            element.textContent = userData.name;
+        }
+    });
+    
+    // Update footer with current year
+    const currentYearElement = document.getElementById('current-year');
+    if (currentYearElement) {
+        currentYearElement.textContent = new Date().getFullYear();
+    }
 
     // Update about section
     const aboutName = document.querySelector('.info-item:nth-child(1) .info-value');
@@ -196,6 +210,35 @@ function updateUserInfoFromGitHub(userData) {
     const aboutLocation = document.querySelector('.info-item:nth-child(3) .info-value');
     if (aboutLocation && userData.location) {
         aboutLocation.textContent = userData.location;
+    }
+    
+    // Update contact section
+    const contactLocation = document.querySelector('.location-value');
+    if (contactLocation && userData.location) {
+        contactLocation.textContent = userData.location;
+    }
+    
+    const contactEmail = document.querySelector('.email-value');
+    if (contactEmail && userData.email) {
+        contactEmail.textContent = userData.email;
+    } else if (contactEmail) {
+        contactEmail.textContent = 'Contact via GitHub';
+    }
+      const contactGitHub = document.querySelector('.github-username-link');
+    if (contactGitHub && userData.login) {
+        contactGitHub.textContent = `github.com/${userData.login}`;
+        contactGitHub.href = `https://github.com/${userData.login}`;
+    }
+    
+    // Update GitHub profile button link
+    const githubProfileLink = document.querySelector('.github-profile-link');
+    if (githubProfileLink && userData.login) {
+        githubProfileLink.href = `https://github.com/${userData.login}`;
+    }
+    
+    const contactRepoCount = document.querySelector('.repo-count-value');
+    if (contactRepoCount && userData.public_repos) {
+        contactRepoCount.textContent = `${userData.public_repos} Public Repositories`;
     }
 
     // Update bio if available from user data (will be overwritten by README bio if available)

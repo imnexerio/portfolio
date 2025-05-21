@@ -112,9 +112,8 @@
                         <div class="info-item stagger-item">
                             <span class="info-title">Availability:</span>
                             <span class="info-value">Available for projects</span>
-                        </div>
-                    </div>
-                    <a href="https://github.com/" class="btn primary-btn magnetic" target="_blank">View GitHub Profile</a>
+                        </div>                    </div>
+                    <a href="https://github.com/" class="btn primary-btn magnetic github-profile-link" target="_blank">View GitHub Profile</a>
                     <div class="github-stats scroll-reveal slide-in-right delay-4">
                         <div class="github-stats-header">
                             <i class="fab fa-github"></i>
@@ -195,14 +194,13 @@
             <div class="section-header">
                 <h2 class="scroll-reveal">Contact Me</h2>
             </div>
-            <div class="contact-content">
-                <div class="contact-info scroll-reveal slide-in-left stagger-container">                    <div class="contact-item stagger-item">
+            <div class="contact-content">                <div class="contact-info scroll-reveal slide-in-left stagger-container">                    <div class="contact-item stagger-item">
                         <div class="contact-icon">
                             <i class="fas fa-map-marker-alt"></i>
                         </div>
                         <div class="contact-text">
                             <h3>Location</h3>
-                            <p>Location</p>
+                            <p class="info-value location-value">Location</p>
                         </div>
                     </div>
                     <div class="contact-item stagger-item">
@@ -211,7 +209,7 @@
                         </div>
                         <div class="contact-text">
                             <h3>Email</h3>
-                            <p>Contact via GitHub</p>
+                            <p class="info-value email-value">Contact via GitHub</p>
                         </div>
                     </div>
                     <div class="contact-item stagger-item">
@@ -220,7 +218,7 @@
                         </div>
                         <div class="contact-text">
                             <h3>GitHub</h3>
-                            <p><a href="https://github.com/" target="_blank">github.com/username</a></p>
+                            <p><a href="https://github.com/" target="_blank" class="github-username-link">github.com/username</a></p>
                         </div>
                     </div>
                     <div class="contact-item stagger-item">
@@ -229,7 +227,7 @@
                         </div>
                         <div class="contact-text">
                             <h3>Repositories</h3>
-                            <p>Public Repositories</p>
+                            <p class="info-value repo-count-value">Public Repositories</p>
                         </div>
                     </div>
                 </div>                <div class="contact-form scroll-reveal slide-in-right">
@@ -275,14 +273,14 @@
     <footer id="footer">
         <div class="container">
             <div class="footer-content">                <div class="footer-logo">
-                    <h3 class="scroll-reveal">GitHub User</h3>
+                    <h3 class="scroll-reveal github-username">GitHub User</h3>
                 </div>
                 <div class="footer-social social-icons scroll-reveal">
                     <!-- Social media links will be dynamically inserted here -->
                 </div>
             </div>
             <div class="footer-bottom">
-                <p class="scroll-reveal">&copy; 2025 GitHub User. All Rights Reserved.</p>
+                <p class="scroll-reveal">&copy; <span id="current-year">2025</span> <span class="github-username">GitHub User</span>. All Rights Reserved.</p>
             </div>
         </div>
     </footer>
