@@ -24,7 +24,7 @@ jobs:
       
       - name: Setup Pages
         uses: actions/configure-pages@v4
-        - name: Create env.js file with environment variables
+      - name: Create env.js file with environment variables
         run: |
           echo "window.env = { PAT_GITHUB: '${{ secrets.PAT_GITHUB }}', FORMSPREE_ID: '${{ secrets.FORMSPREE_ID }}' };" > env.js
           
