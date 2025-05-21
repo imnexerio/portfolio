@@ -750,70 +750,49 @@ function initPortfolioModal(dynamicProjectDetails) {
  * Contact Form Validation
  */
 function initContactForm() {
-    const contactForm = document.getElementById('contactForm');
+    const form = document.getElementById('contactForm');
+    const formStatus = document.getElementById('form-status');
     
-    if (contactForm) {
-        contactForm.addEventListener('submit', function(e) {
-            e.preventDefault();
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
             
-            // Get form values
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const subject = document.getElementById('subject').value.trim();
-            const message = document.getElementById('message').value.trim();
+            // Show loading status
+            formStatus.innerHTML = '<div class="loading">Sending message...</div>';
+            formStatus.style.display = 'block';
             
-            // Simple validation
-            if (name === '' || email === '' || subject === '' || message === '') {
-                showFormAlert('Please fill in all fields', 'error');
-                return;
-            }
+            // Get the form data
+            const formData = new FormData(form);
             
-            if (!isValidEmail(email)) {
-                showFormAlert('Please enter a valid email address', 'error');
-                return;
-            }
-            
-            // In a real application, you would send the form data to a server here
-            // For this demo, we'll just show a success message
-            showFormAlert('Your message has been sent successfully!', 'success');
-            contactForm.reset();
+            // Send the form data to Formspree
+            fetch(form.action, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Success message
+                    formStatus.innerHTML = '<div class="success">Thank you! Your message has been sent.</div>';
+                    form.reset(); // Clear the form
+                } else {
+                    // Error message
+                    response.json().then(data => {
+                        if (Object.hasOwnProperty.call(data, 'errors')) {
+                            formStatus.innerHTML = '<div class="error">Oops! There was a problem with your submission. Please try again.</div>';
+                        } else {
+                            formStatus.innerHTML = '<div class="error">Oops! There was a problem with your submission. Please try again.</div>';
+                        }
+                    });
+                }
+            })
+            .catch(error => {
+                // Network error
+                formStatus.innerHTML = '<div class="error">Oops! There was a network error. Please check your connection and try again.</div>';
+            });
         });
-    }
-    
-    // Helper function to validate email
-    function isValidEmail(email) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
-    
-    // Helper function to show form alerts
-    function showFormAlert(message, type) {
-        // Remove any existing alerts
-        const existingAlert = document.querySelector('.form-alert');
-        if (existingAlert) {
-            existingAlert.remove();
-        }
-        
-        // Create new alert
-        const alert = document.createElement('div');
-        alert.className = `form-alert ${type}`;
-        alert.textContent = message;
-        
-        // Insert alert before the form
-        contactForm.parentNode.insertBefore(alert, contactForm);
-        
-        // Add animation class
-        setTimeout(() => {
-            alert.classList.add('alert-animate');
-        }, 10);
-        
-        // Remove alert after 3 seconds
-        setTimeout(() => {
-            alert.classList.remove('alert-animate');
-            setTimeout(() => {
-                alert.remove();
-            }, 300);
-        }, 3000);
     }
 }
 

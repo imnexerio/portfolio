@@ -1112,6 +1112,41 @@ section:nth-child(even) {
     border-left: 4px solid #ff4757;
 }
 
+/* Form Status Messages */
+.form-status {
+    margin-top: 20px;
+    padding: 12px;
+    border-radius: var(--border-radius);
+    font-size: 14px;
+    font-weight: 500;
+    display: none;
+}
+
+.form-status .loading {
+    color: var(--text-color);
+    background-color: rgba(var(--primary-color-rgb), 0.1);
+    border-left: 4px solid var(--primary-color);
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+    animation: pulse 1.5s infinite alternate;
+}
+
+.form-status .success {
+    color: #155724;
+    background-color: #d4edda;
+    border-left: 4px solid #28a745;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+}
+
+.form-status .error {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-left: 4px solid #dc3545;
+    padding: 10px;
+    border-radius: var(--border-radius-sm);
+}
+
 /* Footer */
 #footer {
     background-color: var(--footer-bg);
