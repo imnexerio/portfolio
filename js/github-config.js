@@ -14,6 +14,9 @@ window.GitHubConfig = (function() {    // Private GitHub credentials
     // 2. Empty string for production (should use PAT_GITHUB in GitHub Actions)
     const _token = (window.env && window.env.PAT_GITHUB) || '';
     
+    // Get Formspree ID from environment variables
+    const _formspreeId = (window.env && window.env.FORMSPREE_ID) || '';
+    
     // Configuration options
     const _config = {
         maxLanguages: 6,              // Maximum number of languages to display
@@ -32,6 +35,11 @@ window.GitHubConfig = (function() {    // Private GitHub credentials
         // Get GitHub token
         getToken: function() {
             return _token;
+        },
+        
+        // Get Formspree ID
+        getFormspreeId: function() {
+            return _formspreeId;
         },
         
         // Get config settings

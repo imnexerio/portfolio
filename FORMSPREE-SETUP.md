@@ -18,13 +18,11 @@ This portfolio website uses [Formspree](https://formspree.io) to handle form sub
      `https://formspree.io/f/xxxxxxxx`
    - The part after "/f/" is your form ID (xxxxxxxx)
 
-4. **Update Your HTML**:
-   - Open `index.html` in your portfolio
-   - Find the contact form section (search for `<form id="contactForm"`)
-   - Replace "your-formspree-id" in the action attribute with your actual form ID:
-     ```html
-     <form id="contactForm" action="https://formspree.io/f/your-actual-id" method="POST">
-     ```
+4. **Update the Environment Configuration**:
+   - Open `js/env-loader.js` in your portfolio
+   - Find the line `window.env.FORMSPREE_ID = 'xzzrwvzp';`
+   - Replace 'xzzrwvzp' with your actual Formspree ID
+   - For production deployment, make sure to set this environment variable in your hosting environment
 
 5. **Test Your Form**:
    - Open your portfolio website

@@ -754,6 +754,16 @@ function initContactForm() {
     const formStatus = document.getElementById('form-status');
     
     if (form) {
+        // Get Formspree ID from config
+        const formspreeId = window.GitHubConfig.getFormspreeId();
+        
+        // Set the form action URL using the Formspree ID
+        if (formspreeId) {
+            form.action = `https://formspree.io/f/${formspreeId}`;
+        } else {
+            console.warn('Formspree ID not found. Contact form may not work.');
+        }
+        
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             
