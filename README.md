@@ -247,25 +247,60 @@ The enhanced modal system provides:
 
 ## 🧪 Local Development with Environment Variables
 
-For local testing with GitHub authentication:
+This portfolio uses an environment variable loader system for secure local development:
 
-1. Edit the `js/env-loader.js` file and replace `'your_github_token_here'` with your actual GitHub token:
-   ```javascript
-   // Set your GitHub token for local testing
-   window.env.PAT_GITHUB = 'your_actual_token_here';
-   ```
+### 🔐 Using env-loader.js
 
-2. Start your local development server (e.g., Live Server in VS Code or Python's built-in server)
+The `env-loader.js` file provides a secure way to use GitHub authentication during local development without exposing your token in committed code:
+
+```javascript
+// Environment Variable Loader for Local Development
+window.env = window.env || {};
+
+function setupLocalEnv() {
+    // Only set environment variables in local development environments
+    if (window.location.hostname === 'localhost' || 
+        window.location.hostname === '127.0.0.1') {
+        
+        console.log('Local development environment detected');
+        
+        // Set your GitHub token for local testing
+        window.env.PAT_GITHUB = 'your_github_token_here';
+        
+        Object.keys(window.env).forEach(key => {
+            console.log(`Loaded env variable: ${key}`);
+        });
+    }
+}
+
+setupLocalEnv();
+```
+
+### 🚀 Setup Instructions
+
+1. Edit the `js/env-loader.js` file and replace `'your_github_token_here'` with your actual GitHub token
+   
+2. Start your local development server:
    ```bash
    # Using Python's built-in server
    python -m http.server 8000
+   
+   # Using Node.js http-server (install with: npm install -g http-server)
+   http-server
+   
+   # Or use VS Code's Live Server extension
    ```
 
 3. Open your browser to the local development URL (e.g., `http://localhost:8000` or `http://127.0.0.1:5500`)
 
-The environment variable loader will detect you're in a local environment and use the token from the env-loader.js file. This file is added to .gitignore, so you won't accidentally commit your token to the repository.
+### 🛡️ Security Features
 
-> **Note**: Always ensure `js/env-loader.js` remains in your `.gitignore` file to prevent committing your token.
+- **Environment Detection**: Automatically detects local development environments (localhost/127.0.0.1)
+- **Console Logging**: Provides feedback when environment variables are successfully loaded
+- **Git Protection**: The file is included in `.gitignore` by default to prevent accidental token exposure
+- **Production Safety**: No effect in production environments, where GitHub Actions secrets are used instead
+
+> **⚠️ Security Warning**: Never commit your actual GitHub token. The `env-loader.js` file should always remain in your `.gitignore` file.
 
 ## 📄 License
 
