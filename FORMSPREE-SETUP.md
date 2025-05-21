@@ -22,7 +22,16 @@ This portfolio website uses [Formspree](https://formspree.io) to handle form sub
    - Open `js/env-loader.js` in your portfolio
    - Find the line `window.env.FORMSPREE_ID = 'xzzrwvzp';`
    - Replace 'xzzrwvzp' with your actual Formspree ID
-   - For production deployment, make sure to set this environment variable in your hosting environment
+
+5. **Configure GitHub Actions (for production deployment)**:
+   - Go to your GitHub repository
+   - Navigate to Settings > Secrets and Variables > Actions
+   - Click on "New repository secret"
+   - Name: `FORMSPREE_ID`
+   - Value: Your Formspree form ID (the part after "/f/" in your form URL)
+   - Click "Add secret"
+
+   This will securely pass your Formspree ID to your deployment without exposing it in your code.
 
 5. **Test Your Form**:
    - Open your portfolio website

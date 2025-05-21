@@ -34,4 +34,5 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v4
         env:
-          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}  # Pass your token as environment variable
+          PAT_GITHUB: ${{ secrets.PAT_GITHUB }}  # Pass your GitHub token as environment variable
+          FORMSPREE_ID: ${{ secrets.FORMSPREE_ID }}  # Pass your Formspree ID as environment variable
