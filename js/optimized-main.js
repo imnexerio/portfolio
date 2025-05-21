@@ -786,8 +786,7 @@ function initContactForm() {
             
             // Get the form data
             const formData = new FormData(form);
-            
-            // Send the form data to Formspree
+              // Send the form data to Formspree
             fetch(form.action, {
                 method: 'POST',
                 body: formData,
@@ -801,19 +800,15 @@ function initContactForm() {
                     formStatus.innerHTML = '<div class="success">Thank you! Your message has been sent.</div>';
                     form.reset(); // Clear the form
                 } else {
-                    // Error message
-                    response.json().then(data => {
-                        if (Object.hasOwnProperty.call(data, 'errors')) {
-                            formStatus.innerHTML = '<div class="error">Oops! There was a problem with your submission. Please try again.</div>';
-                        } else {
-                            formStatus.innerHTML = '<div class="error">Oops! There was a problem with your submission. Please try again.</div>';
-                        }
-                    });
+                    // Error message - handle non-JSON responses safely
+                    formStatus.innerHTML = '<div class="error">Oops! There was a problem with your submission. Please try again.</div>';
+                    console.log('Form submission error:', response.status, response.statusText);
                 }
             })
             .catch(error => {
                 // Network error
                 formStatus.innerHTML = '<div class="error">Oops! There was a network error. Please check your connection and try again.</div>';
+                console.log('Form submission network error:', error);
             });
         });
     }
