@@ -115,6 +115,17 @@ function showGeneratorForm() {
                         <input type="text" id="generator-instagram" placeholder="e.g. https://www.instagram.com/johndoe/">
                         <div class="input-help">Complete Instagram profile URL including https://</div>
                     </div>
+                    
+                    <div class="form-info formspree-info">
+                        <p><strong>About Contact Form Integration</strong></p>
+                        <p>Your portfolio includes a contact form powered by Formspree, a free form backend service.</p>
+                        <p><strong>How to set up Formspree:</strong></p>
+                        <ol>
+                            <li>Create a free account at <a href="https://formspree.io" target="_blank">Formspree.io</a></li>
+                            <li>Create a new form and get your form ID (looks like <code>xrgjayzb</code>)</li>
+                            <li>Replace the form action URL in the contact section with your Formspree endpoint: <code>https://formspree.io/f/YOUR_FORM_ID</code></li>
+                        </ol>
+                    </div>
                       <div class="form-info">
                         <p><strong>What happens next?</strong></p>
                         <p>Clicking "Update My Portfolio" will update the social links and GitHub information in the website.</p>
@@ -203,12 +214,19 @@ function showGeneratorForm() {
             border-left: 3px solid var(--secondary-color, #0078d7);
         }
         
-        .github-token-info ol {
+        .formspree-info {
+            background-color: rgba(var(--accent-color-rgb, 76, 175, 80), 0.1);
+            border-left: 3px solid var(--accent-color, #4CAF50);
+        }
+        
+        .github-token-info ol,
+        .formspree-info ol {
             margin: 10px 0;
             padding-left: 20px;
         }
         
-        .github-token-info li {
+        .github-token-info li,
+        .formspree-info li {
             margin-bottom: 5px;
         }
         
@@ -833,12 +851,12 @@ function completeGeneration(config, zipBlob) {
                     <li><small>README.md and LICENSE files</small></li>
                     <li><small>Portfolio preview images</small></li>
                     <li><small>GitHub Actions workflow for secure deployment</small></li>
-                </ul>
-                <p><small><strong>Next Steps:</strong></small></p>
+                </ul>                <p><small><strong>Next Steps:</strong></small></p>
                 <ol>
                     <li><small>Create a GitHub token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></small></li>
                     <li><small>Add your token as a repository secret named <code>PAT_GITHUB</code> in your repository settings</small></li>
                     <li><small>Set GitHub Pages source to "GitHub Actions" in repository settings</small></li>
+                    <li><small>Set up Formspree for your contact form: create an account at <a href="https://formspree.io" target="_blank">Formspree.io</a> and update the form action URL</small></li>
                 </ol>
             `;
             
