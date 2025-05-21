@@ -1605,3 +1605,76 @@ section:nth-child(even) {
 #user-bio li, #user-bio-continued li {
     margin-bottom: 0.5rem;
 }
+
+/* ====================== */
+/* Custom Status Indicators */
+/* ====================== */
+
+/* Last updated date in footer */
+.last-updated {
+    font-size: 0.75rem;
+    color: var(--text-color-light);
+    margin-top: 0.5rem;
+    opacity: 0.8;
+}
+
+#last-updated-date {
+    display: inline-block;
+    font-style: italic;
+}
+
+/* Availability status indicator */
+.availability-status {
+    position: relative;
+    padding-left: 20px;
+}
+
+.availability-status:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #777;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+}
+
+.availability-status.available:before {
+    background-color: #4cd137;
+    box-shadow: 0 0 8px rgba(76,209,55,0.5);
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(76,209,55, 0.7);
+    }
+    70% {
+        box-shadow: 0 0 0 5px rgba(76,209,55, 0);
+    }
+    100% {
+        box-shadow: 0 0 0 0 rgba(76,209,55, 0);
+    }
+}
+
+/* Profile image loading animation */
+.loading-image {
+    opacity: 0.7;
+    animation: imageLoading 1.5s infinite ease-in-out;
+}
+
+@keyframes imageLoading {
+    0% { 
+        filter: blur(0px);
+    }
+    50% { 
+        filter: blur(2px); 
+    }
+    100% { 
+        filter: blur(0px);
+    }
+}
