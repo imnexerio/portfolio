@@ -88,17 +88,8 @@ function showGeneratorForm() {
                         <input type="text" id="generator-github-username" placeholder="e.g. octocat" required>
                         <div class="error-message" id="github-username-error">Please enter a valid GitHub username</div>                        <div class="input-help">Your GitHub profile will be used to populate projects, stats, and personal information</div>
                     </div>
-                      <div class="form-info github-token-info">
-                        <p><strong>About GitHub Authentication</strong></p>
-                        <p>For secure GitHub integration, this portfolio includes a GitHub Actions workflow for deployment.</p>
-                        <p><strong>How to set up your token:</strong></p>
-                        <ol>
-                            <li>Create a token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></li>
-                            <li>Add this token as a repository secret named <code>PAT_GITHUB</code> in your repository settings</li>
-                            <li>The included GitHub Actions workflow will use this secret for secure deployment</li>
-                        </ol>
-                    </div>
-                      <div class="form-group">
+                    
+                    <div class="form-group">
                         <label for="generator-linkedin">LinkedIn URL <span class="form-field-optional">(optional)</span></label>
                         <input type="text" id="generator-linkedin" placeholder="e.g. https://www.linkedin.com/in/johndoe/">
                         <div class="input-help">Full LinkedIn profile URL including https://</div>
@@ -116,23 +107,39 @@ function showGeneratorForm() {
                         <div class="input-help">Complete Instagram profile URL including https://</div>
                     </div>
                     
-                    <div class="form-info formspree-info">
-                        <p><strong>About Contact Form Integration</strong></p>
-                        <p>Your portfolio includes a contact form powered by Formspree, a free form backend service.</p>
-                        <p><strong>How to set up Formspree:</strong></p>
-                        <ol>
-                            <li>Create a free account at <a href="https://formspree.io" target="_blank">Formspree.io</a></li>
-                            <li>Create a new form and get your form ID (looks like <code>xrgjayzb</code>)</li>
-                            <li>Replace the form action URL in the contact section with your Formspree endpoint: <code>https://formspree.io/f/YOUR_FORM_ID</code></li>
-                        </ol>
+                    <div class="consolidated-info">
+                        <h3>Important Information</h3>
+                        
+                        <div class="info-section github-section">
+                            <h4>GitHub Authentication</h4>
+                            <p>For secure GitHub integration, this portfolio includes a GitHub Actions workflow for deployment.</p>
+                            <p><strong>How to set up your token:</strong></p>
+                            <ol>
+                                <li>Create a token with "public_repo" scope at <a href="https://github.com/settings/tokens" target="_blank">GitHub token settings</a></li>
+                                <li>Add this token as a repository secret named <code>PAT_GITHUB</code> in your repository settings</li>
+                                <li>The included GitHub Actions workflow will use this secret for secure deployment</li>
+                            </ol>
+                        </div>
+                        
+                        <div class="info-section formspree-section">
+                            <h4>Contact Form Integration</h4>
+                            <p>Your portfolio includes a contact form powered by Formspree, a free form backend service.</p>
+                            <p><strong>How to set up Formspree:</strong></p>
+                            <ol>
+                                <li>Create a free account at <a href="https://formspree.io" target="_blank">Formspree.io</a></li>
+                                <li>Create a new form and get your form ID (looks like <code>xrgjayzb</code>)</li>
+                                <li>Replace the form action URL in the contact section with your Formspree endpoint: <code>https://formspree.io/f/YOUR_FORM_ID</code></li>
+                            </ol>
+                        </div>
+                        
+                        <div class="info-section deployment-section">
+                            <h4>What happens next?</h4>
+                            <p>Clicking "Update My Portfolio" will update the social links and GitHub information in the website.</p>
+                            <p>You'll receive a ZIP file that you can upload to any web hosting service or GitHub Pages.</p>
+                            <p><strong>Secure Deployment:</strong> The generated package includes a GitHub Actions workflow (<code>.github/workflows/deploy.yml</code>) for secure deployment.</p>
+                        </div>
                     </div>
-                      <div class="form-info">
-                        <p><strong>What happens next?</strong></p>
-                        <p>Clicking "Update My Portfolio" will update the social links and GitHub information in the website.</p>
-                        <p>You'll receive a ZIP file that you can upload to any web hosting service or GitHub Pages.</p>
-                        <p><strong>Secure Deployment:</strong> The generated package includes a GitHub Actions workflow (<code>.github/workflows/deploy.yml</code>) for secure deployment. Add your token as a repository secret called <code>PAT_GITHUB</code> instead of including it in your code.</p>
-                    </div>
-                </div>                  <div class="loading-indicator">
+                </div><div class="loading-indicator">
                     <p>Updating your portfolio website...</p>
                     <div class="generator-progress">
                         <div class="progress-bar">
@@ -140,8 +147,7 @@ function showGeneratorForm() {
                         </div>
                         <div class="progress-status">Updating site files...</div>
                     </div>
-                </div>
-                  <div class="success-message">
+                </div>                <div class="success-message">
                     <h3>Success! 🎉</h3>
                     <p>Your portfolio website has been updated.</p>
                     <p>Download the ZIP file and upload it to your existing web hosting service!</p>
@@ -198,39 +204,68 @@ function showGeneratorForm() {
     });
     
     // Generate website event
-    generateButton.addEventListener('click', validateAndGenerate);
-      // Add CSS for new elements
+    generateButton.addEventListener('click', validateAndGenerate);      // Add CSS for new elements
     const style = document.createElement('style');
-    style.textContent = `        .form-info {
-            background-color: rgba(var(--primary-color-rgb), 0.1);
-            border-left: 3px solid var(--primary-color);
-            padding: 15px;
-            margin-top: 20px;
-            border-radius: 4px;
+    style.textContent = `        .consolidated-info {
+            background-color: rgba(var(--primary-color-rgb, 0, 120, 215), 0.05);
+            border: 1px solid rgba(var(--primary-color-rgb, 0, 120, 215), 0.2);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0 15px 0;
         }
         
-        .github-token-info {
-            background-color: rgba(var(--secondary-color-rgb, 0, 120, 215), 0.1);
+        .consolidated-info h3 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--primary-color, #0078d7);
+        }
+        
+        .info-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(var(--primary-color-rgb, 0, 120, 215), 0.1);
+        }
+        
+        .info-section:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .info-section h4 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: var(--secondary-color, #0078d7);
+            font-size: 1.1em;
+        }
+        
+        .github-section {
             border-left: 3px solid var(--secondary-color, #0078d7);
+            padding-left: 15px;
         }
         
-        .formspree-info {
-            background-color: rgba(var(--accent-color-rgb, 76, 175, 80), 0.1);
+        .formspree-section {
             border-left: 3px solid var(--accent-color, #4CAF50);
+            padding-left: 15px;
         }
         
-        .github-token-info ol,
-        .formspree-info ol {
+        .deployment-section {
+            border-left: 3px solid var(--primary-color, #0078d7);
+            padding-left: 15px;
+        }
+        
+        .info-section ol {
             margin: 10px 0;
             padding-left: 20px;
         }
         
-        .github-token-info li,
-        .formspree-info li {
+        .info-section li {
             margin-bottom: 5px;
         }
         
-        .form-info p {
+        .info-section p {
             margin: 5px 0;
             text-align: left;
         }
@@ -247,10 +282,32 @@ function showGeneratorForm() {
             margin: 10px 0;
             font-size: 0.9em;
         }
-        
-        .update-details ul {
+          .update-details ul {
             margin: 5px 0;
             padding-left: 20px;
+        }
+        
+        /* Styles for better information hierarchy and transitions */
+        .consolidated-info {
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .info-section {
+            transition: background-color 0.3s ease;
+        }
+        
+        .info-section:hover {
+            background-color: rgba(var(--primary-color-rgb, 0, 120, 215), 0.05);
+        }
+        
+        .generator-error-message {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     `;
     document.head.appendChild(style);
@@ -881,8 +938,7 @@ function showGenerationError(message) {
     if (loadingIndicator) loadingIndicator.classList.remove('active');
     if (formContent) formContent.style.display = 'block';
     if (formButtons) formButtons.style.display = 'flex';
-    
-    // Create a more user-friendly error notification
+      // Create a more user-friendly error notification
     // First, check if we already have an error message element
     let errorElement = document.querySelector('.generator-error-message');
     
@@ -891,16 +947,17 @@ function showGenerationError(message) {
         errorElement = document.createElement('div');
         errorElement.className = 'generator-error-message';
         
-        // Add some styling
+        // Add styling that matches our consolidated approach
         errorElement.style.backgroundColor = 'rgba(255, 0, 0, 0.1)';
         errorElement.style.border = '1px solid #ff0000';
-        errorElement.style.borderRadius = '4px';
+        errorElement.style.borderRadius = '8px';
         errorElement.style.padding = '15px';
         errorElement.style.margin = '15px 0';
         errorElement.style.color = '#ff0000';
         
         // Insert at the top of the form content
         if (formContent) {
+            // Insert it at the top of form content
             formContent.insertBefore(errorElement, formContent.firstChild);
         } else {
             // If formContent doesn't exist, try to find the generator form
