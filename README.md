@@ -112,12 +112,14 @@ This portfolio includes a GitHub Actions workflow for automatic deployment to Gi
 2. Go to your repository's Settings > Secrets and variables > Actions
 3. Add a new repository secret named `PAT_GITHUB` with your GitHub token
 4. Add another secret named `FORMSPREE_ID` with your Formspree form ID (see Contact Form setup below)
-5. Go to Settings > Pages and set the source to "GitHub Actions"
-6. Any push to the main branch will automatically deploy your portfolio
+5. Add a secret named `GOOGLE_VERIFICATION_CONTENT` with your Google site verification code (without the .html extension)
+6. Go to Settings > Pages and set the source to "GitHub Actions"
+7. Any push to the main branch will automatically deploy your portfolio
 
 The deployment workflow will:
 - Build and deploy your site to GitHub Pages
 - Make your PAT_GITHUB and FORMSPREE_ID tokens available during the build process
+- Create your Google site verification file for Search Console verification
 - Keep your tokens secure by using GitHub's secret management
 
 ## 📞 Contact Form Setup
@@ -143,6 +145,35 @@ The contact form uses [Formspree](https://formspree.io) to handle form submissio
      PAT_GITHUB=your_github_personal_access_token
      FORMSPREE_ID=your_formspree_id
      ```
+
+## 🔍 Setting Up Google Site Verification
+
+Adding your site to Google Search Console requires verifying ownership through a verification file.
+
+1. **Get Your Google Verification Code**:
+   - Go to [Google Search Console](https://search.google.com/search-console/welcome)
+   - Enter your website URL (e.g., `https://yourusername.github.io/portfolio`)
+   - Choose "HTML file" verification method
+   - Google will provide a verification filename that looks like: `google1234567890abcdef.html`
+   - Note down the filename **without** the `.html` extension (e.g., `google1234567890abcdef`)
+
+2. **Add as GitHub Secret**:
+   - Go to your GitHub repository
+   - Navigate to Settings > Secrets and Variables > Actions
+   - Click on "New repository secret"
+   - Name: `GOOGLE_VERIFICATION_CONTENT`
+   - Value: Your verification code (without `.html` extension)
+   - Click "Add secret"
+
+3. **How It Works**:
+   - The GitHub Actions workflow automatically creates your verification file during deployment
+   - The file will be created at the root of your site with the correct content
+   - Google Search Console can then verify your ownership of the site
+
+4. **Troubleshooting**:
+   - If verification fails, ensure the code is entered correctly without the `.html` extension
+   - Check that the workflow ran successfully and deployed your site
+   - Verify the file exists by visiting `https://yourusername.github.io/portfolio/google1234567890abcdef.html`
 
 ## 🛠️ Configuration
 
