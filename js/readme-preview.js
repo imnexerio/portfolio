@@ -79,8 +79,34 @@ function initReadmeHybridBehavior() {
         }
     });
     
-    // Hide preview when mouse leaves the preview in hover mode
+    // Add interactive hover effects to the preview window
+    modalPreview.addEventListener('mousemove', (e) => {
+        // Only apply 3D effect when preview is visible
+        if (modalPreview.style.display === 'none') return;
+        
+        const rect = modalPreview.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const mouseX = e.clientX - centerX;
+        const mouseY = e.clientY - centerY;
+        
+        // Calculate rotation based on mouse position (subtle effect)
+        const rotateY = (mouseX / (rect.width / 2)) * 5; // Max 5 degrees
+        const rotateX = -((mouseY / (rect.height / 2)) * 5); // Max 5 degrees
+        
+        // Apply 3D transform with smooth transition
+        requestAnimationFrame(() => {
+            modalPreview.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        });
+    });
+    
+    // Reset transform when mouse leaves in both modes
     modalPreview.addEventListener('mouseleave', () => {
+        // Reset 3D transform
+        requestAnimationFrame(() => {
+            modalPreview.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        });
+        
         if (isHoverMode && !isPreviewOpen) {
             leaveTimer = setTimeout(() => {
                 if (modalPreview.style.display !== 'none' && isHoverMode) {
@@ -195,8 +221,8 @@ function initReadmeHybridBehavior() {
         previewEl.style.boxShadow = '0 15px 40px rgba(0, 0, 0, 0.5)';
         previewEl.style.padding = '20px';
         previewEl.style.opacity = '0';
-        previewEl.style.cursor = 'pointer';
-        previewEl.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        previewEl.style.cursor = 'default';
+        previewEl.style.transition = 'opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease';
     }
     
     // Create the HTML content for the preview
@@ -247,12 +273,13 @@ document.addEventListener('DOMContentLoaded', () => {
             box-sizing: border-box;
             transform-origin: center center;
             will-change: transform, opacity;
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             pointer-events: auto;
+            transform-style: preserve-3d;
         }
         
         .portfolio-overlay-preview.repositioned {
-            transition: opacity 0.3s ease, transform 0.3s ease, top 0.2s ease, left 0.2s ease;
+            transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.2s ease, left 0.2s ease;
         }
         
         .portfolio-overlay-preview .preview-project {
@@ -268,12 +295,36 @@ document.addEventListener('DOMContentLoaded', () => {
             overflow: hidden;
             border-radius: 8px;
             margin-bottom: 15px;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .portfolio-overlay-preview .preview-image::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,0.3) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .portfolio-overlay-preview .preview-image:hover::after {
+            opacity: 1;
         }
         
         .portfolio-overlay-preview .preview-image img {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        
+        .portfolio-overlay-preview .preview-image:hover img {
+            transform: scale(1.1);
         }
         
         .portfolio-overlay-preview .preview-details {
@@ -288,6 +339,13 @@ document.addEventListener('DOMContentLoaded', () => {
             color: var(--primary-color, #3498db);
             font-size: 1.2rem;
             text-align: center;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+        
+        .portfolio-overlay-preview .preview-details h2:hover {
+            transform: translateY(-2px);
+            text-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
         }
         
         .portfolio-overlay-preview .project-category {
@@ -295,6 +353,11 @@ document.addEventListener('DOMContentLoaded', () => {
             font-size: 0.9rem;
             text-align: center;
             margin-bottom: 10px;
+            transition: color 0.3s ease;
+        }
+        
+        .portfolio-overlay-preview .project-category:hover {
+            color: #fff;
         }
         
         .portfolio-overlay-preview .project-description {
@@ -314,15 +377,40 @@ document.addEventListener('DOMContentLoaded', () => {
             text-decoration: none;
             font-weight: 500;
             font-size: 0.95rem;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             text-align: center;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .portfolio-overlay-preview .btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+        
+        .portfolio-overlay-preview .btn:hover::before {
+            width: 300px;
+            height: 300px;
         }
         
         .portfolio-overlay-preview .btn:hover {
             background-color: var(--primary-hover, #2980b9);
-            transform: translateY(-3px);
-            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 20px rgba(52, 152, 219, 0.5);
+        }
+        
+        .portfolio-overlay-preview .btn:active {
+            transform: translateY(-1px) scale(1.02);
+            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.4);
         }
         
         .preview-close-btn {
@@ -339,14 +427,19 @@ document.addEventListener('DOMContentLoaded', () => {
             justify-content: center;
             font-size: 20px;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             z-index: 10;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         .preview-close-btn:hover {
-            background-color: var(--primary-hover, #2980b9);
-            transform: scale(1.1);
+            background-color: #e74c3c;
+            transform: scale(1.2) rotate(90deg);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.5);
+        }
+        
+        .preview-close-btn:active {
+            transform: scale(1.1) rotate(90deg);
         }
         
         /* Responsive adjustments for the preview */
