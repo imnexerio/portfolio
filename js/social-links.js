@@ -31,10 +31,22 @@ function renderSocialLinks() {
     // Find all containers with class 'social-icons'
     const socialContainers = document.querySelectorAll('.social-icons');
     
+    // Check if viewing a guest profile
+    const isGuest = window.GitHubConfig && window.GitHubConfig.isGuestProfile();
+    
     // For each container, render the social links
     socialContainers.forEach(container => {
         // Clear existing content
         container.innerHTML = '';
+        
+        // If viewing guest profile, hide social links completely (Option 1)
+        if (isGuest) {
+            container.style.display = 'none';
+            return;
+        }
+        
+        // Show container for default profile
+        container.style.display = '';
         
         // Add each social link
         socialLinks.forEach(link => {

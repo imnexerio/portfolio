@@ -9,12 +9,36 @@
     <link rel="stylesheet" href="css/advanced-animations.css">
     <link rel="stylesheet" href="css/wow-effects.css">    <link rel="stylesheet" href="css/consolidated-responsive.css">    <link rel="stylesheet" href="css/github-stats.css">    <link rel="stylesheet" href="css/website-generator.css">
     <link rel="stylesheet" href="css/github-readme.css">
+    <link rel="stylesheet" href="css/dynamic-profile.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Scroll Progress Indicator -->
-    <div class="scroll-progress"></div>    <!-- Theme Switcher -->
+    <div class="scroll-progress"></div>
+    
+    <!-- Dynamic Profile Feature Banner -->
+    <div id="profile-feature-banner" class="profile-feature-banner" style="display: none;">
+        <div class="banner-content">
+            <span class="banner-icon">✨</span>
+            <span class="banner-text">
+                <strong>Try this!</strong> View any GitHub user's profile by adding <code>#username</code> to the URL
+                <span class="banner-example">(e.g., <a href="#torvalds">#torvalds</a> or <a href="#octocat">#octocat</a>)</span>
+            </span>
+            <button class="banner-close" onclick="closeBanner()" title="Dismiss">&times;</button>
+        </div>
+    </div>
+    
+    <!-- Guest Profile Indicator -->
+    <div id="guest-profile-indicator" class="guest-profile-indicator" style="display: none;">
+        <div class="guest-indicator-content">
+            <span class="guest-icon">👤</span>
+            <span class="guest-text">Viewing: <strong id="guest-username"></strong>'s profile</span>
+            <a href="." class="btn-back-default">View Default Profile</a>
+        </div>
+    </div>
+    
+    <!-- Theme Switcher -->
     <div class="theme-switcher">
         <div class="theme-btn toggle-theme magnetic" data-theme="light" title="Toggle Light/Dark Theme">
             <i class="fas fa-sun"></i>
@@ -302,6 +326,52 @@
     <script src="js/github-stats.js"></script>
     <script src="js/optimized-main.js"></script>
     <script src="js/social-links.js"></script>
+    <script>
+        // Dynamic profile banner management
+        function closeBanner() {
+            const banner = document.getElementById('profile-feature-banner');
+            if (banner) {
+                banner.style.display = 'none';
+                // Use sessionStorage so banner shows again on next browser session
+                sessionStorage.setItem('featureBannerDismissed', 'true');
+            }
+        }
+        
+        // Handle hash changes for dynamic profile switching
+        window.addEventListener('hashchange', function() {
+            // Reload the page when hash changes to update profile
+            window.location.reload();
+        });
+        
+        // Show appropriate banner based on profile type
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.GitHubConfig) {
+                const isGuest = GitHubConfig.isGuestProfile();
+                const isDynamic = GitHubConfig.isDynamicMode();
+                
+                if (isGuest) {
+                    // Show guest profile indicator
+                    const indicator = document.getElementById('guest-profile-indicator');
+                    const usernameSpan = document.getElementById('guest-username');
+                    if (indicator && usernameSpan) {
+                        usernameSpan.textContent = '@' + GitHubConfig.getUsername();
+                        indicator.style.display = 'block';
+                    }
+                } else if (isDynamic) {
+                    // Show feature banner (only if not dismissed this session)
+                    const dismissed = sessionStorage.getItem('featureBannerDismissed');
+                    if (!dismissed) {
+                        const banner = document.getElementById('profile-feature-banner');
+                        if (banner) {
+                            setTimeout(() => {
+                                banner.style.display = 'block';
+                            }, 2000); // Show after 2 seconds
+                        }
+                    }
+                }
+            }
+        });
+    </script>
     <script src="js/readme-preview.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="js/website-generator.js"></script>

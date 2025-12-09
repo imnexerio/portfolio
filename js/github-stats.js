@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', () => {
 async function initGitHubStats() {
     const username = GitHubConfig.getUsername();
     
+    // Validate username
+    if (!username || !GitHubConfig.validateUsername(username)) {
+        console.error('Invalid GitHub username:', username);
+        showUserNotFoundError('Invalid username format');
+        return;
+    }
+    
     try {
         // Get headers from config
         const headers = GitHubConfig.getAuthHeaders();
@@ -27,6 +34,11 @@ async function initGitHubStats() {
         console.log(`GitHub Stats: Rate limit remaining: ${rateLimitRemaining}`);
         
         if (!userResponse.ok) {
+            if (userResponse.status === 404) {
+                console.error('GitHub Stats: User not found:', username);
+                showUserNotFoundError(username);
+                return;
+            }
             if (userResponse.status === 403 && rateLimitRemaining === '0') {
                 console.error('GitHub Stats: Rate limit exceeded');
                 showStatsError('GitHub API rate limit exceeded. Please try again later.');
@@ -815,6 +827,77 @@ function createSkillElement(name, percentage, delay) {
     `;
     
     return skillItem;
+}
+
+// Show user not found error with pleasant message
+function showUserNotFoundError(username) {
+    const message = `User "${username}" doesn't exist on GitHub`;
+    console.error('GitHub Stats Error:', message);
+    
+    // Create a pleasant error overlay
+    const errorOverlay = document.createElement('div');
+    errorOverlay.className = 'user-error-overlay';
+    errorOverlay.innerHTML = `
+        <div class="user-error-content">
+            <div class="user-error-icon">😕</div>
+            <h2>User Not Found</h2>
+            <p>The GitHub user <strong>"${username}"</strong> doesn't exist.</p>
+            <p class="error-hint">Please check the username and try again.</p>
+            <a href="${window.location.pathname}" class="btn primary-btn magnetic">Go to Default Profile</a>
+        </div>
+    `;
+    
+    // Add styles for the error overlay
+    const style = document.createElement('style');
+    style.textContent = `
+        .user-error-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color, #ffffff);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        }
+        .user-error-content {
+            text-align: center;
+            padding: 40px;
+            max-width: 500px;
+        }
+        .user-error-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        .user-error-content h2 {
+            color: var(--text-color, #333);
+            margin-bottom: 15px;
+        }
+        .user-error-content p {
+            color: var(--text-muted, #666);
+            margin-bottom: 10px;
+        }
+        .user-error-content strong {
+            color: var(--primary-color, #0078d7);
+        }
+        .error-hint {
+            font-size: 0.9em;
+            font-style: italic;
+        }
+        .user-error-content .btn {
+            margin-top: 20px;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    `;
+    
+    document.head.appendChild(style);
+    document.body.appendChild(errorOverlay);
 }
 
 // Show error message when stats can't be loaded

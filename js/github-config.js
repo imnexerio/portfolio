@@ -9,6 +9,9 @@
 window.GitHubConfig = (function() {    // Private GitHub credentials
     const _username = 'imnexerio';
     
+    // Allow dynamic username from URL parameters (set to false for generated sites)
+    const _allowDynamic = true;
+    
     // Try to get token from environment variables for local development
     // 1. Check window.env (from .env file loader for local dev)
     // 2. Empty string for production (should use PAT_GITHUB in GitHub Actions)
@@ -35,11 +38,78 @@ window.GitHubConfig = (function() {    // Private GitHub credentials
         sortBy: 'updated'             // How to sort repositories
     };
     
+    // Helper function to get username from URL
+    function getUsernameFromURL() {
+        // Priority 1: Check hash params (cleaner URLs)
+        const hash = window.location.hash.slice(1); // Remove #
+        if (hash) {
+            // Support both formats:
+            // #octocat (clean format - preferred)
+            // #user=octocat (explicit format)
+            const hashMatch = hash.match(/^(?:user=)?([^&]+)/);
+            if (hashMatch) {
+                const username = hashMatch[1].trim();
+                if (username) return username;
+            }
+        }
+        
+        // Priority 2: Fall back to query params (?user=username)
+        const urlParams = new URLSearchParams(window.location.search);
+        const searchParam = urlParams.get('user');
+        if (searchParam) return searchParam.trim();
+        
+        return null;
+    }
+    
+    // Validate username format (only alphanumeric and hyphens)
+    function validateUsername(username) {
+        if (!username || typeof username !== 'string') return false;
+        // GitHub usernames: alphanumeric and hyphens, max 39 chars
+        return /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/.test(username);
+    }
+    
     // Public API
     return {
-        // Get GitHub username
+        // Get GitHub username (with dynamic support)
         getUsername: function() {
+            // If dynamic mode is allowed, check URL first
+            if (_allowDynamic) {
+                const urlUsername = getUsernameFromURL();
+                if (urlUsername) {
+                    // Validate the username from URL
+                    if (validateUsername(urlUsername)) {
+                        return urlUsername;
+                    } else {
+                        console.warn('Invalid username format from URL:', urlUsername);
+                        // Fall back to default
+                        return _username;
+                    }
+                }
+            }
+            // Return default username
             return _username;
+        },
+        
+        // Get the default/configured username (ignoring URL)
+        getDefaultUsername: function() {
+            return _username;
+        },
+        
+        // Check if currently viewing a guest profile
+        isGuestProfile: function() {
+            if (!_allowDynamic) return false;
+            const urlUsername = getUsernameFromURL();
+            return urlUsername && validateUsername(urlUsername) && urlUsername !== _username;
+        },
+        
+        // Check if dynamic mode is enabled
+        isDynamicMode: function() {
+            return _allowDynamic;
+        },
+        
+        // Validate username format
+        validateUsername: function(username) {
+            return validateUsername(username);
         },
         
         // Get GitHub token

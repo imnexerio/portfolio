@@ -74,12 +74,40 @@
       </td>
       <td align="center">
         <img src="https://github.githubassets.com/images/modules/profile/achievements/public-sponsor-default.png" width="50px"><br>
-        <b>Self-Deployable</b><br>
-        <sub>Generate customized versions</sub>
+        <b>Dynamic Profile Viewer</b><br>
+        <sub>View any GitHub user's profile via URL</sub>
       </td>
     </tr>
   </table>
 </div>
+
+### 🔥 **NEW: Dynamic Profile Viewer**
+
+View **any GitHub user's profile** using clean hash-based URLs:
+
+```
+https://yoursite.com/#octocat         → View Octocat's profile
+https://yoursite.com/#torvalds        → View Linus Torvalds' profile
+https://yoursite.com/                 → View default profile
+```
+
+**Alternative formats also supported:**
+```
+https://yoursite.com/#user=octocat    → Explicit hash format
+https://yoursite.com/?user=octocat    → Query parameter format
+```
+
+**Features:**
+- ✅ Real-time GitHub data fetching for any user
+- ✅ Clean hash-based URLs (e.g., `#octocat`)
+- ✅ Automatic error handling for non-existent users
+- ✅ Security validation to prevent malicious input
+- ✅ Guest profile indicator showing whose profile is being viewed
+- ✅ Social links hidden for guest profiles (privacy)
+- ✅ Generated portfolios are locked to owner (no URL override)
+- ✅ Works on all static hosting platforms (GitHub Pages, Netlify, Vercel)
+
+**Note:** The demo site allows dynamic viewing, but portfolios generated via the website generator are locked to the owner's profile for security.
 
 ## 🖥️ Demo
 

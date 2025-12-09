@@ -426,6 +426,10 @@ function generateGithubConfigFile(config) {    return `/**
 window.GitHubConfig = (function() {
     // Private GitHub credentials
     const _username = '${config.github.username}';
+    
+    // Dynamic mode disabled for generated sites (locked to owner)
+    const _allowDynamic = false;
+    
     // Get token from environment variable or leave empty for public access
     const _token = ''; // Token should be set as PAT_GITHUB in GitHub repository secrets
     
@@ -678,6 +682,7 @@ function collectWebsiteFiles() {
             'css/github-stats.css',
             'css/github-readme.css',
             'css/website-generator.css',
+            'css/dynamic-profile.css',
             'js/github-stats.js',
             'js/optimized-main.js',
             'js/website-generator.js',
