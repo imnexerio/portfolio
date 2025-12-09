@@ -1,0 +1,232 @@
+    /**
+ * Dynamic Profile Feature Styles
+ * Styles for profile viewer banners and indicators
+ */
+
+/* Feature Banner - appears for default profile to inform about dynamic feature */
+.profile-feature-banner {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, var(--primary-color, #0078d7), var(--secondary-color, #005a9e));
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+    animation: slideDown 0.5s ease, pulse 2s ease-in-out infinite;
+    max-width: 90%;
+    width: auto;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+        box-shadow: 0 8px 40px rgba(0, 120, 215, 0.4);
+    }
+}
+
+.banner-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.banner-icon {
+    font-size: 24px;
+    animation: rotate 3s linear infinite;
+}
+
+@keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.banner-text {
+    flex: 1;
+    min-width: 250px;
+}
+
+.banner-text code {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+}
+
+.banner-example {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 0.9em;
+    opacity: 0.9;
+}
+
+.banner-example a {
+    color: white;
+    text-decoration: underline;
+    font-weight: 600;
+    margin: 0 3px;
+}
+
+.banner-example a:hover {
+    opacity: 0.8;
+    text-decoration: none;
+}
+
+.banner-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    font-size: 24px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    line-height: 1;
+}
+
+.banner-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg);
+}
+
+/* Guest Profile Indicator - shows when viewing someone else's profile */
+.guest-profile-indicator {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 12px 25px;
+    border-radius: 10px;
+    box-shadow: 0 6px 24px rgba(102, 126, 234, 0.3);
+    z-index: 9999;
+    animation: slideDown 0.5s ease;
+    max-width: 90%;
+    width: auto;
+}
+
+.guest-indicator-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.guest-icon {
+    font-size: 20px;
+}
+
+.guest-text {
+    flex: 1;
+    font-size: 16px;
+}
+
+.guest-text strong {
+    font-weight: 700;
+    color: #fff;
+}
+
+.btn-back-default {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 6px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.btn-back-default:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .profile-feature-banner,
+    .guest-profile-indicator {
+        top: 70px;
+        padding: 12px 15px;
+        max-width: 95%;
+    }
+    
+    .banner-content,
+    .guest-indicator-content {
+        gap: 10px;
+    }
+    
+    .banner-icon {
+        font-size: 20px;
+    }
+    
+    .banner-text {
+        font-size: 14px;
+        min-width: 200px;
+    }
+    
+    .banner-example {
+        display: block;
+        margin-left: 0;
+        margin-top: 5px;
+    }
+    
+    .guest-text {
+        font-size: 14px;
+    }
+    
+    .btn-back-default {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-feature-banner,
+    .guest-profile-indicator {
+        top: 65px;
+        padding: 10px 12px;
+    }
+    
+    .banner-text {
+        font-size: 13px;
+    }
+    
+    .banner-text code {
+        font-size: 0.85em;
+    }
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .profile-feature-banner {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+}
+
+[data-theme="dark"] .guest-profile-indicator {
+    background: linear-gradient(135deg, #4c1d95 0%, #5b21b6 100%);
+}
