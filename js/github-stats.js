@@ -1047,45 +1047,61 @@ async function fetchGitHubProjects() {
             portfolioItem.style.transform = 'scale(1)';
             portfolioItem.style.cursor = 'pointer'; // Add pointer cursor to indicate item is clickable
             
-            // Try to use custom preview images from the repository's main branch
+            // Try to use custom preview images from the repository's default branch (main or master)
             // First try PNG (faster loading) then switch to GIF (for animation)
-            const customPreviewPngUrl = `https://raw.githubusercontent.com/${user}/${repo.name}/main/public-portfolio/preview.png`;
-            const customPreviewGifUrl = `https://raw.githubusercontent.com/${user}/${repo.name}/main/public-portfolio/preview.gif`;
+            const branches = ['main', 'master'];
             const githubOgPreviewUrl = `https://opengraph.githubassets.com/1/${user}/${repo.name}`;
             const fallbackImageUrl = `https://github.com/identicons/${repo.name}.png`;
             
             // Use the GitHub OpenGraph image as initial fallback
             let imageUrl = githubOgPreviewUrl;
             
-            // First check if preview.png exists
-            const imgTestPng = new Image();
-            imgTestPng.onload = function() {                // If PNG exists, update immediately as it's faster to load
-                const imgElement = portfolioItem.querySelector('.portfolio-img img');
-                if (imgElement) {
-                    imgElement.src = customPreviewPngUrl;
-                }
-                // Also update the project details for the modal
-                if (details[index + 1]) {
-                    details[index + 1].image = customPreviewPngUrl;
-                }
+            // Helper function to try loading preview from a specific branch
+            function tryLoadPreviewFromBranch(branchIndex) {
+                if (branchIndex >= branches.length) return; // No more branches to try
                 
-                // Then try to load the GIF in the background
-                const imgTestGif = new Image();
-                imgTestGif.onload = function() {
-                    // When GIF is loaded, switch to it for animation
+                const branch = branches[branchIndex];
+                const customPreviewPngUrl = `https://raw.githubusercontent.com/${user}/${repo.name}/${branch}/public-portfolio/preview.png`;
+                const customPreviewGifUrl = `https://raw.githubusercontent.com/${user}/${repo.name}/${branch}/public-portfolio/preview.gif`;
+                
+                const imgTestPng = new Image();
+                imgTestPng.onload = function() {
+                    // If PNG exists, update immediately as it's faster to load
                     const imgElement = portfolioItem.querySelector('.portfolio-img img');
                     if (imgElement) {
-                        imgElement.src = customPreviewGifUrl;
+                        imgElement.src = customPreviewPngUrl;
                     }
-                    // Update project details to use GIF for modal
+                    // Also update the project details for the modal
                     if (details[index + 1]) {
-                        details[index + 1].image = customPreviewGifUrl;
+                        details[index + 1].image = customPreviewPngUrl;
                     }
+                    
+                    // Then try to load the GIF in the background
+                    const imgTestGif = new Image();
+                    imgTestGif.onload = function() {
+                        // When GIF is loaded, switch to it for animation
+                        const imgElement = portfolioItem.querySelector('.portfolio-img img');
+                        if (imgElement) {
+                            imgElement.src = customPreviewGifUrl;
+                        }
+                        // Update project details to use GIF for modal
+                        if (details[index + 1]) {
+                            details[index + 1].image = customPreviewGifUrl;
+                        }
+                    };
+                    // Set the source to test if GIF exists
+                    imgTestGif.src = customPreviewGifUrl;
                 };
-                // Set the source to test if GIF exists
-                imgTestGif.src = customPreviewGifUrl;
-            };            // Set the source to test if PNG exists
-            imgTestPng.src = customPreviewPngUrl;
+                imgTestPng.onerror = function() {
+                    // PNG not found on this branch, try next branch
+                    tryLoadPreviewFromBranch(branchIndex + 1);
+                };
+                // Set the source to test if PNG exists
+                imgTestPng.src = customPreviewPngUrl;
+            }
+            
+            // Start trying to load preview from branches (main first, then master)
+            tryLoadPreviewFromBranch(0);
             
             // Store project details for modal
             details[projectId] = {
