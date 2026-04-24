@@ -426,7 +426,7 @@ function initCreatorTypingEffect() {
     const typedMessage = document.querySelector('.typed-message');
     if (!creatorBtn || !typedMessage) return;
     
-    const message = "Create your own portfolio - It's free!";
+    const message = "Clone this template for free";
     let charIndex = 0;
     let typeTimeout = null;
     let isHovered = false;
