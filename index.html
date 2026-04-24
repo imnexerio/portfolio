@@ -339,8 +339,14 @@
         
         // Handle hash changes for dynamic profile switching
         window.addEventListener('hashchange', function() {
-            // Reload the page when hash changes to update profile
-            window.location.reload();
+            // Reload the page when hash changes to update profile, unless it's an internal section link
+            const hash = window.location.hash.slice(1);
+            const internalSections = ['hero', 'about', 'skills', 'portfolio', 'contact'];
+            
+            // Only reload if the hash is not empty and not an internal link
+            if (hash && !internalSections.includes(hash.toLowerCase())) {
+                window.location.reload();
+            }
         });
         
         // Show appropriate banner based on profile type

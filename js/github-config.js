@@ -49,7 +49,12 @@ window.GitHubConfig = (function() {    // Private GitHub credentials
             const hashMatch = hash.match(/^(?:user=)?([^&]+)/);
             if (hashMatch) {
                 const username = hashMatch[1].trim();
-                if (username) return username;
+                
+                // Blocklist of internal sections that shouldn't be treated as user profiles
+                const internalSections = ['hero', 'about', 'skills', 'portfolio', 'contact'];
+                if (username && !internalSections.includes(username.toLowerCase())) {
+                    return username;
+                }
             }
         }
         
