@@ -1533,63 +1533,7 @@ section:nth-child(even) {
     }
 }
 
-.website-creator-btn {
-    display: flex;
-    align-items: center;
-    padding: 10px 15px;
-    border-radius: 25px;
-    background: var(--primary-color);
-    color: white;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.website-creator-btn:hover {
-    transform: scale(1.05);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.website-creator-btn i {
-    font-size: 16px;
-    margin-right: 10px;
-}
-
-.typed-container {
-    display: block;
-    white-space: nowrap;
-    font-size: 14px;
-}
-
-.typed-message {
-    display: inline-block;
-    position: relative;
-}
-
-.typed-message::after {
-    content: '|';
-    position: absolute;
-    right: -8px;
-    animation: blink 0.7s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-
-.typed-message::after {
-    content: '|';
-    position: absolute;
-    right: -8px;
-    animation: blink 0.7s infinite;
-}
-
-@keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0; }
-}
-
+/* Website Creator styles relocated entirely to website-generator.css to avoid conflicts */
 #user-bio, #user-bio-continued {
     margin-bottom: 1rem;
     line-height: 1.7;

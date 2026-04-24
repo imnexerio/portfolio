@@ -422,38 +422,44 @@ function initTypingEffect() {
  * Creator Button Typing Animation
  */
 function initCreatorTypingEffect() {
+    const creatorBtn = document.querySelector('.website-creator-btn.create');
     const typedMessage = document.querySelector('.typed-message');
-    if (!typedMessage) return;
+    if (!creatorBtn || !typedMessage) return;
     
     const message = "Create your own portfolio - It's free!";
     let charIndex = 0;
-    let isDeleting = false;
-    let typingSpeed = 100;
+    let typeTimeout = null;
+    let isHovered = false;
+    
+    // Clear any initial text so it fits the circular button default state
+    typedMessage.textContent = "";
     
     function type() {
-        if (isDeleting) {
-            typedMessage.textContent = message.substring(0, charIndex - 1);
-            charIndex--;
-            typingSpeed = 50;
-        } else {
+        if (!isHovered) return;
+        
+        if (charIndex < message.length) {
             typedMessage.textContent = message.substring(0, charIndex + 1);
             charIndex++;
-            typingSpeed = 100;
+            typeTimeout = setTimeout(type, 40); // Type faster on hover
         }
-        
-        if (!isDeleting && charIndex === message.length) {
-            isDeleting = true;
-            typingSpeed = 2000; // Pause at the end of message
-        } else if (isDeleting && charIndex === 0) {
-            isDeleting = false;
-            typingSpeed = 500; // Pause before retyping
-        }
-        
-        setTimeout(type, typingSpeed);
     }
     
-    // Start typing immediately
-    setTimeout(type, 1000);
+    // Start typing on hover
+    creatorBtn.addEventListener('mouseenter', () => {
+        isHovered = true;
+        charIndex = 0;
+        typedMessage.textContent = "";
+        clearTimeout(typeTimeout);
+        // Delay slightly so the expand animation runs first
+        typeTimeout = setTimeout(type, 200); 
+    });
+    
+    // Reset and hide text on mouse leave
+    creatorBtn.addEventListener('mouseleave', () => {
+        isHovered = false;
+        clearTimeout(typeTimeout);
+        typedMessage.textContent = ""; 
+    });
 }
 
 
