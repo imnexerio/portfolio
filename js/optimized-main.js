@@ -1278,3 +1278,109 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+/* ========================================================================= */
+/* 3D Animated Cubes Background System
+/* ========================================================================= */
+
+// Initialize 3D Background when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    init3DBackground();
+});
+
+function getResponsiveConfig() {
+    const width = window.innerWidth;
+    
+    if (width < 768) { // Mobile
+        return {
+            cubeCount: 2,
+            cubeSize: '70px',
+            positions: [
+                { left: '10%', top: '20%' },
+                { right: '10%', top: '60%' }
+            ]
+        };
+    } else if (width < 1024) { // Tablet
+        return {
+            cubeCount: 3,
+            cubeSize: '100px',
+            positions: [
+                { left: '8%', top: '25%' },
+                { right: '12%', top: '40%' },
+                { left: '20%', bottom: '30%' }
+            ]
+        };
+    } else { // Desktop
+        return {
+            cubeCount: 4,
+            cubeSize: '130px',
+            positions: [
+                { left: '8%', top: '20%' },
+                { right: '10%', top: '35%' },
+                { left: '18%', bottom: '25%' },
+                { right: '20%', top: '60%' }
+            ]
+        };
+    }
+}
+
+function init3DBackground() {
+    const bgContainer = document.getElementById('animated-bg');
+    if (!bgContainer) return;
+    
+    // Initial creation
+    createAnimatedCubes(bgContainer, getResponsiveConfig());
+    
+    // Handle resize with debounce safely
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            bgContainer.innerHTML = '';
+            createAnimatedCubes(bgContainer, getResponsiveConfig());
+        }, 300);
+    });
+}
+
+function createAnimatedCubes(container, config) {
+    const iconSets = [
+        ['🧠', '📚', '⚡', '🎯', '🚀', '🔮', '🔭', '🎨'],
+        ['⚙️', '🎵', '🌈', '💫', '🔥', '🎉']
+    ];
+    
+    const faces = ['front', 'back', 'right', 'left', 'top', 'bottom'];
+    
+    for (let i = 0; i < config.cubeCount; i++) {
+        const position = config.positions[i];
+        const currentIcons = iconSets[i % iconSets.length];
+        
+        // Create cube container
+        const cubeContainer = document.createElement('div');
+        cubeContainer.className = 'cube-container-3d';
+        
+        // Set position dynamically
+        Object.keys(position).forEach(key => {
+            cubeContainer.style[key] = position[key];
+        });
+        
+        // Create cube spinning wrapper
+        const cube = document.createElement('div');
+        cube.className = 'cube-3d';
+        cube.style.width = config.cubeSize;
+        cube.style.height = config.cubeSize;
+        
+        // Stagger animation delays to make it look organic
+        cube.style.animationDelay = `${i * 3}s`;
+        
+        // Create 6 mathematical faces of a cube
+        faces.forEach((face, faceIndex) => {
+            const cubeFace = document.createElement('div');
+            cubeFace.className = `cube-face-3d ${face}`;
+            cubeFace.innerHTML = currentIcons[faceIndex];
+            cube.appendChild(cubeFace);
+        });
+        
+        cubeContainer.appendChild(cube);
+        container.appendChild(cubeContainer);
+    }
+}

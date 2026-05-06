@@ -1,5 +1,87 @@
 /* Advanced Scroll Effects and Animations */
 
+/* 3D Animated Background System */
+.animated-3d-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    z-index: -1;
+    pointer-events: none;
+    perspective: 1000px;
+    will-change: transform;
+}
+
+.cube-3d {
+    position: relative;
+    transform-style: preserve-3d;
+    animation: cube-rotate-smooth 20s linear infinite;
+    will-change: transform;
+}
+
+.cube-container-3d {
+    position: absolute;
+    transform-style: preserve-3d;
+    will-change: transform;
+}
+
+.cube-face-3d {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, 
+        rgba(var(--primary-color-rgb, 108, 99, 255), 0.1) 0%, 
+        rgba(var(--secondary-color-rgb, 0, 255, 252), 0.1) 100%);
+    border: 1px solid rgba(var(--primary-color-rgb, 108, 99, 255), 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+}
+
+[data-theme="dark"] .cube-face-3d {
+    background: linear-gradient(135deg, 
+        rgba(var(--primary-color-rgb, 108, 99, 255), 0.15) 0%, 
+        rgba(var(--secondary-color-rgb, 0, 255, 252), 0.15) 100%);
+    border-color: rgba(var(--primary-color-rgb, 108, 99, 255), 0.3);
+}
+
+@keyframes cube-rotate-smooth {
+    0% { transform: rotateX(0deg) rotateY(0deg); }
+    100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@media (max-width: 767px) {
+    .cube-face-3d { width: 70px; height: 70px; font-size: 12px; }
+    .cube-face-3d.front { transform: rotateY(0deg) translateZ(35px); }
+    .cube-face-3d.back { transform: rotateY(180deg) translateZ(35px); }
+    .cube-face-3d.right { transform: rotateY(90deg) translateZ(35px); }
+    .cube-face-3d.left { transform: rotateY(-90deg) translateZ(35px); }
+    .cube-face-3d.top { transform: rotateX(90deg) translateZ(35px); }
+    .cube-face-3d.bottom { transform: rotateX(-90deg) translateZ(35px); }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .cube-face-3d { width: 100px; height: 100px; font-size: 16px; }
+    .cube-face-3d.front { transform: rotateY(0deg) translateZ(50px); }
+    .cube-face-3d.back { transform: rotateY(180deg) translateZ(50px); }
+    .cube-face-3d.right { transform: rotateY(90deg) translateZ(50px); }
+    .cube-face-3d.left { transform: rotateY(-90deg) translateZ(50px); }
+    .cube-face-3d.top { transform: rotateX(90deg) translateZ(50px); }
+    .cube-face-3d.bottom { transform: rotateX(-90deg) translateZ(50px); }
+}
+
+@media (min-width: 1024px) {
+    .cube-face-3d { width: 130px; height: 130px; font-size: 20px; }
+    .cube-face-3d.front { transform: rotateY(0deg) translateZ(65px); }
+    .cube-face-3d.back { transform: rotateY(180deg) translateZ(65px); }
+    .cube-face-3d.right { transform: rotateY(90deg) translateZ(65px); }
+    .cube-face-3d.left { transform: rotateY(-90deg) translateZ(65px); }
+    .cube-face-3d.top { transform: rotateX(90deg) translateZ(65px); }
+    .cube-face-3d.bottom { transform: rotateX(-90deg) translateZ(65px); }
+}
+
 /* Parallax and 3D Effects */
 .parallax-section {
   position: relative;
